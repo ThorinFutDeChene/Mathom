@@ -249,39 +249,39 @@ void BNPView::setupGlobalShortcuts()
     a = ac->addAction(QStringLiteral("global_note_add_html"), this, &BNPView::addNoteHtml);
     a->setText(i18n("Insert text mathom"));
     a->setStatusTip(
-        i18n("Add a text note to the current basket without having to open "
+        i18n("Add a text mathom to the current location without having to open "
              "the main window."));
     KGlobalAccel::setGlobalShortcut(a, (QKeySequence(modifier | Qt::Key_T)));
 
     a = ac->addAction(QStringLiteral("global_note_add_image"), this, &BNPView::addNoteImage);
     a->setText(i18n("Insert image mathom"));
     a->setStatusTip(
-        i18n("Add an image note to the current basket without having to open "
+        i18n("Add an image mathom to the current location without having to open "
              "the main window."));
 
     a = ac->addAction(QStringLiteral("global_note_add_link"), this, &BNPView::addNoteLink);
     a->setText(i18n("Insert link mathom"));
     a->setStatusTip(
-        i18n("Add a link note to the current basket without having "
+        i18n("Add a link mathom to the current location without having "
              "to open the main window."));
 
     a = ac->addAction(QStringLiteral("global_note_add_color"), this, &BNPView::addNoteColor);
     a->setText(i18n("Insert color mathom"));
     a->setStatusTip(
-        i18n("Add a color note to the current basket without having to open "
+        i18n("Add a color mathom to the current location without having to open "
              "the main window."));
 
     a = ac->addAction(QStringLiteral("global_note_pick_color"), this, &BNPView::slotColorFromScreen);
     a->setText(i18n("Pick color from screen"));
     a->setStatusTip(
-        i18n("Add a color note picked from one pixel on screen to the current "
-             "basket without "
+        i18n("Add a color mathom picked from one pixel on screen to the current "
+             "location without "
              "having to open the main window."));
 
     a = ac->addAction(QStringLiteral("global_note_grab_screenshot"), this, &BNPView::grabScreenshot);
     a->setText(i18n("Grab screen zone"));
     a->setStatusTip(
-        i18n("Grab a screen zone as an image in the current basket without "
+        i18n("Grab a screen zone as an image mathom in the current location without "
              "having to open the main window."));
 
 #if 0
@@ -289,7 +289,7 @@ void BNPView::setupGlobalShortcuts()
                       &BNPView::addNoteText);
     a->setText(i18n("Insert plain text mathom"));
     a->setStatusTip(
-        i18n("Add a plain text note to the current basket without having to "
+        i18n("Add a plain text mathom to the current location without having to "
              "open the main window."));
 #endif
 }
@@ -343,11 +343,11 @@ void BNPView::initialize()
 
     /// What's This Help for the tree:
     m_tree->setWhatsThis(
-        i18n("<h2>Basket Tree</h2>"
-             "Here is the list of your baskets. "
-             "You can organize your data by putting them in different baskets. "
-             "You can group baskets by subject by creating new baskets inside others. "
-             "You can browse between them by clicking a basket to open it, or reorganize them using drag and drop."));
+        i18n("<h2>Organization Tree</h2>"
+             "Here is the list of your Mathom-Houses and shelves. "
+             "You can organize your mathoms by placing them in different locations. "
+             "You can create shelves inside Mathom-Houses and other shelves to form a hierarchy. "
+             "You can browse between locations by clicking them, or reorganize them using drag and drop."));
 
     setTreePlacement(Settings::treeOnLeft());
 }

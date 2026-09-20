@@ -51,7 +51,7 @@ void Archive::save(BasketScene *basket, bool withSubBaskets, const QString &dest
     QDir dir;
     QProgressDialog dialog;
     dialog.setWindowTitle(i18n("Save as Mathom-House Archive"));
-    dialog.setLabelText(i18n("Saving as basket archive. Please wait..."));
+    dialog.setLabelText(i18n("Saving as Mathom-House archive. Please wait..."));
     dialog.setCancelButton(nullptr);
     dialog.setAutoClose(true);
 
@@ -264,32 +264,32 @@ void Archive::open(const QString &path)
 
     switch (extractArchive(path, tempFolder, false)) {
     case IOErrorCode::FailedToOpenResource:
-        KMessageBox::error(nullptr, i18n("Failed to open a file resource."), i18n("Basket Archive Error"));
+        KMessageBox::error(nullptr, i18n("Failed to open a file resource."), i18n("Mathom-House Archive Error"));
         break;
     case IOErrorCode::NotABasketArchive:
-        KMessageBox::error(nullptr, i18n("This file is not a basket archive."), i18n("Basket Archive Error"));
+        KMessageBox::error(nullptr, i18n("This file is not a Mathom-House archive."), i18n("Mathom-House Archive Error"));
         break;
     case IOErrorCode::CorruptedBasketArchive:
-        KMessageBox::error(nullptr, i18n("This file is corrupted. It can not be opened."), i18n("Basket Archive Error"));
+        KMessageBox::error(nullptr, i18n("This file is corrupted. It can not be opened."), i18n("Mathom-House Archive Error"));
         break;
     case IOErrorCode::DestinationExists:
-        KMessageBox::error(nullptr, i18n("Extraction path already exists."), i18n("Basket Archive Error"));
+        KMessageBox::error(nullptr, i18n("Extraction path already exists."), i18n("Mathom-House Archive Error"));
         break;
     case IOErrorCode::IncompatibleBasketVersion:
         KMessageBox::error(nullptr,
                            i18n("This file was created with a recent version of %1."
                                 "Please upgrade to a newer version to be able to open that file.",
                                 QGuiApplication::applicationDisplayName()),
-                           i18n("Basket Archive Error"));
+                           i18n("Mathom-House Archive Error"));
         break;
     case IOErrorCode::PossiblyCompatibleBasketVersion:
         KMessageBox::information(nullptr,
                                  i18n("This file was created with a recent version of %1. "
                                       "It can be opened but not every information will be available to you. "
-                                      "For instance, some notes may be missing because they are of a type only available in new versions. "
+                                      "For instance, some mathoms may be missing because they are of a type only available in new versions. "
                                       "When saving the file back, consider to save it to another file, to preserve the original one.",
                                       QGuiApplication::applicationDisplayName()),
-                                 i18n("Basket Archive Error"));
+                                 i18n("Mathom-House Archive Error"));
         [[fallthrough]];
     case IOErrorCode::NoError:
         if (Global::activeMainWindow()) {

@@ -230,11 +230,11 @@ NewBasketDialog::NewBasketDialog(BasketScene *parentBasket, const NewBasketDefau
     label->setText(i18n("C&reate in:"));
     label->setBuddy(m_createIn);
     auto *helpLabel = new HelpLabel(i18n("How is it useful?"),
-                                    i18n("<p>Creating baskets inside of other baskets to form a hierarchy allows you to be more organized by eg.:</p><ul>"
-                                         "<li>Grouping baskets by themes or topics;</li>"
-                                         "<li>Grouping baskets in folders for different projects;</li>"
-                                         "<li>Making sections with sub-baskets representing chapters or pages;</li>"
-                                         "<li>Making a group of baskets to export together (to eg. email them to people).</li></ul>"),
+                                    i18n("<p>Creating shelves inside Mathom-Houses and other shelves forms a hierarchy that helps you organize your mathoms:</p><ul>"
+                                         "<li>Grouping mathoms by themes or topics;</li>"
+                                         "<li>Creating shelves for different projects;</li>"
+                                         "<li>Creating nested shelves representing sections, chapters or pages;</li>"
+                                         "<li>Grouping related locations so they can be exported together.</li></ul>"),
                                     page);
     layout->addWidget(label);
     layout->addWidget(m_createIn);

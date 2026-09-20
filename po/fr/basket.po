@@ -129,8 +129,8 @@ msgstr "Impossible d'ouvrir ce fichier de ressource."
 
 #: devtools/weaver/weaver.cpp:307 src/archive.cpp:270
 #, kde-format
-msgid "This file is not a basket archive."
-msgstr "Ce fichier n'est pas une archive de paniers."
+msgid "This file is not a Mathom-House archive."
+msgstr "Ce fichier n'est pas une archive de Mathom-House."
 
 #: devtools/weaver/weaver.cpp:310 src/archive.cpp:273
 #, kde-format
@@ -267,14 +267,14 @@ msgstr "Enregistrer comme archive de Mathom-House"
 
 #: src/archive.cpp:54
 #, kde-format
-msgid "Saving as basket archive. Please wait..."
-msgstr "Enregistrer en tant qu'archive de paniers. Veuillez patienter..."
+msgid "Saving as Mathom-House archive. Please wait..."
+msgstr "Enregistrement de l'archive de Mathom-House. Veuillez patienter..."
 
 #: src/archive.cpp:267 src/archive.cpp:270 src/archive.cpp:273
 #: src/archive.cpp:276 src/archive.cpp:283 src/archive.cpp:292
 #, kde-format
-msgid "Basket Archive Error"
-msgstr "Erreur d'archive de paniers"
+msgid "Mathom-House Archive Error"
+msgstr "Erreur d'archive de Mathom-House"
 
 #: src/archive.cpp:276
 #, kde-format
@@ -292,19 +292,8 @@ msgstr ""
 
 #: src/archive.cpp:287
 #, kde-format
-msgid ""
-"This file was created with a recent version of %1. It can be opened but not "
-"every information will be available to you. For instance, some notes may be "
-"missing because they are of a type only available in new versions. When "
-"saving the file back, consider to save it to another file, to preserve the "
-"original one."
-msgstr ""
-"Ce fichier a été créé avec une version récente de %1. Il peut être ouvert "
-"mais il se peut que certaines informations soient manquantes. Par exemple, "
-"quelques notes peuvent manquer car elles sont d'un type disponible "
-"uniquement dans des nouvelles versions. En enregistrant ce fichier, il peut "
-"être judicieux de l'enregistrer dans un autre fichier, pour préserver "
-"l'original."
+msgid "This file was created with a recent version of %1. It can be opened but not every information will be available to you. For instance, some mathoms may be missing because they are of a type only available in new versions. When saving the file back, consider to save it to another file, to preserve the original one."
+msgstr "Ce fichier a été créé avec une version récente de %1. Il peut être ouvert, mais certaines informations peuvent être indisponibles. Par exemple, certains mathoms peuvent manquer s'ils utilisent un type disponible uniquement dans les versions plus récentes. Lors de l'enregistrement, utilisez de préférence un autre fichier afin de préserver l'original."
 
 #: src/backup.cpp:53
 #, kde-format
@@ -514,24 +503,23 @@ msgstr "Mathom avant restauration (%1)"
 
 #: src/basketfactory.cpp:53
 #, kde-format
-msgid "Sorry, but the folder creation for this new basket has failed."
-msgstr "Désolé, mais la création d'un dossier pour ce nouveau panier a échoué."
+msgid "Sorry, but the folder creation for this new location has failed."
+msgstr "La création du dossier pour ce nouvel emplacement a échoué."
 
 #: src/basketfactory.cpp:53 src/basketfactory.cpp:86 src/basketfactory.cpp:107
 #, kde-format
-msgid "Basket Creation Failed"
-msgstr "Échec de la création de panier"
+msgid "Location Creation Failed"
+msgstr "Échec de la création de l'emplacement"
 
 #: src/basketfactory.cpp:86
 #, kde-format
-msgid "Sorry, but the template copying for this new basket has failed."
-msgstr "Désolé, mais la copie du modèle pour ce nouveau panier a échoué."
+msgid "Sorry, but the template copying for this new location has failed."
+msgstr "La copie du modèle pour ce nouvel emplacement a échoué."
 
 #: src/basketfactory.cpp:107
 #, kde-format
-msgid "Sorry, but the template customization for this new basket has failed."
-msgstr ""
-"Désolé, mais la personnalisation du modèle pour ce nouveau panier a échoué."
+msgid "Sorry, but the template customization for this new location has failed."
+msgstr "La personnalisation du modèle pour ce nouvel emplacement a échoué."
 
 #: src/basketlistview.cpp:582
 #, kde-format
@@ -1097,10 +1085,8 @@ msgstr "Insérer un mathom texte"
 
 #: src/bnpview.cpp:252
 #, kde-format
-msgid ""
-"Add a text note to the current basket without having to open the main window."
-msgstr ""
-"Ajouter un texte au panier courant sans avoir à ouvrir la fenêtre principale."
+msgid "Add a text mathom to the current location without having to open the main window."
+msgstr "Ajouter un mathom texte à l'emplacement courant sans ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:257 src/settings.cpp:587
 #, kde-format
@@ -1109,12 +1095,8 @@ msgstr "Insérer un mathom image"
 
 #: src/bnpview.cpp:259
 #, kde-format
-msgid ""
-"Add an image note to the current basket without having to open the main "
-"window."
-msgstr ""
-"Ajouter une image au panier courant sans avoir à ouvrir la fenêtre "
-"principale."
+msgid "Add an image mathom to the current location without having to open the main window."
+msgstr "Ajouter un mathom image à l'emplacement courant sans ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:263 src/settings.cpp:588
 #, kde-format
@@ -1123,10 +1105,8 @@ msgstr "Insérer un mathom lien"
 
 #: src/bnpview.cpp:265
 #, kde-format
-msgid ""
-"Add a link note to the current basket without having to open the main window."
-msgstr ""
-"Ajouter un lien au panier courant sans avoir à ouvrir la fenêtre principale."
+msgid "Add a link mathom to the current location without having to open the main window."
+msgstr "Ajouter un mathom lien à l'emplacement courant sans ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:269 src/settings.cpp:591
 #, kde-format
@@ -1135,12 +1115,8 @@ msgstr "Insérer un mathom couleur"
 
 #: src/bnpview.cpp:271
 #, kde-format
-msgid ""
-"Add a color note to the current basket without having to open the main "
-"window."
-msgstr ""
-"Ajouter une couleur au panier courant sans avoir à ouvrir la fenêtre "
-"principale."
+msgid "Add a color mathom to the current location without having to open the main window."
+msgstr "Ajouter un mathom couleur à l'emplacement courant sans ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:275
 #, kde-format
@@ -1149,12 +1125,8 @@ msgstr "Puiser une couleur sur l'écran"
 
 #: src/bnpview.cpp:277
 #, kde-format
-msgid ""
-"Add a color note picked from one pixel on screen to the current basket "
-"without having to open the main window."
-msgstr ""
-"Ajouter une couleur puisée sur un pixel à l'écran dans le panier courant "
-"sans avoir à ouvrir la fenêtre principale."
+msgid "Add a color mathom picked from one pixel on screen to the current location without having to open the main window."
+msgstr "Ajouter à l'emplacement courant un mathom couleur prélevé sur un pixel de l'écran sans ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:282 src/settings.cpp:592
 #, kde-format
@@ -1163,12 +1135,8 @@ msgstr "Capturer une zone de l'écran"
 
 #: src/bnpview.cpp:284
 #, kde-format
-msgid ""
-"Grab a screen zone as an image in the current basket without having to open "
-"the main window."
-msgstr ""
-"Capturer une zone de l'écran en tant qu'image dans le panier courant sans "
-"avoir à ouvrir la fenêtre principale."
+msgid "Grab a screen zone as an image mathom in the current location without having to open the main window."
+msgstr "Capturer une zone de l'écran comme mathom image dans l'emplacement courant sans ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:290
 #, kde-format
@@ -1177,12 +1145,8 @@ msgstr "Insérer un mathom texte brut"
 
 #: src/bnpview.cpp:292
 #, kde-format
-msgid ""
-"Add a plain text note to the current basket without having to open the main "
-"window."
-msgstr ""
-"Ajouter une note texte au panier courant sans avoir à ouvrir la fenêtre "
-"principale."
+msgid "Add a plain text mathom to the current location without having to open the main window."
+msgstr "Ajouter un mathom texte brut à l'emplacement courant sans ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:301
 #, kde-format
@@ -1191,17 +1155,8 @@ msgstr "Mathom-Houses"
 
 #: src/bnpview.cpp:346
 #, kde-format
-msgid ""
-"<h2>Basket Tree</h2>Here is the list of your baskets. You can organize your "
-"data by putting them in different baskets. You can group baskets by subject "
-"by creating new baskets inside others. You can browse between them by "
-"clicking a basket to open it, or reorganize them using drag and drop."
-msgstr ""
-"<h2>Arborescence des paniers</h2>Ceci est la liste de vos paniers. Vous "
-"pouvez organiser vos données en les mettant dans différents paniers. Vous "
-"pouvez grouper les paniers par sujet en créant de nouveaux paniers dans "
-"d'autres. Vous pouvez naviguer entre eux en cliquant sur un panier pour "
-"l'ouvrir, ou les réorganiser en utilisant le glisser / déposer."
+msgid "<h2>Organization Tree</h2>Here is the list of your Mathom-Houses and shelves. You can organize your mathoms by placing them in different locations. You can create shelves inside Mathom-Houses and other shelves to form a hierarchy. You can browse between locations by clicking them, or reorganize them using drag and drop."
+msgstr "<h2>Arborescence d'organisation</h2>Voici la liste de vos Mathom-Houses et de vos étagères. Vous pouvez organiser vos mathoms en les rangeant dans différents emplacements. Vous pouvez créer des étagères dans les Mathom-Houses et dans d'autres étagères afin de former une hiérarchie. Vous pouvez naviguer entre les emplacements en cliquant dessus ou les réorganiser par glisser-déposer."
 
 #: src/bnpview.cpp:361 src/bnpview.cpp:367
 #, kde-format
@@ -2078,20 +2033,8 @@ msgstr "En quoi est-ce utile ?"
 
 #: src/newbasketdialog.cpp:225
 #, kde-format
-msgid ""
-"<p>Creating baskets inside of other baskets to form a hierarchy allows you "
-"to be more organized by eg.:</p><ul><li>Grouping baskets by themes or topics;"
-"</li><li>Grouping baskets in folders for different projects;</li><li>Making "
-"sections with sub-baskets representing chapters or pages;</li><li>Making a "
-"group of baskets to export together (to eg. email them to people).</li></ul>"
-msgstr ""
-"<p>Créer des paniers à l'intérieur d'autres paniers pour former une "
-"hiérarchie vous permet d'être plus organisé. Par exemple, vous pouvez :</"
-"p><ul><li>Grouper des paniers par thèmes ou sujets,</li><li>Grouper des "
-"paniers dans des dossiers pour différents projets,</li><li>Créer des "
-"sections avec des sous-paniers représentant des chapitres ou des pages,</"
-"li><li>Créer des groupes de paniers à exporter ensemble (par exemple, pour "
-"les envoyer par e-mail à un groupe de personnes).</li></ul>"
+msgid "<p>Creating shelves inside Mathom-Houses and other shelves forms a hierarchy that helps you organize your mathoms:</p><ul><li>Grouping mathoms by themes or topics;</li><li>Creating shelves for different projects;</li><li>Creating nested shelves representing sections, chapters or pages;</li><li>Grouping related locations so they can be exported together.</li></ul>"
+msgstr "<p>Créer des étagères dans les Mathom-Houses et dans d'autres étagères permet de former une hiérarchie pour organiser vos mathoms :</p><ul><li>regrouper les mathoms par thème ou sujet ;</li><li>créer des étagères pour différents projets ;</li><li>imbriquer des étagères représentant des sections, chapitres ou pages ;</li><li>regrouper des emplacements liés afin de les exporter ensemble.</li></ul>"
 
 #: src/notecontent.cpp:98
 #, kde-format
@@ -3902,10 +3845,8 @@ msgstr "Sélectionnez un lanceur d'applications..."
 
 #: src/variouswidgets.cpp:119
 #, kde-format
-msgid "Use KDE Plasma Application Launchers to open your Basket Notes"
-msgstr ""
-"Utilisez les lanceurs d'applications de KDE Plasma pour l'ouverture de vos "
-"notes dans Basket"
+msgid "Use KDE Plasma Application Launchers to open Mathom content"
+msgstr "Utiliser les lanceurs d'applications KDE Plasma pour ouvrir le contenu de Mathom"
 
 #: src/variouswidgets.cpp:139 src/variouswidgets.cpp:140
 #: src/variouswidgets.cpp:141 src/variouswidgets.cpp:142

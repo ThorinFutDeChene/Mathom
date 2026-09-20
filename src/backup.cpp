@@ -252,7 +252,7 @@ void BackupDialog::restore()
     QString all = i18n("All Files");
     QString filter = suffix + title + newline + all;
 
-    QString path = QFileDialog::getOpenFileName(this, i18n("Open Basket Archive"), folder, filter);
+    QString path = QFileDialog::getOpenFileName(this, i18n("Open Mathom-House Archive"), folder, filter);
     if (path.isEmpty()) // User has canceled
         return;
 

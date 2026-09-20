@@ -50,7 +50,7 @@ void Archive::save(BasketScene *basket, bool withSubBaskets, const QString &dest
 {
     QDir dir;
     QProgressDialog dialog;
-    dialog.setWindowTitle(i18n("Save as Basket Archive"));
+    dialog.setWindowTitle(i18n("Save as Mathom-House Archive"));
     dialog.setLabelText(i18n("Saving as basket archive. Please wait..."));
     dialog.setCancelButton(nullptr);
     dialog.setAutoClose(true);

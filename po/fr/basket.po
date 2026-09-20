@@ -262,8 +262,8 @@ msgstr "Blocs notes BasKet"
 
 #: src/archive.cpp:53 src/bnpview.cpp:1984
 #, kde-format
-msgid "Save as Basket Archive"
-msgstr "Enregistrer en tant qu'archive de paniers"
+msgid "Save as Mathom-House Archive"
+msgstr "Enregistrer comme archive de Mathom-House"
 
 #: src/archive.cpp:54
 #, kde-format
@@ -455,8 +455,8 @@ msgstr "Enregistrement des paniers en cours. Veuillez patienter..."
 
 #: src/backup.cpp:255 src/bnpview.cpp:2029
 #, kde-format
-msgid "Open Basket Archive"
-msgstr "Ouvrir une archive de paniers"
+msgid "Open Mathom-House Archive"
+msgstr "Ouvrir une archive de Mathom-House"
 
 #: src/backup.cpp:266
 #, kde-format
@@ -1096,76 +1096,53 @@ msgstr "Général"
 
 #: src/bnpview.cpp:217
 #, kde-format
-msgid "Paste clipboard contents in current basket"
-msgstr "Coller le contenu du presse-papiers dans le panier courant"
+msgid "Paste clipboard contents in current location"
+msgstr "Coller le contenu du presse-papiers dans l'emplacement courant"
 
 #: src/bnpview.cpp:219
 #, kde-format
-msgid ""
-"Allows you to paste clipboard contents in the current basket without having "
-"to open the main window."
-msgstr ""
-"Vous permet de coller le contenu du presse-papiers dans le panier courant "
-"sans avoir à ouvrir la fenêtre principale."
+msgid "Allows you to paste clipboard contents in the current location without having to open the main window."
+msgstr "Vous permet de coller le contenu du presse-papiers dans l'emplacement courant sans avoir à ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:224
 #, kde-format
-msgid "Paste selection in current basket"
-msgstr "Coller la sélection dans le panier courant"
+msgid "Paste selection in current location"
+msgstr "Coller la sélection dans l'emplacement courant"
 
 #: src/bnpview.cpp:226
 #, kde-format
-msgid ""
-"Allows you to paste clipboard selection in the current basket without having "
-"to open the main window."
-msgstr ""
-"Vous permet de coller la sélection dans le panier courant sans avoir à "
-"ouvrir la fenêtre principale."
+msgid "Allows you to paste clipboard selection in the current location without having to open the main window."
+msgstr "Vous permet de coller la sélection dans l'emplacement courant sans avoir à ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:231
 #, kde-format
-msgid "Create a new basket"
-msgstr "Crée un nouveau panier"
+msgid "Create a new Mathom-House"
+msgstr "Créer une nouvelle Mathom-House"
 
 #: src/bnpview.cpp:233
 #, kde-format
-msgid ""
-"Allows you to create a new basket without having to open the main window "
-"(you then can use the other global shortcuts to add a note, paste clipboard "
-"or paste selection in this new basket)."
-msgstr ""
-"Vous permet de créer un nouveau panier sans avoir à ouvrir la fenêtre "
-"principale (vous pouvez alors utiliser les autres raccourcis clavier globaux "
-"pour ajouter un objet, coller le contenu du presse-papiers ou coller la "
-"sélection dans le panier courant)."
+msgid "Allows you to create a new Mathom-House without having to open the main window (you then can use the other global shortcuts to add a mathom, paste clipboard or paste selection in this new Mathom-House)."
+msgstr "Vous permet de créer une nouvelle Mathom-House sans avoir à ouvrir la fenêtre principale. Vous pouvez ensuite utiliser les autres raccourcis globaux pour ajouter un mathom, coller le presse-papiers ou une sélection dans cette nouvelle Mathom-House."
 
 #: src/bnpview.cpp:238
 #, kde-format
-msgid "Go to previous basket"
-msgstr "Aller au panier précédent"
+msgid "Go to previous location"
+msgstr "Aller à l'emplacement précédent"
 
 #: src/bnpview.cpp:240
 #, kde-format
-msgid ""
-"Allows you to change current basket to the previous one without having to "
-"open the main window."
-msgstr ""
-"Vous permet de changer le panier courant pour le précédent sans avoir à "
-"ouvrir la fenêtre principale."
+msgid "Allows you to go to the previous location without having to open the main window."
+msgstr "Vous permet d'aller à l'emplacement précédent sans avoir à ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:244
 #, kde-format
-msgid "Go to next basket"
-msgstr "Aller au panier suivant"
+msgid "Go to next location"
+msgstr "Aller à l'emplacement suivant"
 
 #: src/bnpview.cpp:246
 #, kde-format
-msgid ""
-"Allows you to change current basket to the next one without having to open "
-"the main window."
-msgstr ""
-"Vous permet de changer le panier courant pour le suivant sans avoir à ouvrir "
-"la fenêtre principale."
+msgid "Allows you to go to the next location without having to open the main window."
+msgstr "Vous permet d'aller à l'emplacement suivant sans avoir à ouvrir la fenêtre principale."
 
 #: src/bnpview.cpp:250
 #, kde-format
@@ -1282,8 +1259,8 @@ msgstr ""
 
 #: src/bnpview.cpp:361 src/bnpview.cpp:367
 #, kde-format
-msgid "&Basket Archive..."
-msgstr "&Archive de paniers..."
+msgid "&Mathom-House Archive..."
+msgstr "&Archive de Mathom-House..."
 
 #: src/bnpview.cpp:373
 #, kde-format
@@ -1704,8 +1681,8 @@ msgstr "&Supprimer les paniers fils"
 
 #: src/bnpview.cpp:1981 src/bnpview.cpp:2028
 #, kde-format
-msgid "Basket Archives"
-msgstr "Archives de paniers"
+msgid "Mathom-House Archives"
+msgstr "Archives de Mathom-Houses"
 
 #: src/bnpview.cpp:1991 src/htmlexporter.cpp:68
 #, kde-format

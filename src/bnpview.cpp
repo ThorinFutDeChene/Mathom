@@ -214,36 +214,36 @@ void BNPView::setupGlobalShortcuts()
     const Qt::Modifiers modifier = Qt::CTRL | Qt::ALT | Qt::SHIFT;
 
     a = ac->addAction(QStringLiteral("global_paste"), this, &BNPView::globalPasteInCurrentBasket);
-    a->setText(i18n("Paste clipboard contents in current basket"));
+    a->setText(i18n("Paste clipboard contents in current location"));
     a->setStatusTip(
-        i18n("Allows you to paste clipboard contents in the current basket "
+        i18n("Allows you to paste clipboard contents in the current location "
              "without having to open the main window."));
     KGlobalAccel::setGlobalShortcut(a, QKeySequence(modifier | Qt::Key_V));
 
     a = ac->addAction(QStringLiteral("global_paste_selection"), this, &BNPView::pasteSelInCurrentBasket);
-    a->setText(i18n("Paste selection in current basket"));
+    a->setText(i18n("Paste selection in current location"));
     a->setStatusTip(
-        i18n("Allows you to paste clipboard selection in the current basket "
+        i18n("Allows you to paste clipboard selection in the current location "
              "without having to open the main window."));
     KGlobalAccel::setGlobalShortcut(a, (QKeySequence(Qt::CTRL | Qt::ALT | Qt::SHIFT | Qt::Key_S)));
 
     a = ac->addAction(QStringLiteral("global_new_basket"), this, qOverload<>(&BNPView::askNewBasket));
-    a->setText(i18n("Create a new basket"));
+    a->setText(i18n("Create a new Mathom-House"));
     a->setStatusTip(
-        i18n("Allows you to create a new basket without having to open the "
+        i18n("Allows you to create a new Mathom-House without having to open the "
              "main window (you then can use the other global shortcuts to add "
-             "a note, paste clipboard or paste selection in this new basket)."));
+             "a mathom, paste clipboard or paste selection in this new Mathom-House)."));
 
     a = ac->addAction(QStringLiteral("global_previous_basket"), this, &BNPView::goToPreviousBasket);
-    a->setText(i18n("Go to previous basket"));
+    a->setText(i18n("Go to previous location"));
     a->setStatusTip(
-        i18n("Allows you to change current basket to the previous one without "
+        i18n("Allows you to go to the previous location without "
              "having to open the main window."));
 
     a = ac->addAction(QStringLiteral("global_next_basket"), this, &BNPView::goToNextBasket);
-    a->setText(i18n("Go to next basket"));
+    a->setText(i18n("Go to next location"));
     a->setStatusTip(
-        i18n("Allows you to change current basket to the next one "
+        i18n("Allows you to go to the next location "
              "without having to open the main window."));
 
     a = ac->addAction(QStringLiteral("global_note_add_html"), this, &BNPView::addNoteHtml);
@@ -358,13 +358,13 @@ void BNPView::setupActions()
     KActionCollection *ac = actionCollection();
 
     a = ac->addAction(QStringLiteral("basket_export_basket_archive"), this, &BNPView::saveAsArchive);
-    a->setText(i18n("&Basket Archive..."));
+    a->setText(i18n("&Mathom-House Archive..."));
     a->setIcon(QIcon::fromTheme(QStringLiteral("baskets")));
     a->setShortcut(0);
     m_actSaveAsArchive = a;
 
     a = ac->addAction(QStringLiteral("basket_import_basket_archive"), this, &BNPView::openArchive);
-    a->setText(i18n("&Basket Archive..."));
+    a->setText(i18n("&Mathom-House Archive..."));
     a->setIcon(QIcon::fromTheme(QStringLiteral("baskets")));
     a->setShortcut(0);
     m_actOpenArchive = a;
@@ -1985,10 +1985,10 @@ void BNPView::saveAsArchive()
     QString folder = config.readEntry("lastFolder", QDir::homePath()) + QStringLiteral("/");
     QString url = folder + QString(basket->basketName()).replace(QLatin1Char('/'), QLatin1Char('_')) + QStringLiteral(".baskets");
 
-    QString filter = QStringLiteral("*.baskets|") + i18n("Basket Archives") + QStringLiteral("\n*|") + i18n("All Files");
+    QString filter = QStringLiteral("*.baskets|") + i18n("Mathom-House Archives") + QStringLiteral("\n*|") + i18n("All Files");
     QString destination = url;
     for (bool askAgain = true; askAgain;) {
-        destination = QFileDialog::getSaveFileName(nullptr, i18n("Save as Basket Archive"), destination, filter);
+        destination = QFileDialog::getSaveFileName(nullptr, i18n("Save as Mathom-House Archive"), destination, filter);
         if (destination.isEmpty()) // User canceled
             return;
         if (dir.exists(destination)) {
@@ -2007,7 +2007,7 @@ void BNPView::saveAsArchive()
             askAgain = false;
     }
     bool withSubBaskets =
-        true; // KMessageBox::questionYesNo(this, i18n("Do you want to export sub-baskets too?"), i18n("Save as Basket Archive")) == KMessageBox::Yes;
+        true; // KMessageBox::questionYesNo(this, i18n("Do you want to export sub-baskets too?"), i18n("Save as Mathom-House Archive")) == KMessageBox::Yes;
 
     config.writeEntry("lastFolder", QUrl::fromLocalFile(destination).adjusted(QUrl::RemoveFilename).path());
     config.sync();
@@ -2032,8 +2032,8 @@ void BNPView::delayedOpenBasket()
 
 void BNPView::openArchive()
 {
-    QString filter = QStringLiteral("*.baskets|") + i18n("Basket Archives") + QStringLiteral("\n*|") + i18n("All Files");
-    QString path = QFileDialog::getOpenFileName(this, i18n("Open Basket Archive"), QString(), filter);
+    QString filter = QStringLiteral("*.baskets|") + i18n("Mathom-House Archives") + QStringLiteral("\n*|") + i18n("All Files");
+    QString path = QFileDialog::getOpenFileName(this, i18n("Open Mathom-House Archive"), QString(), filter);
     if (!path.isEmpty()) { // User has not canceled
         Archive::open(path);
     }

@@ -421,8 +421,8 @@ Note *NoteFactory::dropNote(const QMimeData *source, BasketScene *parent, bool f
     note = createNoteUnknown(source, parent);
     QString message = i18n(
         "<p>%1 doesn't support the data you've dropped.<br>"
-        "It however created a generic note, allowing you to drag or copy it to an application that understand it.</p>"
-        "<p>If you want the support of these data, please contact developer.</p>",
+        "It however created a generic mathom, allowing you to drag or copy it to an application that understands it.</p>"
+        "<p>If you want support for this data, please contact the developer.</p>",
         QGuiApplication::applicationDisplayName());
     KMessageBox::information(parent->graphicsView()->viewport(),
                              message,
@@ -1002,7 +1002,7 @@ Note *NoteFactory::importIcon(BasketScene *parent)
 
 Note *NoteFactory::importFileContent(BasketScene *parent)
 {
-    QUrl url = QFileDialog::getOpenFileUrl(parent->graphicsView(), i18n("Load File Content into a Note"), QUrl(), QString());
+    QUrl url = QFileDialog::getOpenFileUrl(parent->graphicsView(), i18n("Load File Content into a Mathom"), QUrl(), QString());
     if (!url.isEmpty())
         return copyFileAndLoad(url, parent);
     return nullptr;

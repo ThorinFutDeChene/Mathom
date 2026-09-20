@@ -654,7 +654,7 @@ void BNPView::setupActions()
     m_actPassBasket = a;
 
     a = ac->addAction(QStringLiteral("basket_lock"), this, &BNPView::lockBasket);
-    a->setText(i18nc("Lock Basket", "&Lock"));
+    a->setText(i18nc("Lock Location", "&Lock"));
     newBasketMenu->setIcon(QIcon::fromTheme(QStringLiteral("document-new")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::Key_L));
     m_actLockBasket = a;
@@ -722,7 +722,7 @@ void BNPView::setupActions()
 #if 0
     // FOR_BETA_PURPOSE:
     a = ac->addAction("beta_convert_texts", this, &BNPView::convertTexts);
-    a->setText(i18n("Convert text notes to rich text notes"));
+    a->setText(i18n("Convert text mathoms to rich text mathoms"));
     a->setIcon(QIcon::fromTheme("run-build-file"));
     m_convertTexts = a;
 #endif
@@ -996,8 +996,8 @@ bool BNPView::convertTexts()
 {
     bool convertedNotes = false;
     QProgressDialog dialog;
-    dialog.setWindowTitle(i18n("Plain Text Notes Conversion"));
-    dialog.setLabelText(i18n("Converting plain text notes to rich text ones..."));
+    dialog.setWindowTitle(i18n("Plain Text Mathoms Conversion"));
+    dialog.setLabelText(i18n("Converting plain text mathoms to rich text ones..."));
     dialog.setModal(true);
     dialog.setRange(0, basketCount());
     dialog.show(); // setMinimumDuration(50/*ms*/);
@@ -1700,9 +1700,9 @@ void BNPView::slotConvertTexts()
                 "If nobody complain about not having plain text notes anymore, then the final version is likely to not support plain text notes anymore.</p>"
                 "<p><b>Which basket notes do you want to convert?</b></p>"
             ),
-            i18n("Convert Text Notes"),
-            KGuiItem(i18n("Only in the Current Basket")),
-            KGuiItem(i18n("In Every Baskets"))
+            i18n("Convert Text Mathoms"),
+            KGuiItem(i18n("Only in the Current Location")),
+            KGuiItem(i18n("In All Locations"))
         );
         if (result == KMessageBox::Cancel)
             return;
@@ -1715,9 +1715,9 @@ void BNPView::slotConvertTexts()
     conversionsDone = convertTexts();
 
     if (conversionsDone)
-        KMessageBox::information(this, i18n("The plain text notes have been converted to rich text."), i18n("Conversion Finished"));
+        KMessageBox::information(this, i18n("The plain text mathoms have been converted to rich text."), i18n("Conversion Finished"));
     else
-        KMessageBox::information(this, i18n("There are no plain text notes to convert."), i18n("Conversion Finished"));
+        KMessageBox::information(this, i18n("There are no plain text mathoms to convert."), i18n("Conversion Finished"));
 }
 
 QMenu *BNPView::popupMenu(const QString &menuName)
@@ -1777,7 +1777,7 @@ void BNPView::insertEmpty(int type)
 void BNPView::insertWizard(int type)
 {
     if (currentBasket()->isLocked()) {
-        Q_EMIT showErrorMessage(i18n("Cannot add note."));
+        Q_EMIT showErrorMessage(i18n("Cannot add mathom."));
         return;
     }
     currentBasket()->insertWizard(type);

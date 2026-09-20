@@ -122,7 +122,7 @@ void HTMLExporter::prepareExport(BasketScene *basket, const QString &fullPath)
     // Create sub-folders:
     iconsFolderPath = filesFolderPath + i18nc("HTML export folder (icons)", "icons") + QLatin1Char('/'); // eg.: "/home/seb/foo.html_files/icons/"
     imagesFolderPath = filesFolderPath + i18nc("HTML export folder (images)", "images") + QLatin1Char('/'); // eg.: "/home/seb/foo.html_files/images/"
-    basketsFolderPath = filesFolderPath + i18nc("HTML export folder (baskets)", "baskets") + QLatin1Char('/'); // eg.: "/home/seb/foo.html_files/baskets/"
+    basketsFolderPath = filesFolderPath + i18nc("HTML export folder (Mathom-Houses)", "mathom-houses") + QLatin1Char('/'); // eg.: "/home/seb/foo.html_files/baskets/"
     dir.mkdir(iconsFolderPath);
     dir.mkdir(imagesFolderPath);
     dir.mkdir(basketsFolderPath);
@@ -163,7 +163,7 @@ void HTMLExporter::exportBasket(BasketScene *basket, bool isSubBasket)
         filesFolderName = i18nc("HTML export folder (files)", "%1_files", QUrl::fromLocalFile(filePath).fileName()) + QLatin1Char('/');
         dataFolderName = filesFolderName + i18nc("HTML export folder (data)", "data") + QLatin1Char('/');
         dataFolderPath = filesFolderPath + i18nc("HTML export folder (data)", "data") + QLatin1Char('/');
-        basketsFolderName = filesFolderName + i18nc("HTML export folder (baskets)", "baskets") + QLatin1Char('/');
+        basketsFolderName = filesFolderName + i18nc("HTML export folder (Mathom-Houses)", "mathom-houses") + QLatin1Char('/');
     }
     iconsFolderName = (isSubBasket ? QStringLiteral("../") : filesFolderName) + i18nc("HTML export folder (icons)", "icons")
         + QLatin1Char('/'); // eg.: "foo.html_files/icons/"   or "../icons/"
@@ -402,7 +402,7 @@ void HTMLExporter::exportBasket(BasketScene *basket, bool isSubBasket)
     stream << QStringLiteral(
                   "  </div>\n"
                   "  <p class=\"credits\">%1</p>\n")
-                  .arg(i18n("Made with <a href=\"%1\">%2</a> %3, a tool to take notes and keep information at hand.",
+                  .arg(i18n("Made with <a href=\"%1\">%2</a> %3, a tool to organize mathoms and keep information at hand.",
                             KAboutData::applicationData().homepage(),
                             QGuiApplication::applicationDisplayName(),
                             QStringLiteral(BASKET_VERSION_STRING)));

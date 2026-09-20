@@ -107,16 +107,16 @@ BasketPropertiesDialog::BasketPropertiesDialog(BasketScene *basket, QWidget *par
 
     m_ui->helpLabel->setMessage(
         i18n("<p><strong>Easily Remember your Shortcuts</strong>:<br>"
-             "With the first option, giving the basket a shortcut of the form <strong>Alt+Letter</strong> will underline that letter in the basket tree.<br>"
-             "For instance, if you are assigning the shortcut <i>Alt+T</i> to a basket named <i>Tips</i>, the basket will be displayed as <i><u>T</u>ips</i> "
+             "With the first option, giving the current location a shortcut of the form <strong>Alt+Letter</strong> will underline that letter in the organization tree.<br>"
+             "For instance, if you assign the shortcut <i>Alt+T</i> to a location named <i>Tips</i>, it will be displayed as <i><u>T</u>ips</i> "
              "in the tree. "
              "It helps you visualize the shortcuts to remember them more quickly.</p>"
              "<p><strong>Local vs Global</strong>:<br>"
-             "The first option allows you to show the basket while the main window is active. "
+             "The first option allows you to show the location while the main window is active. "
              "Global shortcuts are valid from anywhere, even if the window is hidden.</p>"
              "<p><strong>Show vs Switch</strong>:<br>"
-             "The last option makes this basket the current one without opening the main window. "
-             "It is useful in addition to the configurable global shortcuts, eg. to paste the clipboard or the selection into the current basket from "
+             "The last option makes this location the current one without opening the main window. "
+             "It is useful in addition to the configurable global shortcuts, eg. to paste the clipboard or the selection into the current location from "
              "anywhere.</p>"));
 
     connect(m_ui->shortcut, &KShortcutWidget::shortcutChanged, this, &BasketPropertiesDialog::capturedShortcut);

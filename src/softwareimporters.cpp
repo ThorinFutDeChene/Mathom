@@ -54,13 +54,13 @@ TreeImportDialog::TreeImportDialog(QWidget *parent)
     setObjectName("ImportHeirachy");
     setModal(true);
 
-    m_choices = new QGroupBox(i18n("How to Import the Notes?"), page);
+    m_choices = new QGroupBox(i18n("How to Import the Mathoms?"), page);
     m_choiceLayout = new QVBoxLayout();
     m_choices->setLayout(m_choiceLayout);
 
-    m_hierarchy_choice = new QRadioButton(i18n("&Keep original hierarchy (all notes in separate baskets)"), m_choices);
-    m_separate_baskets_choice = new QRadioButton(i18n("&First level notes in separate baskets"), m_choices);
-    m_one_basket_choice = new QRadioButton(i18n("&All notes in one basket"), m_choices);
+    m_hierarchy_choice = new QRadioButton(i18n("&Keep original hierarchy (all mathoms in separate Mathom-Houses)"), m_choices);
+    m_separate_baskets_choice = new QRadioButton(i18n("&First-level mathoms in separate Mathom-Houses"), m_choices);
+    m_one_basket_choice = new QRadioButton(i18n("&All mathoms in one Mathom-House"), m_choices);
 
     m_hierarchy_choice->setChecked(true);
     m_choiceLayout->addWidget(m_hierarchy_choice);
@@ -113,10 +113,10 @@ TextFileImportDialog::TextFileImportDialog(QWidget *parent)
     m_choiceLayout = new QVBoxLayout;
     m_choices->setLayout(m_choiceLayout);
 
-    m_emptyline_choice = new QRadioButton(i18n("Notes separated by an &empty line"), m_choices);
-    m_newline_choice = new QRadioButton(i18n("One &note per line"), m_choices);
-    m_dash_choice = new QRadioButton(i18n("Notes begin with a &dash (-)"), m_choices);
-    m_star_choice = new QRadioButton(i18n("Notes begin with a &star (*)"), m_choices);
+    m_emptyline_choice = new QRadioButton(i18n("Mathoms separated by an &empty line"), m_choices);
+    m_newline_choice = new QRadioButton(i18n("One &mathom per line"), m_choices);
+    m_dash_choice = new QRadioButton(i18n("Mathoms begin with a &dash (-)"), m_choices);
+    m_star_choice = new QRadioButton(i18n("Mathoms begin with a &star (*)"), m_choices);
     m_anotherSeparator = new QRadioButton(i18n("&Use another separator:"), m_choices);
 
     m_choiceLayout->addWidget(m_emptyline_choice);
@@ -133,7 +133,7 @@ TextFileImportDialog::TextFileImportDialog(QWidget *parent)
     m_customSeparator = new KTextEdit(indentedTextEdit);
     hLayout->addWidget(m_customSeparator);
 
-    m_all_in_one_choice = new QRadioButton(i18n("&All in one note"), m_choices);
+    m_all_in_one_choice = new QRadioButton(i18n("&All in one mathom"), m_choices);
     m_choiceLayout->addWidget(m_all_in_one_choice);
 
     m_emptyline_choice->setChecked(true);

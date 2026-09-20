@@ -308,13 +308,13 @@ void BasketScene::preparePlug(Note *note)
     // If some notes don't match (are hidden), tell it to the user:
     if (m_loaded && founds < count) {
         if (count == 1) {
-            Q_EMIT postMessage(i18n("The new note does not match the filter and is hidden."));
+            Q_EMIT postMessage(i18n("The new mathom does not match the filter and is hidden."));
         } else if (founds == count - 1) {
-            Q_EMIT postMessage(i18n("A new note does not match the filter and is hidden."));
+            Q_EMIT postMessage(i18n("A new mathom does not match the filter and is hidden."));
         } else if (founds > 0) {
-            Q_EMIT postMessage(i18n("Some new notes do not match the filter and are hidden."));
+            Q_EMIT postMessage(i18n("Some new mathoms do not match the filter and are hidden."));
         } else {
-            Q_EMIT postMessage(i18n("The new notes do not match the filter and are hidden."));
+            Q_EMIT postMessage(i18n("The new mathoms do not match the filter and are hidden."));
         }
     }
 }
@@ -2776,7 +2776,7 @@ void BasketScene::helpEvent(QGraphicsSceneHelpEvent *event)
     Note *note = noteAt(contentPos);
 
     if (!note && isFreeLayout()) {
-        message = i18n("Insert note here\nRight click for more options");
+        message = i18n("Insert mathom here\nRight click for more options");
         QRectF itRect;
         for (QList<QRectF>::iterator it = m_blankAreas.begin(); it != m_blankAreas.end(); ++it) {
             itRect = QRectF(0, 0, m_view->viewport()->width(), m_view->viewport()->height()).intersected(*it);
@@ -2795,16 +2795,16 @@ void BasketScene::helpEvent(QGraphicsSceneHelpEvent *event)
 
         switch (zone) {
         case Note::Resizer:
-            message = (note->isColumn() ? i18n("Resize those columns") : (note->isGroup() ? i18n("Resize this group") : i18n("Resize this note")));
+            message = (note->isColumn() ? i18n("Resize those columns") : (note->isGroup() ? i18n("Resize this group") : i18n("Resize this mathom")));
             break;
         case Note::Handle:
-            message = i18n("Select or move this note");
+            message = i18n("Select or move this mathom");
             break;
         case Note::Group:
             message = i18n("Select or move this group");
             break;
         case Note::TagsArrow:
-            message = i18n("Assign or remove tags from this note");
+            message = i18n("Assign or remove tags from this mathom");
             if (note->states().count() > 0) {
                 QString tagsString;
                 for (State::List::iterator it = note->states().begin(); it != note->states().end(); ++it) {
@@ -2829,16 +2829,16 @@ void BasketScene::helpEvent(QGraphicsSceneHelpEvent *event)
             break;
         case Note::TopInsert:
         case Note::BottomInsert:
-            message = i18n("Insert note here\nRight click for more options");
+            message = i18n("Insert mathom here\nRight click for more options");
             break;
         case Note::TopGroup:
-            message = i18n("Group note with the one below\nRight click for more options");
+            message = i18n("Group mathom with the one below\nRight click for more options");
             break;
         case Note::BottomGroup:
-            message = i18n("Group note with the one above\nRight click for more options");
+            message = i18n("Group mathom with the one above\nRight click for more options");
             break;
         case Note::BottomColumn:
-            message = i18n("Insert note here\nRight click for more options");
+            message = i18n("Insert mathom here\nRight click for more options");
             break;
         case Note::None:
             message = QStringLiteral("** Zone NONE: internal error **");
@@ -3993,8 +3993,8 @@ void BasketScene::noteDelete()
     if (Settings::confirmNoteDeletion())
         really = KMessageBox::questionTwoActions(
             m_view,
-            i18np("<qt>Do you really want to delete this note?</qt>", "<qt>Do you really want to delete these <b>%1</b> notes?</qt>", countSelecteds()),
-            i18np("Delete Note", "Delete Notes", countSelecteds()),
+            i18np("<qt>Do you really want to delete this mathom?</qt>", "<qt>Do you really want to delete these <b>%1</b> mathoms?</qt>", countSelecteds()),
+            i18np("Delete Mathom", "Delete Mathoms", countSelecteds()),
             KStandardGuiItem::del(),
             KStandardGuiItem::cancel());
     if (really == KMessageBox::SecondaryAction)
@@ -4093,13 +4093,13 @@ void BasketScene::doCopy(CopyMode copyMode)
         switch (copyMode) {
         default:
         case CopyToClipboard:
-            Q_EMIT postMessage(i18np("Copied note to clipboard.", "Copied notes to clipboard.", countCopied));
+            Q_EMIT postMessage(i18np("Copied mathom to clipboard.", "Copied mathoms to clipboard.", countCopied));
             break;
         case CutToClipboard:
-            Q_EMIT postMessage(i18np("Cut note to clipboard.", "Cut notes to clipboard.", countCopied));
+            Q_EMIT postMessage(i18np("Cut mathom to clipboard.", "Cut mathoms to clipboard.", countCopied));
             break;
         case CopyToSelection:
-            Q_EMIT postMessage(i18np("Copied note to selection.", "Copied notes to selection.", countCopied));
+            Q_EMIT postMessage(i18np("Copied mathom to selection.", "Copied mathoms to selection.", countCopied));
             break;
         }
     }
@@ -4163,7 +4163,7 @@ void BasketScene::noteOpen(Note *note)
     QString message = note->content()->messageWhenOpening(NoteContent::OpenOne /*NoteContent::OpenSeveral*/);
     if (url.isEmpty()) {
         if (message.isEmpty()) {
-            Q_EMIT postMessage(i18n("Unable to open this note.") /*"Unable to open those notes."*/);
+            Q_EMIT postMessage(i18n("Unable to open this mathom.") /*"Unable to open those notes."*/);
         } else {
             int result = KMessageBox::warningContinueCancel(m_view, message, /*caption=*/QString(), KGuiItem(i18n("&Edit"), QStringLiteral("edit")));
             if (result == KMessageBox::Continue) {
@@ -4245,7 +4245,7 @@ void BasketScene::noteOpenWith(Note *note)
     QString message = note->content()->messageWhenOpening(NoteContent::OpenOneWith);
     QString text = note->content()->messageWhenOpening(NoteContent::OpenOneWithDialog);
     if (url.isEmpty()) {
-        Q_EMIT postMessage(i18n("Unable to open this note."));
+        Q_EMIT postMessage(i18n("Unable to open this mathom."));
     } else {
         QList<QUrl> urls{url};
         if (KRun__displayOpenWithDialog(urls, m_view->window(), false, text)) {

@@ -327,7 +327,7 @@ TagsEditDialog::TagsEditDialog(QWidget *parent, State *stateToEdit, bool addNewT
 
     m_ui->allowCrossReferenceHelp->setMessage(
         QStringLiteral("<p>")
-        + i18n("This option will enable you to type a cross reference link directly into a text note. Cross Reference links can have the following syntax:")
+        + i18n("This option will enable you to type a cross reference link directly into a text mathom. Cross Reference links can have the following syntax:")
         + QStringLiteral("</p>") + QStringLiteral("<p>") + i18n("From the top of the tree (Absolute path):") + QStringLiteral("<br />")
         + i18n("[[/top level item/child|optional title]]") + QStringLiteral("<p>") + QStringLiteral("<p>") + i18n("Relative to the current location:")
         + QStringLiteral("<br />") + i18n("[[../sibling|optional title]]") + QStringLiteral("<br />") + i18n("[[child|optional title]]")
@@ -369,19 +369,19 @@ TagsEditDialog::TagsEditDialog(QWidget *parent, State *stateToEdit, bool addNewT
 
     m_ui->textEquivalentHelp->setMessage(
         QStringLiteral("<p>")
-        + i18n("When you copy and paste or drag and drop notes to a text editor, this text will be inserted as a textual equivalent of the tag.")
+        + i18n("When you copy and paste or drag and drop mathoms to a text editor, this text will be inserted as a textual equivalent of the tag.")
         + QStringLiteral("</p>") +
         //      "<p>" + i18n("If filled, this property lets you paste this tag or this state as textual equivalent.") + "<br>" +
-        i18n("For instance, a list of notes with the <b>To Do</b> and <b>Done</b> tags are exported as lines preceded by <b>[ ]</b> or <b>[x]</b>, "
+        i18n("For instance, a list of mathoms with the <b>To Do</b> and <b>Done</b> tags are exported as lines preceded by <b>[ ]</b> or <b>[x]</b>, "
              "representing an empty checkbox and a checked box.")
         + QStringLiteral("</p>") + QStringLiteral("<p align='center'><img src=\":images/tag_export_help.png\"></p>"));
 
     m_ui->onEveryLinesHelp->setMessage(
         QStringLiteral("<p>")
-        + i18n("When a note has several lines, you can choose to export the tag or the state on the first line or on every line of the note.")
+        + i18n("When a mathom has several lines, you can choose to export the tag or the state on the first line or on every line of the mathom.")
         + QStringLiteral("</p>") + QStringLiteral("<p align='center'><img src=\":images/tag_export_on_every_lines_help.png\"></p>") + QStringLiteral("<p>")
-        + i18n("In the example above, the tag of the top note is only exported on the first line, while the tag of the bottom note is exported on every "
-               "line of the note."));
+        + i18n("In the example above, the tag of the top mathom is only exported on the first line, while the tag of the bottom mathom is exported on every "
+               "line of the mathom."));
 
     // Load Tags:
     for (Tag::List::iterator tagIt = Tag::all.begin(); tagIt != Tag::all.end(); ++tagIt)
@@ -767,12 +767,12 @@ void TagsEditDialog::deleteTag()
     int result = KMessageBox::Continue;
     if (item->tagCopy() && item->tagCopy()->oldTag)
         result = KMessageBox::warningContinueCancel(this,
-                                                    i18n("Deleting the tag will remove it from every note it is currently assigned to."),
+                                                    i18n("Deleting the tag will remove it from every mathom it is currently assigned to."),
                                                     i18n("Confirm Delete Tag"),
                                                     KGuiItem(i18n("Delete Tag"), QStringLiteral("edit-delete")));
     else if (item->stateCopy() && item->stateCopy()->oldState)
         result = KMessageBox::warningContinueCancel(this,
-                                                    i18n("Deleting the state will remove the tag from every note the state is currently assigned to."),
+                                                    i18n("Deleting the state will remove the tag from every mathom the state is currently assigned to."),
                                                     i18n("Confirm Delete State"),
                                                     KGuiItem(i18n("Delete State"), QStringLiteral("edit-delete")));
     if (result != KMessageBox::Continue)

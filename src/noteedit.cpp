@@ -539,9 +539,9 @@ ImageEditor::ImageEditor(ImageContent *imageContent, QWidget *parent)
 {
     int choice = KMessageBox::questionTwoActionsCancel(
         parent,
-        i18n("Images can not be edited here at the moment (the next version of BasKet Note Pads will include an image editor).\n"
+        i18n("Images cannot be edited here at the moment.\n"
              "Do you want to open it with an application that understand it?"),
-        i18n("Edit Image Note"),
+        i18n("Edit Image Mathom"),
         KStandardGuiItem::open(),
         KGuiItem(i18n("Load From &File..."), QStringLiteral("document-import")),
         KStandardGuiItem::cancel());
@@ -568,7 +568,7 @@ AnimationEditor::AnimationEditor(AnimationContent *animationContent, QWidget *pa
     int choice = KMessageBox::questionTwoActions(parent,
                                                  i18n("This animated image can not be edited here.\n"
                                                       "Do you want to open it with an application that understands it?"),
-                                                 i18n("Edit Animation Note"),
+                                                 i18n("Edit Animation Mathom"),
                                                  KStandardGuiItem::open(),
                                                  KStandardGuiItem::cancel());
 
@@ -657,7 +657,7 @@ ColorEditor::ColorEditor(ColorContent *colorContent, QWidget *parent)
     : NoteEditor(colorContent)
 {
     const QColor oldColor = colorContent->color();
-    const QColor result = QColorDialog::getColor(oldColor, parent, i18n("Edit Color Note"));
+    const QColor result = QColorDialog::getColor(oldColor, parent, i18n("Edit Color Mathom"));
     if (result.isValid()) {
         if (result != oldColor) {
             colorContent->setColor(result);
@@ -673,9 +673,9 @@ UnknownEditor::UnknownEditor(UnknownContent *unknownContent, QWidget *parent)
     : NoteEditor(unknownContent)
 {
     KMessageBox::information(parent,
-                             i18n("The type of this note is unknown and can not be edited here.\n"
-                                  "You however can drag or copy the note into an application that understands it."),
-                             i18n("Edit Unknown Note"));
+                             i18n("The type of this mathom is unknown and cannot be edited here.\n"
+                                  "You however can drag or copy the mathom into an application that understands it."),
+                             i18n("Edit Unknown Mathom"));
 }
 
 /*********************************************************************/
@@ -687,7 +687,7 @@ LinkEditDialog::LinkEditDialog(LinkContent *contentNote, QWidget *parent /*, QKe
     , m_noteContent(contentNote)
 {
     // QDialog options
-    setWindowTitle(i18n("Edit Link Note"));
+    setWindowTitle(i18n("Edit Link Mathom"));
     setObjectName("EditLink");
     setModal(true);
 
@@ -954,7 +954,7 @@ LauncherEditDialog::LauncherEditDialog(LauncherContent *contentNote, QWidget *pa
     , m_noteContent(contentNote)
 {
     // QDialog options
-    setWindowTitle(i18n("Edit Launcher Note"));
+    setWindowTitle(i18n("Edit Launcher Mathom"));
     setObjectName("EditLauncher");
     setModal(true);
 

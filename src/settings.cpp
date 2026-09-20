@@ -511,7 +511,7 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
     appearanceLayout->addWidget(m_showNotesToolTip);
     connect(m_showNotesToolTip, &QCheckBox::toggled, this, &KCModule::markAsChanged);
 
-    m_bigNotes = new QCheckBox(i18n("&Big notes"), appearanceBox);
+    m_bigNotes = new QCheckBox(i18n("&Big mathoms"), appearanceBox);
     appearanceLayout->addWidget(m_bigNotes);
     connect(m_bigNotes, &QCheckBox::toggled, this, &KCModule::markAsChanged);
 
@@ -526,7 +526,7 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
     behaviorLayout->addWidget(m_autoBullet);
     connect(m_autoBullet, &QCheckBox::toggled, this, &KCModule::markAsChanged);
 
-    m_confirmNoteDeletion = new QCheckBox(i18n("Ask confirmation before &deleting notes"), behaviorBox);
+    m_confirmNoteDeletion = new QCheckBox(i18n("Ask confirmation before &deleting mathoms"), behaviorBox);
     behaviorLayout->addWidget(m_confirmNoteDeletion);
     connect(m_confirmNoteDeletion, &QCheckBox::toggled, this, &KCModule::markAsChanged);
 
@@ -534,7 +534,7 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
     behaviorLayout->addWidget(m_pasteAsPlainText);
     connect(m_pasteAsPlainText, &QCheckBox::toggled, this, &KCModule::markAsChanged);
 
-    m_detectTextTags = new QCheckBox(i18n("Automatically detect tags from note's content"), behaviorBox);
+    m_detectTextTags = new QCheckBox(i18n("Automatically detect tags from mathom's content"), behaviorBox);
     behaviorLayout->addWidget(m_detectTextTags);
     connect(m_detectTextTags, &QCheckBox::toggled, this, &KCModule::markAsChanged);
 
@@ -546,9 +546,9 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
 
     hLabel = new HelpLabel(
         i18n("When does this apply?"),
-        QStringLiteral("<p>") + i18n("It does apply when you copy and paste, or drag and drop notes to a text editor.") + QStringLiteral("</p>")
+        QStringLiteral("<p>") + i18n("It does apply when you copy and paste, or drag and drop mathoms to a text editor.") + QStringLiteral("</p>")
             + QStringLiteral("<p>") + i18n("If enabled, this property lets you paste the tags as textual equivalents.") + QStringLiteral("<br>")
-            + i18n("For instance, a list of notes with the <b>To Do</b> and <b>Done</b> tags are exported as lines preceded by <b>[ ]</b> or <b>[x]</b>, "
+            + i18n("For instance, a list of mathoms with the <b>To Do</b> and <b>Done</b> tags are exported as lines preceded by <b>[ ]</b> or <b>[x]</b>, "
                    "representing an empty checkbox and a checked box.")
             + QStringLiteral("</p>") + QStringLiteral("<p align='center'><img src=\":/images/tag_export_help.png\"></p>"),
         widget);
@@ -560,15 +560,15 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
     m_groupOnInsertionLineWidget = new QWidget(behaviorBox);
     behaviorLayout->addWidget(m_groupOnInsertionLineWidget);
     auto *hLayV = new QHBoxLayout(m_groupOnInsertionLineWidget);
-    m_groupOnInsertionLine = new QCheckBox(i18n("&Group a new note when clicking on the right of the insertion line"), m_groupOnInsertionLineWidget);
+    m_groupOnInsertionLine = new QCheckBox(i18n("&Group a new mathom when clicking on the right of the insertion line"), m_groupOnInsertionLineWidget);
     auto *helpV =
-        new HelpLabel(i18n("How to group a new note?"),
-                      i18n("<p>When this option is enabled, the insertion-line not only allows you to insert notes at the cursor position, but also allows you "
-                           "to group a new note with the one under the cursor:</p>")
+        new HelpLabel(i18n("How to group a new mathom?"),
+                      i18n("<p>When this option is enabled, the insertion-line not only allows you to insert mathoms at the cursor position, but also allows you "
+                           "to group a new mathom with the one under the cursor:</p>")
                           + QStringLiteral("<p align='center'><img src=\":/images/insertion_help.png\"></p>")
-                          + i18n("<p>Place your mouse between notes, where you want to add a new one.<br>"
-                                 "Click on the <b>left</b> of the insertion-line middle-mark to <b>insert</b> a note.<br>"
-                                 "Click on the <b>right</b> to <b>group</b> a note, with the one <b>below or above</b>, depending on where your mouse is.</p>"),
+                          + i18n("<p>Place your mouse between mathoms, where you want to add a new one.<br>"
+                                 "Click on the <b>left</b> of the insertion-line middle-mark to <b>insert</b> a mathom.<br>"
+                                 "Click on the <b>right</b> to <b>group</b> a mathom, with the one <b>below or above</b>, depending on where your mouse is.</p>"),
                       m_groupOnInsertionLineWidget);
     hLayV->addWidget(m_groupOnInsertionLine);
     hLayV->addWidget(helpV);
@@ -713,12 +713,12 @@ NewNotesPage::NewNotesPage(QObject *parent, const KPluginMetaData &data)
     m_newNotesPlace = new KComboBox(this->widget());
 
     label = new QLabel(this->widget());
-    label->setText(i18n("&Place of new notes:"));
+    label->setText(i18n("&Place of new mathoms:"));
     label->setBuddy(m_newNotesPlace);
 
     m_newNotesPlace->addItem(i18n("On top"));
     m_newNotesPlace->addItem(i18n("On bottom"));
-    m_newNotesPlace->addItem(i18n("At current note"));
+    m_newNotesPlace->addItem(i18n("At current mathom"));
     hLay->addWidget(label);
     hLay->addWidget(m_newNotesPlace);
     hLay->addStretch();
@@ -1013,7 +1013,7 @@ ApplicationsPage::ApplicationsPage(QObject *parent, const KPluginMetaData &data)
     connect(m_linkProg, &ServiceLaunchRequester::launcherChanged, this, &KCModule::markAsChanged);
 
     QString whatsthis = i18n(
-        "<p>If checked, the application defined below will be used when opening that type of note.</p>"
+        "<p>If checked, the application defined below will be used when opening that type of mathom.</p>"
         "<p>Otherwise, the application you've configured in Konqueror will be used.</p>");
 
     m_htmlUseProg->setWhatsThis(whatsthis);

@@ -30,6 +30,7 @@ class KColorCombo;
 class BasketScene;
 class FontSizeCombo;
 class Note;
+class RunCommandRequester;
 class ServiceLaunchRequester;
 class FocusWidgetFilter;
 class BasketListViewItem;
@@ -311,7 +312,7 @@ protected:
 
 private:
     LauncherContent *m_noteContent;
-    ServiceLaunchRequester *m_command;
+    RunCommandRequester *m_command;
     QLineEdit *m_name;
     KIconButton *m_icon;
 };

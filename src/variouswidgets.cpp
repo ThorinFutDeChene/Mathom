@@ -30,6 +30,53 @@
 #include <KLocalizedString>
 #include <KOpenWithDialog>
 
+/** class RunCommandRequester: */
+
+RunCommandRequester::RunCommandRequester(const QString &runCommand, const QString &message, QWidget *parent)
+    : QWidget(parent)
+    , m_message(message)
+{
+    auto *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    m_runCommand = new QLineEdit(runCommand, this);
+    auto *button = new QPushButton(i18n("..."), this);
+    button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    layout->addWidget(m_runCommand);
+    layout->addWidget(button);
+
+    connect(button, &QPushButton::clicked, this, &RunCommandRequester::slotSelCommand);
+}
+
+RunCommandRequester::~RunCommandRequester() = default;
+
+QString RunCommandRequester::runCommand() const
+{
+    return m_runCommand->text();
+}
+
+void RunCommandRequester::setRunCommand(const QString &runCommand)
+{
+    m_runCommand->setText(runCommand);
+}
+
+void RunCommandRequester::slotSelCommand()
+{
+    QPointer<KOpenWithDialog> dlg =
+        new KOpenWithDialog(QList<QUrl>(), m_message, m_runCommand->text(), this);
+
+    if (dlg->exec() != QDialog::Accepted)
+        return;
+
+    KService::Ptr selectedService = dlg->service();
+
+    if (selectedService)
+        m_runCommand->setText(selectedService->exec());
+    else if (!dlg->text().isEmpty())
+        m_runCommand->setText(dlg->text());
+}
+
 /** class ServiceLaunchRequester: */
 
 ServiceLaunchRequester::ServiceLaunchRequester(const QString serviceLauncher, const QString message, QWidget *parent)

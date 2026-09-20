@@ -23,6 +23,29 @@ class QKeyEvent;
  * with a QLineEdit and a QPushButton.
  * @author Sébastien Laoût
  */
+class RunCommandRequester : public QWidget
+{
+    Q_OBJECT
+public:
+    RunCommandRequester(const QString &runCommand, const QString &message, QWidget *parent = nullptr);
+    ~RunCommandRequester() override;
+
+    QString runCommand() const;
+    void setRunCommand(const QString &runCommand);
+
+    QLineEdit *lineEdit() const
+    {
+        return m_runCommand;
+    }
+
+private Q_SLOTS:
+    void slotSelCommand();
+
+private:
+    QLineEdit *m_runCommand;
+    QString m_message;
+};
+
 class ServiceLaunchRequester : public QWidget
 {
     Q_OBJECT

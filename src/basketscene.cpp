@@ -68,6 +68,7 @@
 #include <KTextEdit>
 
 #include <KIO/ApplicationLauncherJob>
+#include <KIO/CommandLauncherJob>
 #include <KIO/CopyJob>
 #include <KIO/OpenUrlJob>
 
@@ -4174,7 +4175,14 @@ void BasketScene::noteOpen(Note *note)
         // Finally do the opening job:
         QString serviceLauncher = note->content()->customServiceLauncher();
 
-        if (url.url().startsWith(QStringLiteral("basket://"))) {
+        if (note->content()->type() == NoteType::Launcher) {
+            auto *launcherContent = static_cast<LauncherContent *>(note->content());
+            auto *job = new KIO::CommandLauncherJob(launcherContent->exec());
+            job->setUiDelegate(new KDialogJobUiDelegate(
+                KJobUiDelegate::AutoHandlingEnabled,
+                m_view->window()));
+            job->start();
+        } else if (url.url().startsWith(QStringLiteral("basket://"))) {
             Q_EMIT crossReference(url.url());
         } else if (serviceLauncher.isEmpty()) {
             auto *job = new KIO::OpenUrlJob(url, m_view->window());

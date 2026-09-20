@@ -966,7 +966,7 @@ LauncherEditDialog::LauncherEditDialog(LauncherContent *contentNote, QWidget *pa
     layout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addLayout(layout);
 
-    m_command = new ServiceLaunchRequester(service.storageId(), i18n("Choose a command to run:"), this);
+    m_command = new RunCommandRequester(service.exec(), i18n("Choose a command to run:"), this);
     layout->addRow(i18n("Comman&d:"), m_command);
 
     m_name = new QLineEdit(service.name(), this);
@@ -1011,8 +1011,8 @@ bool LauncherEditDialog::event(QEvent *event)
 {
     const bool result = QDialog::event(event);
     if (event->type() == QEvent::Polish) {
-        if (m_command->serviceLauncher().isEmpty()) {
-            m_command->setFocus();
+        if (m_command->runCommand().isEmpty()) {
+            m_command->lineEdit()->setFocus();
         } else {
             m_name->setFocus();
             m_name->end(false);
@@ -1028,19 +1028,19 @@ void LauncherEditDialog::slotOk()
 
     KDesktopFile dtFile(m_noteContent->fullPath());
     KConfigGroup grp = dtFile.desktopGroup();
-    grp.writeEntry("Exec", m_command->serviceLauncher());
+    grp.writeEntry("Exec", m_command->runCommand());
     grp.writeEntry("Name", m_name->text());
     grp.writeEntry("Icon", m_icon->icon());
 
     // Just for faster feedback: conf object will save to disk (and then
     // m_note->loadContent() called)
-    m_noteContent->setLauncher(m_name->text(), m_icon->icon(), m_command->serviceLauncher());
+    m_noteContent->setLauncher(m_name->text(), m_icon->icon(), m_command->runCommand());
     m_noteContent->setEdited();
 }
 
 void LauncherEditDialog::guessIcon()
 {
-    m_icon->setIcon(NoteFactory::iconForCommand(m_command->serviceLauncher()));
+    m_icon->setIcon(NoteFactory::iconForCommand(m_command->runCommand()));
 }
 
 /** class InlineEditors: */

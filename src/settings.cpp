@@ -584,14 +584,14 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
     m_middleAction = new KComboBox(widget);
     m_middleAction->addItem(i18n("Do nothing"));
     m_middleAction->addItem(i18n("Paste clipboard"));
-    m_middleAction->addItem(i18n("Insert image note"));
-    m_middleAction->addItem(i18n("Insert link note"));
-    m_middleAction->addItem(i18n("Insert cross reference"));
-    m_middleAction->addItem(i18n("Insert launcher note"));
-    m_middleAction->addItem(i18n("Insert color note"));
+    m_middleAction->addItem(i18n("Insert image mathom"));
+    m_middleAction->addItem(i18n("Insert link mathom"));
+    m_middleAction->addItem(i18n("Insert cross-reference mathom"));
+    m_middleAction->addItem(i18n("Insert launcher mathom"));
+    m_middleAction->addItem(i18n("Insert color mathom"));
     m_middleAction->addItem(i18n("Grab screen zone"));
     m_middleAction->addItem(i18n("Insert color from screen"));
-    m_middleAction->addItem(i18n("Load note from file"));
+    m_middleAction->addItem(i18n("Load mathom from file"));
     m_middleAction->addItem(i18n("Import Launcher for desktop application"));
     m_middleAction->addItem(i18n("Import icon"));
 

@@ -247,26 +247,26 @@ void BNPView::setupGlobalShortcuts()
              "without having to open the main window."));
 
     a = ac->addAction(QStringLiteral("global_note_add_html"), this, &BNPView::addNoteHtml);
-    a->setText(i18n("Insert text note"));
+    a->setText(i18n("Insert text mathom"));
     a->setStatusTip(
         i18n("Add a text note to the current basket without having to open "
              "the main window."));
     KGlobalAccel::setGlobalShortcut(a, (QKeySequence(modifier | Qt::Key_T)));
 
     a = ac->addAction(QStringLiteral("global_note_add_image"), this, &BNPView::addNoteImage);
-    a->setText(i18n("Insert image note"));
+    a->setText(i18n("Insert image mathom"));
     a->setStatusTip(
         i18n("Add an image note to the current basket without having to open "
              "the main window."));
 
     a = ac->addAction(QStringLiteral("global_note_add_link"), this, &BNPView::addNoteLink);
-    a->setText(i18n("Insert link note"));
+    a->setText(i18n("Insert link mathom"));
     a->setStatusTip(
         i18n("Add a link note to the current basket without having "
              "to open the main window."));
 
     a = ac->addAction(QStringLiteral("global_note_add_color"), this, &BNPView::addNoteColor);
-    a->setText(i18n("Insert color note"));
+    a->setText(i18n("Insert color mathom"));
     a->setStatusTip(
         i18n("Add a color note to the current basket without having to open "
              "the main window."));
@@ -287,7 +287,7 @@ void BNPView::setupGlobalShortcuts()
 #if 0
     a = ac->addAction("global_note_add_text", this,
                       &BNPView::addNoteText);
-    a->setText(i18n("Insert plain text note"));
+    a->setText(i18n("Insert plain text mathom"));
     a->setStatusTip(
         i18n("Add a plain text note to the current basket without having to "
              "open the main window."));
@@ -401,19 +401,19 @@ void BNPView::setupActions()
     m_actCopyNote = KStandardAction::copy(this, &BNPView::copyNote, ac);
 
     m_actSelectAll = KStandardAction::selectAll(this, &BNPView::slotSelectAll, ac);
-    m_actSelectAll->setStatusTip(i18n("Selects all notes"));
+    m_actSelectAll->setStatusTip(i18n("Selects all mathoms"));
 
     a = ac->addAction(QStringLiteral("edit_unselect_all"), this, &BNPView::slotUnselectAll);
     a->setText(i18n("U&nselect All"));
     m_actUnselectAll = a;
-    m_actUnselectAll->setStatusTip(i18n("Unselects all selected notes"));
+    m_actUnselectAll->setStatusTip(i18n("Unselects all selected mathoms"));
 
     a = ac->addAction(QStringLiteral("edit_invert_selection"), this, &BNPView::slotInvertSelection);
     a->setText(i18n("&Invert Selection"));
     m_actionCollection->setDefaultShortcut(a, Qt::CTRL | Qt::Key_Asterisk);
     m_actInvertSelection = a;
 
-    m_actInvertSelection->setStatusTip(i18n("Inverts the current selection of notes"));
+    m_actInvertSelection->setStatusTip(i18n("Inverts the current selection of mathoms"));
 
     m_actClearFormatting = ac->addAction(QStringLiteral("note_clear"), this, &BNPView::clearFormattingNote);
     m_actClearFormatting->setText(i18n("&Clear Formatting"));
@@ -1575,7 +1575,7 @@ void BNPView::notesStateChanged()
     else if (!basket->isLoaded())
         setSelectionStatus(i18n("Loading..."));
     else if (basket->count() == 0)
-        setSelectionStatus(i18n("No notes"));
+        setSelectionStatus(i18n("No mathoms"));
     else {
         QString count = i18np("%1 note", "%1 notes", basket->count());
         QString selecteds = i18np("%1 selected", "%1 selected", basket->countSelecteds());

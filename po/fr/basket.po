@@ -1169,8 +1169,8 @@ msgstr ""
 
 #: src/bnpview.cpp:250
 #, kde-format
-msgid "Insert text note"
-msgstr "Insérer une note texte"
+msgid "Insert text mathom"
+msgstr "Insérer un mathom texte"
 
 #: src/bnpview.cpp:252
 #, kde-format
@@ -1181,8 +1181,8 @@ msgstr ""
 
 #: src/bnpview.cpp:257 src/settings.cpp:587
 #, kde-format
-msgid "Insert image note"
-msgstr "Insérer une note image"
+msgid "Insert image mathom"
+msgstr "Insérer un mathom image"
 
 #: src/bnpview.cpp:259
 #, kde-format
@@ -1195,8 +1195,8 @@ msgstr ""
 
 #: src/bnpview.cpp:263 src/settings.cpp:588
 #, kde-format
-msgid "Insert link note"
-msgstr "Insérer une note lien"
+msgid "Insert link mathom"
+msgstr "Insérer un mathom lien"
 
 #: src/bnpview.cpp:265
 #, kde-format
@@ -1207,8 +1207,8 @@ msgstr ""
 
 #: src/bnpview.cpp:269 src/settings.cpp:591
 #, kde-format
-msgid "Insert color note"
-msgstr "Insérer une note couleur"
+msgid "Insert color mathom"
+msgstr "Insérer un mathom couleur"
 
 #: src/bnpview.cpp:271
 #, kde-format
@@ -1249,8 +1249,8 @@ msgstr ""
 
 #: src/bnpview.cpp:290
 #, kde-format
-msgid "Insert plain text note"
-msgstr "Insérer une note texte"
+msgid "Insert plain text mathom"
+msgstr "Insérer un mathom texte brut"
 
 #: src/bnpview.cpp:292
 #, kde-format
@@ -1312,8 +1312,8 @@ msgstr "Suppri&mer"
 
 #: src/bnpview.cpp:404
 #, kde-format
-msgid "Selects all notes"
-msgstr "Sélectionner toutes les notes"
+msgid "Selects all mathoms"
+msgstr "Sélectionner tous les mathoms"
 
 #: src/bnpview.cpp:407
 #, kde-format
@@ -1322,8 +1322,8 @@ msgstr "Tout &désélectionner"
 
 #: src/bnpview.cpp:409
 #, kde-format
-msgid "Unselects all selected notes"
-msgstr "Désélectionne toutes les notes sélectionnées"
+msgid "Unselects all selected mathoms"
+msgstr "Désélectionne tous les mathoms sélectionnés"
 
 #: src/bnpview.cpp:412
 #, kde-format
@@ -1332,8 +1332,8 @@ msgstr "In&verser la sélection"
 
 #: src/bnpview.cpp:416
 #, kde-format
-msgid "Inverts the current selection of notes"
-msgstr "Inverse la sélection des notes"
+msgid "Inverts the current selection of mathoms"
+msgstr "Inverse la sélection des mathoms"
 
 #: src/bnpview.cpp:419
 #, kde-format
@@ -1578,8 +1578,8 @@ msgstr "Verrouillé"
 
 #: src/bnpview.cpp:1578
 #, kde-format
-msgid "No notes"
-msgstr "Pas de note"
+msgid "No mathoms"
+msgstr "Aucun mathom"
 
 #: src/bnpview.cpp:1580
 #, kde-format
@@ -3047,13 +3047,13 @@ msgstr "Coller le presse-papiers"
 
 #: src/settings.cpp:589
 #, kde-format
-msgid "Insert cross reference"
-msgstr "Insérer une référence croisée"
+msgid "Insert cross-reference mathom"
+msgstr "Insérer un mathom de référence croisée"
 
 #: src/settings.cpp:590
 #, kde-format
-msgid "Insert launcher note"
-msgstr "Insérer un lanceur"
+msgid "Insert launcher mathom"
+msgstr "Insérer un mathom lanceur"
 
 #: src/settings.cpp:593
 #, kde-format
@@ -3062,8 +3062,8 @@ msgstr "Puiser une couleur sur l'écran"
 
 #: src/settings.cpp:594
 #, kde-format
-msgid "Load note from file"
-msgstr "Charger une note depuis un fichier"
+msgid "Load mathom from file"
+msgstr "Charger un mathom depuis un fichier"
 
 #: src/settings.cpp:595
 #, kde-format

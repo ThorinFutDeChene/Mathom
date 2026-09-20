@@ -298,7 +298,7 @@ void BNPView::initialize()
 {
     /// Configure the List View Columns:
     m_tree = new BasketTreeListView(this);
-    m_tree->setHeaderLabel(i18n("Baskets"));
+    m_tree->setHeaderLabel(i18n("Mathom-Houses"));
     m_tree->setSortingEnabled(false /*Disabled*/);
     m_tree->setRootIsDecorated(true);
     m_tree->setLineWidth(1);
@@ -592,18 +592,18 @@ void BNPView::setupActions()
     /** Basket : **************************************************************/
 
     a = ac->addAction(QStringLiteral("basket_new"), this, qOverload<>(&BNPView::askNewBasket));
-    a->setText(i18n("&New Basket..."));
+    a->setText(i18n("&New Mathom-House..."));
     a->setIcon(QIcon::fromTheme(QStringLiteral("document-new")));
     m_actionCollection->setDefaultShortcuts(a, KStandardShortcut::shortcut(KStandardShortcut::New));
     actNewBasket = a;
 
     a = ac->addAction(QStringLiteral("basket_new_sub"), this, &BNPView::askNewSubBasket);
-    a->setText(i18n("New &Sub-Basket..."));
+    a->setText(i18n("New &Shelf..."));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_N));
     actNewSubBasket = a;
 
     a = ac->addAction(QStringLiteral("basket_new_sibling"), this, &BNPView::askNewSiblingBasket);
-    a->setText(i18n("New Si&bling Basket..."));
+    a->setText(i18n("New at the Same &Level..."));
     actNewSiblingBasket = a;
 
     auto *newBasketMenu = new KActionMenu(i18n("&New"), ac);
@@ -731,7 +731,7 @@ void BNPView::setupActions()
     /** Help : ****************************************************************/
 
     a = ac->addAction(QStringLiteral("help_welcome_baskets"), this, &BNPView::addWelcomeBaskets);
-    a->setText(i18n("&Welcome Baskets"));
+    a->setText(i18n("&Welcome Mathom-Houses"));
 }
 
 BasketListViewItem *BNPView::topLevelItem(int i)

@@ -86,7 +86,7 @@ NewBasketDialog::NewBasketDialog(BasketScene *parentBasket, const NewBasketDefau
     , m_defaultProperties(defaultProperties)
 {
     // QDialog options
-    setWindowTitle(i18n("New Basket"));
+    setWindowTitle(i18n("New Mathom-House"));
 
     auto *mainWidget = new QWidget(this);
     auto *mainLayout = new QVBoxLayout;
@@ -217,7 +217,15 @@ NewBasketDialog::NewBasketDialog(BasketScene *parentBasket, const NewBasketDefau
 
     layout = new QHBoxLayout;
     m_createIn = new KComboBox(page);
-    m_createIn->addItem(i18n("(Baskets)"));
+    m_createIn->addItem(i18n("(Mathom-Houses)"));
+
+    connect(m_createIn,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            [this](int index) {
+                setWindowTitle(index == 0 ? i18n("New Mathom-House")
+                                          : i18n("New Shelf"));
+            });
     label = new QLabel(page);
     label->setText(i18n("C&reate in:"));
     label->setBuddy(m_createIn);

@@ -1263,8 +1263,8 @@ msgstr ""
 
 #: src/bnpview.cpp:301
 #, kde-format
-msgid "Baskets"
-msgstr "Paniers"
+msgid "Mathom-Houses"
+msgstr "Mathom-Houses"
 
 #: src/bnpview.cpp:346
 #, kde-format
@@ -1453,18 +1453,18 @@ msgstr "Capturer une &zone de l'écran"
 
 #: src/bnpview.cpp:595
 #, kde-format
-msgid "&New Basket..."
-msgstr "&Nouveau panier..."
+msgid "&New Mathom-House..."
+msgstr "&Nouvelle Mathom-House..."
 
 #: src/bnpview.cpp:601
 #, kde-format
-msgid "New &Sub-Basket..."
-msgstr "Nouveau &sous-panier..."
+msgid "New &Shelf..."
+msgstr "Nouvelle &étagère..."
 
 #: src/bnpview.cpp:606
 #, kde-format
-msgid "New Si&bling Basket..."
-msgstr "Nouveau panier &voisin..."
+msgid "New at the Same &Level..."
+msgstr "Nouveau au &même niveau..."
 
 #: src/bnpview.cpp:609
 #, kde-format
@@ -1557,8 +1557,8 @@ msgstr ""
 
 #: src/bnpview.cpp:734
 #, kde-format
-msgid "&Welcome Baskets"
-msgstr "Paniers de &bienvenue"
+msgid "&Welcome Mathom-Houses"
+msgstr "Mathom-Houses de &bienvenue"
 
 #: src/bnpview.cpp:999
 #, kde-format
@@ -2097,8 +2097,13 @@ msgstr "Confirmer pour quitter"
 
 #: src/newbasketdialog.cpp:89
 #, kde-format
-msgid "New Basket"
-msgstr "Nouveau panier"
+msgid "New Mathom-House"
+msgstr "Nouvelle Mathom-House"
+
+#: src/newbasketdialog.cpp
+#, kde-format
+msgid "New Shelf"
+msgstr "Nouvelle étagère"
 
 #: src/newbasketdialog.cpp:123
 #, kde-format
@@ -2137,8 +2142,8 @@ msgstr "&Modèle :"
 
 #: src/newbasketdialog.cpp:220
 #, kde-format
-msgid "(Baskets)"
-msgstr "(Paniers)"
+msgid "(Mathom-Houses)"
+msgstr "(Mathom-Houses)"
 
 #: src/newbasketdialog.cpp:222
 #, kde-format

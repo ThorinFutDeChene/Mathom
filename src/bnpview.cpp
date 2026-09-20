@@ -642,7 +642,7 @@ void BNPView::setupActions()
     m_actSortSiblingsDesc = a;
 
     a = ac->addAction(QStringLiteral("basket_remove"), this, &BNPView::delBasket);
-    a->setText(i18nc("Remove Basket", "&Remove"));
+    a->setText(i18n("&Remove Mathom-House"));
     a->setIcon(QIcon::fromTheme(QStringLiteral("edit-delete")));
     a->setShortcut(0);
     m_actDelBasket = a;
@@ -696,25 +696,25 @@ void BNPView::setupActions()
     /** Go : ******************************************************************/
 
     a = ac->addAction(QStringLiteral("go_basket_previous"), this, &BNPView::goToPreviousBasket);
-    a->setText(i18n("&Previous Basket"));
+    a->setText(i18n("&Previous"));
     a->setIcon(QIcon::fromTheme(QStringLiteral("go-previous")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::ALT | Qt::Key_Left));
     m_actPreviousBasket = a;
 
     a = ac->addAction(QStringLiteral("go_basket_next"), this, &BNPView::goToNextBasket);
-    a->setText(i18n("&Next Basket"));
+    a->setText(i18n("&Next"));
     a->setIcon(QIcon::fromTheme(QStringLiteral("go-next")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::ALT | Qt::Key_Right));
     m_actNextBasket = a;
 
     a = ac->addAction(QStringLiteral("go_basket_fold"), this, &BNPView::foldBasket);
-    a->setText(i18n("&Fold Basket"));
+    a->setText(i18n("&Fold Mathom-House"));
     a->setIcon(QIcon::fromTheme(QStringLiteral("go-up")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::ALT | Qt::Key_Up));
     m_actFoldBasket = a;
 
     a = ac->addAction(QStringLiteral("go_basket_expand"), this, &BNPView::expandBasket);
-    a->setText(i18n("&Expand Basket"));
+    a->setText(i18n("&Expand Mathom-House"));
     a->setIcon(QIcon::fromTheme(QStringLiteral("go-down")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::ALT | Qt::Key_Down));
     m_actExpandBasket = a;
@@ -1890,12 +1890,18 @@ void BNPView::delBasket()
 {
     //  DecoratedBasket *decoBasket    = currentDecoratedBasket();
     BasketScene *basket = currentBasket();
+    const bool isShelf = parentBasketOf(basket) != nullptr;
 
     int really = KMessageBox::questionTwoActions(
         this,
-        i18n("<qt>Do you really want to remove the basket <b>%1</b> and its contents?</qt>", Tools::textToHTMLWithoutP(basket->basketName())),
-        i18n("Remove Basket"),
-        KGuiItem(i18n("&Remove Basket"), QStringLiteral("edit-delete")),
+        isShelf
+            ? i18n("<qt>Do you really want to remove the shelf <b>%1</b> and its contents?</qt>",
+                   Tools::textToHTMLWithoutP(basket->basketName()))
+            : i18n("<qt>Do you really want to remove the Mathom-House <b>%1</b> and its contents?</qt>",
+                   Tools::textToHTMLWithoutP(basket->basketName())),
+        isShelf ? i18n("Remove Shelf") : i18n("Remove Mathom-House"),
+        KGuiItem(isShelf ? i18n("&Remove Shelf") : i18n("&Remove Mathom-House"),
+                 QStringLiteral("edit-delete")),
         KStandardGuiItem::cancel());
 
     if (really == KMessageBox::Ok)
@@ -1905,10 +1911,11 @@ void BNPView::delBasket()
     if (basketsList.count() > 0) {
         int deleteChilds = KMessageBox::questionTwoActionsList(
             this,
-            i18n("<qt><b>%1</b> has the following children baskets.<br>Do you want to remove them too?</qt>", Tools::textToHTMLWithoutP(basket->basketName())),
+            i18n("<qt><b>%1</b> contains the following shelves.<br>Do you want to remove them too?</qt>",
+                 Tools::textToHTMLWithoutP(basket->basketName())),
             basketsList,
-            i18n("Remove Children Baskets"),
-            KGuiItem(i18n("&Remove Children Baskets"), QStringLiteral("edit-delete")),
+            i18n("Remove Shelves"),
+            KGuiItem(i18n("&Remove Shelves"), QStringLiteral("edit-delete")),
             KStandardGuiItem::cancel());
 
         if (deleteChilds == KMessageBox::Cancel)
@@ -2040,6 +2047,20 @@ void BNPView::activatedTagShortcut()
 
 void BNPView::slotBasketChanged()
 {
+    const bool isShelf = currentBasket() && parentBasketOf(currentBasket()) != nullptr;
+
+    m_actDelBasket->setText(isShelf
+                               ? i18n("&Remove Shelf")
+                               : i18n("&Remove Mathom-House"));
+
+    m_actFoldBasket->setText(isShelf
+                                ? i18n("&Fold Shelf")
+                                : i18n("&Fold Mathom-House"));
+
+    m_actExpandBasket->setText(isShelf
+                                  ? i18n("&Expand Shelf")
+                                  : i18n("&Expand Mathom-House"));
+
     m_actFoldBasket->setEnabled(canFold());
     m_actExpandBasket->setEnabled(canExpand());
     if (currentBasket()->decoration()->filterData().isFiltering)

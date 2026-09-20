@@ -1531,23 +1531,23 @@ msgstr "Vider le filt&re"
 
 #: src/bnpview.cpp:699
 #, kde-format
-msgid "&Previous Basket"
-msgstr "&Panier précédent"
+msgid "&Previous"
+msgstr "&Précédent"
 
 #: src/bnpview.cpp:705
 #, kde-format
-msgid "&Next Basket"
-msgstr "Panier &suivant"
+msgid "&Next"
+msgstr "&Suivant"
 
 #: src/bnpview.cpp:711
 #, kde-format
-msgid "&Fold Basket"
-msgstr "&Replier ce panier"
+msgid "&Fold Mathom-House"
+msgstr "&Replier la Mathom-House"
 
 #: src/bnpview.cpp:717
 #, kde-format
-msgid "&Expand Basket"
-msgstr "&Développer ce panier"
+msgid "&Expand Mathom-House"
+msgstr "&Déplier la Mathom-House"
 
 #: src/bnpview.cpp:725
 #, kde-format
@@ -4903,3 +4903,38 @@ msgstr ""
 #~ msgstr ""
 #~ "Si renseignée, cette propriété vous permet de coller les marques en tant "
 #~ "qu'équivalents textes."
+
+
+# Mathom terminology — Thorinux Systems
+msgid "&Remove Mathom-House"
+msgstr "&Supprimer la Mathom-House"
+
+msgid "&Remove Shelf"
+msgstr "&Supprimer l'étagère"
+
+msgid "Remove Mathom-House"
+msgstr "Supprimer la Mathom-House"
+
+msgid "Remove Shelf"
+msgstr "Supprimer l'étagère"
+
+msgid "&Fold Shelf"
+msgstr "&Replier l'étagère"
+
+msgid "&Expand Shelf"
+msgstr "&Déplier l'étagère"
+
+msgid "Remove Shelves"
+msgstr "Supprimer les étagères"
+
+msgid "&Remove Shelves"
+msgstr "&Supprimer les étagères"
+
+msgid "<qt>Do you really want to remove the shelf <b>%1</b> and its contents?</qt>"
+msgstr "<qt>Voulez-vous vraiment supprimer l'étagère <b>%1</b> et son contenu ?</qt>"
+
+msgid "<qt>Do you really want to remove the Mathom-House <b>%1</b> and its contents?</qt>"
+msgstr "<qt>Voulez-vous vraiment supprimer la Mathom-House <b>%1</b> et son contenu ?</qt>"
+
+msgid "<qt><b>%1</b> contains the following shelves.<br>Do you want to remove them too?</qt>"
+msgstr "<qt><b>%1</b> contient les étagères suivantes.<br>Voulez-vous également les supprimer ?</qt>"

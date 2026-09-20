@@ -368,7 +368,7 @@ void Backup::setFolderAndRestart(const QString &folder, const QString &message)
     auto *job = new KIO::CommandLauncherJob(binaryPath);
 
     job->setExecutable(QCoreApplication::applicationName());
-    job->setDesktopName(QStringLiteral("org.kde.basket"));
+    job->setDesktopName(QStringLiteral("fr.thorinux.mathom"));
     job->start();
 
     exit(0);

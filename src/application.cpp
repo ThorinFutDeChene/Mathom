@@ -33,7 +33,7 @@ Application::Application(int &argc, char **argv)
     , m_mainWindow(nullptr)
 {
     KLocalizedString::setApplicationDomain("basket");
-    setWindowIcon(QIcon::fromTheme(QStringLiteral("basket")));
+    setWindowIcon(QIcon::fromTheme(QStringLiteral("fr.thorinux.mathom")));
 
     KAboutData::setApplicationData(AboutData());
     // BasketPart::createAboutData();

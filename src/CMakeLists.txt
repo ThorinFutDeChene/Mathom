@@ -48,14 +48,14 @@ set(libbasket_SRCS
 
 ki18n_wrap_ui(basket_FORM_HDRS passworddialog.ui basketproperties.ui settings_versionsync.ui tagsedit.ui)
 
-qt_add_dbus_adaptor(libbasket_SRCS org.kde.basket.BNPView.xml bnpview.h BNPView)
+qt_add_dbus_adaptor(libbasket_SRCS fr.thorinux.mathom.BNPView.xml bnpview.h BNPView)
 
 qt_add_resources(basket_RESOURCES ../basket.qrc)
 
 ecm_qt_declare_logging_category(libbasket_SRCS
     HEADER basket_debug.h
     IDENTIFIER BASKET_LOG
-    CATEGORY_NAME org.kde.basket
+    CATEGORY_NAME fr.thorinux.mathom
 )
 
 add_library(LibBasket SHARED ${libbasket_SRCS} ${basket_FORM_HDRS} ${basket_RESOURCES})
@@ -120,15 +120,15 @@ if(DEBUG_PIPE)
     list(APPEND basket_SRCS debugwindow.cpp debugwindow.h)
 endif()
 
-add_executable(basket ${basket_SRCS})
-target_link_libraries(basket LibBasket)
+add_executable(mathom ${basket_SRCS})
+target_link_libraries(mathom LibBasket)
 
 if (TARGET LibGit2::LibGit2)
     target_link_libraries(LibBasket LibGit2::LibGit2)
-    target_link_libraries(basket LibGit2::LibGit2)
+    target_link_libraries(mathom LibGit2::LibGit2)
 endif()
 
-install(TARGETS basket DESTINATION ${KDE_INSTALL_BINDIR})
+install(TARGETS mathom DESTINATION ${KDE_INSTALL_BINDIR})
 
 add_library(basket_config_general MODULE kcm_basket/basket_config_general.cpp)
 target_link_libraries(basket_config_general LibBasket)
@@ -155,6 +155,6 @@ target_link_libraries(basket_config_version_sync LibBasket)
 install(TARGETS basket_config_version_sync DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/basket/)
 
 
-install(FILES org.kde.basket.desktop DESTINATION ${KDE_INSTALL_APPDIR})
-install(FILES org.kde.basket.appdata.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
+install(FILES fr.thorinux.mathom.desktop DESTINATION ${KDE_INSTALL_APPDIR})
+install(FILES fr.thorinux.mathom.metainfo.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
 

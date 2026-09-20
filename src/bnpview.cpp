@@ -1734,15 +1734,15 @@ QMenu *BNPView::popupMenu(const QString &menuName)
         QString basketDataPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QStringLiteral("/basket/");
 
         KMessageBox::error(this,
-                           i18n("<p><b>The file basketui.rc seems to not exist or is too old.<br>"
+                           i18n("<p><b>The file mathomui.rc seems to not exist or is too old.<br>"
                                 "%1 cannot run without it and will stop.</b></p>"
                                 "<p>Please check your installation of %2.</p>"
                                 "<p>If you do not have administrator access to install the application "
-                                "system wide, you can copy the file basketui.rc from the installation "
+                                "system wide, you can copy the file mathomui.rc from the installation "
                                 "archive to the folder <a href='file://%3'>%4</a>.</p>"
                                 "<p>As last resort, if you are sure the application is correctly installed "
                                 "but you had a preview version of it, try to remove the "
-                                "file %5basketui.rc</p>",
+                                "file %5mathomui.rc</p>",
                                 QGuiApplication::applicationDisplayName(),
                                 QGuiApplication::applicationDisplayName(),
                                 basketDataPath,

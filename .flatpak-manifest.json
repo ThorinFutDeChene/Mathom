@@ -1,10 +1,10 @@
 {
-   "id" : "org.kde.basket",
+   "id" : "fr.thorinux.mathom",
    "branch" : "master",
    "runtime" : "org.kde.Platform",
    "runtime-version" : "6.9",
    "sdk" : "org.kde.Sdk",
-   "command" : "basket",
+   "command" : "mathom",
    "separate-locales" : false,
    "tags" : [
       "nightly"
@@ -15,7 +15,7 @@
       "--socket=fallback-x11",
       "--socket=wayland",
       "--device=dri",
-      "--own-name=org.kde.basket"
+      "--own-name=fr.thorinux.mathom"
    ],
    "modules" : [
       {

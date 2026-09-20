@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component type="desktop">
-  <id>org.kde.basket</id>
-  <launchable type="desktop-id">org.kde.basket.desktop</launchable>
+  <id>fr.thorinux.mathom</id>
+  <launchable type="desktop-id">fr.thorinux.mathom.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
   <developer id="fr.thorinux">

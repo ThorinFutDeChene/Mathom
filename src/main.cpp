@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
     win->show();
 
-    // Self-test of the presence of basketui.rc (the only required file after basket executable)
+    // Self-test of the presence of mathomui.rc (the only required file after basket executable)
     if (Global::bnpView->popupMenu(QStringLiteral("basket")) == nullptr)
         // An error message will be show by BNPView::popupMenu()
         return 1;

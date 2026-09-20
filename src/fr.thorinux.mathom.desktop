@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
 
-Exec=basket %f
+Exec=mathom %f
 MimeType=application/x-basket-archive;application/x-basket-template;application/x-basket-item;
-Icon=org.kde.basket
+Icon=fr.thorinux.mathom
 Categories=Qt;KDE;Office;
 
 X-DBUS-StartupType=Unique

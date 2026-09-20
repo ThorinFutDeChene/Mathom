@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
     //  InlineEditors::instance()->richTextToolBar();
     setStandardToolBarMenuEnabled(true);
 
-    createGUI(QStringLiteral("basketui.rc"));
+    createGUI(QStringLiteral("mathomui.rc"));
     KConfigGroup group = KSharedConfig::openConfig()->group(autoSaveGroup());
     applyMainWindowSettings(group);
 }
@@ -138,7 +138,7 @@ void MainWindow::configureNotifications()
 void MainWindow::slotNewToolbarConfig() // This is called when OK or Apply is clicked
 {
     // ...if you use any action list, use plugActionList on each here...
-    createGUI(QStringLiteral("basketui.rc")); // TODO: Reconnect tags menu aboutToShow() ??
+    createGUI(QStringLiteral("mathomui.rc")); // TODO: Reconnect tags menu aboutToShow() ??
     // TODO: Does this do anything?
     plugActionList(QString::fromLatin1("go_baskets_list"), actBasketsList);
     KConfigGroup group = KSharedConfig::openConfig()->group(autoSaveGroup());

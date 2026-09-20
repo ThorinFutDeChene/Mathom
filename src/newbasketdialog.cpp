@@ -70,7 +70,7 @@ QItemSelectionModel::SelectionFlags UnselectableListWidget::selectionCommand(con
 /** class NewBasketDefaultProperties: */
 
 NewBasketDefaultProperties::NewBasketDefaultProperties()
-    : icon(QStringLiteral("org.kde.basket"))
+    : icon(QStringLiteral("fr.thorinux.mathom"))
     , backgroundImage(QString())
     , backgroundColor()
     , textColor()

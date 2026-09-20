@@ -23,6 +23,8 @@ AboutData::AboutData()
 {
     // Mathom homepage will be added when the Thorinux Systems project page is available.
     setHomepage(QString());
+    setOrganizationDomain(QByteArrayLiteral("thorinux.fr"));
+    setDesktopFileName(QStringLiteral("fr.thorinux.mathom"));
 
     addAuthor(QStringLiteral("Thorinux Systems"), i18n("Mathom fork maintainer"));
 
@@ -40,7 +42,7 @@ AboutData::AboutData()
 
 QString AboutData::componentName()
 {
-    return QStringLiteral("basket");
+    return QStringLiteral("mathom");
 }
 
 QString AboutData::displayName()

@@ -1577,12 +1577,12 @@ void BNPView::notesStateChanged()
     else if (basket->count() == 0)
         setSelectionStatus(i18n("No mathoms"));
     else {
-        QString count = i18np("%1 note", "%1 notes", basket->count());
+        QString count = i18np("%1 mathom", "%1 mathoms", basket->count());
         QString selecteds = i18np("%1 selected", "%1 selected", basket->countSelecteds());
         QString showns = (currentDecoratedBasket()->filterData().isFiltering ? i18n("all matches") : i18n("no filter"));
         if (basket->countFounds() != basket->count())
             showns = i18np("%1 match", "%1 matches", basket->countFounds());
-        setSelectionStatus(i18nc("e.g. '18 notes, 10 matches, 5 selected'", "%1, %2, %3", count, showns, selecteds));
+        setSelectionStatus(i18nc("e.g. '18 mathoms, 10 matches, 5 selected'", "%1, %2, %3", count, showns, selecteds));
     }
 
     if (currentBasket()->redirectEditActions()) {

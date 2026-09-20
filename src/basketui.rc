@@ -3,7 +3,7 @@
 <gui name="basket" version="3">
  <MenuBar noMerge="1" >
   <Menu name="basket" >
-   <text>&amp;Basket</text>
+   <text>&amp;Mathom-House</text>
    <Action name="basket_new_menu" />
    <Separator/>
    <Action name="basket_properties" />
@@ -59,7 +59,7 @@
    <Action name="go_basket_expand" />
   </Menu>
   <Menu name="note" >
-   <text>&amp;Note</text>
+   <text>&amp;Mathom</text>
    <Action name="note_edit" />
    <Action name="note_open" />
    <Action name="note_open_with" />

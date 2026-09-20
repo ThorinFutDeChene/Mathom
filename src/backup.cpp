@@ -73,7 +73,7 @@ BackupDialog::BackupDialog(QWidget *parent)
     auto *folderGroupLayout = new QVBoxLayout;
     folderGroup->setLayout(folderGroupLayout);
     folderGroupLayout->addWidget(
-        new QLabel(QStringLiteral("<qt><nobr>") + i18n("Your baskets are currently stored in that folder:<br><b>%1</b>", savesFolder), folderGroup));
+        new QLabel(QStringLiteral("<qt><nobr>") + i18n("Your Mathom data is currently stored in this folder:<br><b>%1</b>", savesFolder), folderGroup));
     auto *folderWidget = new QWidget;
     folderGroupLayout->addWidget(folderWidget);
 
@@ -84,13 +84,13 @@ BackupDialog::BackupDialog(QWidget *parent)
     auto *useFolder = new QPushButton(i18n("&Use Another Existing Folder..."), folderWidget);
     auto *helpLabel = new HelpLabel(
         i18n("Why to do that?"),
-        i18n("<p>You can move the folder where %1 store your baskets to:</p><ul>"
-             "<li>Store your baskets in a visible place in your home folder, like ~/Notes or ~/Baskets, so you can manually backup them when you want.</li>"
-             "<li>Store your baskets on a server to share them between two computers.<br>"
+        i18n("<p>You can move the folder where %1 stores its Mathom data to:</p><ul>"
+             "<li>Store your Mathom data in a visible place in your home folder, such as ~/Mathom, so you can back it up manually whenever you want.</li>"
+             "<li>Store your Mathom data on a server to share it between two computers.<br>"
              "In this case, mount the shared-folder to the local file system and ask %1 to use that mount point.<br>"
              "Warning: you should not run %1 at the same time on both computers, or you risk to loss data while the two applications are desynced.</li>"
-             "</ul><p>Please remember that you should not change the content of that folder manually (eg. adding a file in a basket folder will not add that "
-             "file to the basket).</p>",
+             "</ul><p>Please remember that you should not change the content of that folder manually (eg. adding a file directly to the data folder will not add a mathom to "
+             "Mathom).</p>",
              QGuiApplication::applicationDisplayName()),
         folderWidget);
     folderLayout->addWidget(moveFolder);
@@ -145,7 +145,7 @@ void BackupDialog::populateLastBackup()
 void BackupDialog::moveToAnotherFolder()
 {
     const QString currentSavesFolder = Global::savesFolder();
-    const QUrl selectedURL = QFileDialog::getExistingDirectoryUrl(this, i18n("Choose a Folder Where to Move Baskets"), QUrl::fromLocalFile(currentSavesFolder));
+    const QUrl selectedURL = QFileDialog::getExistingDirectoryUrl(this, i18n("Choose a Folder Where to Move Mathom Data"), QUrl::fromLocalFile(currentSavesFolder));
 
     if (!selectedURL.isEmpty()) {
         QString folder = selectedURL.path();
@@ -169,19 +169,19 @@ void BackupDialog::moveToAnotherFolder()
         copier.moveFolder(currentSavesFolder, folder);
         Backup::setFolderAndRestart(
             folder,
-            i18n("Your baskets have been successfully moved to <b>%1</b>. %2 is going to be restarted to take this change into account."));
+            i18n("Your Mathom data has been successfully moved to <b>%1</b>. %2 is going to be restarted to take this change into account."));
     }
 }
 
 void BackupDialog::useAnotherExistingFolder()
 {
     const QString currentSavesFolder = Global::savesFolder();
-    const QUrl selectedURL = QFileDialog::getExistingDirectoryUrl(this, i18n("Choose a Folder Where to Move Baskets"), QUrl::fromLocalFile(currentSavesFolder));
+    const QUrl selectedURL = QFileDialog::getExistingDirectoryUrl(this, i18n("Choose a Folder Where to Move Mathom Data"), QUrl::fromLocalFile(currentSavesFolder));
 
     if (!selectedURL.isEmpty()) {
         Backup::setFolderAndRestart(
             selectedURL.path(),
-            i18n("Your basket save folder has been successfully changed to <b>%1</b>. %2 is going to be restarted to take this change into account."));
+            i18n("Your Mathom data folder has been successfully changed to <b>%1</b>. %2 is going to be restarted to take this change into account."));
     }
 }
 
@@ -193,7 +193,7 @@ void BackupDialog::backup()
     KConfig *config = KSharedConfig::openConfig().data();
     KConfigGroup configGroup(config, QStringLiteral("Backups"));
     QString folder = configGroup.readEntry("lastFolder", QDir::homePath()) + QLatin1Char('/');
-    QString fileName = i18nc("Backup filename (without extension), %1 is the date", "Baskets_%1", QDate::currentDate().toString(Qt::ISODate));
+    QString fileName = i18nc("Backup filename (without extension), %1 is the date", "Mathom_Backup_%1", QDate::currentDate().toString(Qt::ISODate));
     QString url = folder + fileName;
 
     // Ask a file name & path to the user:
@@ -202,7 +202,7 @@ void BackupDialog::backup()
     QString newline = QStringLiteral("\n*|");
     QString all = i18n("All Files");
     QString filter = suffix + title + newline + all;
-    const QString destination = QFileDialog::getSaveFileName(nullptr, i18n("Backup Baskets"), url, filter);
+    const QString destination = QFileDialog::getSaveFileName(nullptr, i18n("Back Up Mathom Data"), url, filter);
 
     // User canceled? b
     if (destination.isEmpty()) {
@@ -210,8 +210,8 @@ void BackupDialog::backup()
     }
 
     QProgressDialog dialog;
-    dialog.setWindowTitle(i18n("Backup Baskets"));
-    dialog.setLabelText(i18n("Backing up baskets. Please wait..."));
+    dialog.setWindowTitle(i18n("Back Up Mathom Data"));
+    dialog.setLabelText(i18n("Backing up Mathom data. Please wait..."));
     dialog.setModal(true);
     dialog.setCancelButton(nullptr);
     dialog.setAutoClose(true);
@@ -252,7 +252,7 @@ void BackupDialog::restore()
     QString all = i18n("All Files");
     QString filter = suffix + title + newline + all;
 
-    QString path = QFileDialog::getOpenFileName(this, i18n("Open Mathom-House Archive"), folder, filter);
+    QString path = QFileDialog::getOpenFileName(this, i18n("Open Mathom Backup"), folder, filter);
     if (path.isEmpty()) // User has canceled
         return;
 
@@ -267,13 +267,13 @@ void BackupDialog::restore()
     QFile file(readmePath);
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);
-        stream << i18n("This is a safety copy of your baskets like they were before you started to restore the backup %1.",
+        stream << i18n("This is a safety copy of your Mathom data as it was before you started to restore the backup %1.",
                        QUrl::fromLocalFile(path).fileName())
                 + QStringLiteral("\n\n")
                << i18n("If the restoration was a success and you restored what you wanted to restore, you can remove this folder.") + QStringLiteral("\n\n")
-               << i18n("If something went wrong during the restoration process, you can re-use this folder to store your baskets and nothing will be lost.")
+               << i18n("If something went wrong during the restoration process, you can re-use this folder as your Mathom data folder and nothing will be lost.")
                 + QStringLiteral("\n\n")
-               << i18n("Choose \"Basket\" -> \"Backup & Restore...\" -> \"Use Another Existing Folder...\" and select that folder.") + QLatin1Char('\n');
+               << i18n("Choose \"Backup & Restore...\" -> \"Use Another Existing Folder...\" and select that folder.") + QLatin1Char('\n');
         file.close();
     }
 
@@ -281,7 +281,7 @@ void BackupDialog::restore()
         + QStringLiteral("</nobr></p><p>") + i18n("If something goes wrong during the restoration process, read the file <b>%1</b>.", readmePath);
 
     auto *dialog = new QProgressDialog();
-    dialog->setWindowTitle(i18n("Restore Baskets"));
+    dialog->setWindowTitle(i18n("Restore Mathom Data"));
     dialog->setLabelText(message);
     dialog->setModal(/*modal=*/true);
     dialog->setCancelButton(nullptr);
@@ -314,7 +314,7 @@ void BackupDialog::restore()
         // Tell the user:
         KMessageBox::error(
             nullptr,
-            i18n("This archive is either not a backup of baskets or is corrupted. It cannot be imported. Your old baskets have been preserved instead."),
+            i18n("This archive is either not a Mathom backup or is corrupted. It cannot be imported. Your previous Mathom data has been preserved instead."),
             i18n("Restore Error"));
         return;
     }
@@ -379,14 +379,14 @@ QString Backup::newSafetyFolder()
     QDir dir;
     QString fullPath;
 
-    fullPath = QDir::homePath() + QLatin1Char('/') + i18nc("Safety folder name before restoring a basket data archive", "Baskets Before Restoration")
+    fullPath = QDir::homePath() + QLatin1Char('/') + i18nc("Safety folder name before restoring Mathom data", "Mathom Before Restoration")
         + QLatin1Char('/');
     if (!dir.exists(fullPath))
         return fullPath;
 
     for (int i = 2;; ++i) {
         fullPath = QDir::homePath() + QLatin1Char('/')
-            + i18nc("Safety folder name before restoring a basket data archive", "Baskets Before Restoration (%1)", i) + QLatin1Char('/');
+            + i18nc("Safety folder name before restoring Mathom data", "Mathom Before Restoration (%1)", i) + QLatin1Char('/');
         if (!dir.exists(fullPath))
             return fullPath;
     }

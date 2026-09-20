@@ -318,8 +318,8 @@ msgstr "Dossier d'enregistrement"
 
 #: src/backup.cpp:76
 #, kde-format
-msgid "Your baskets are currently stored in that folder:<br><b>%1</b>"
-msgstr "Vos paniers sont actuellement stockés dans ce dossier : <br><b>%1</b>"
+msgid "Your Mathom data is currently stored in this folder:<br><b>%1</b>"
+msgstr "Les données de Mathom sont actuellement stockées dans ce dossier :<br><b>%1</b>"
 
 #: src/backup.cpp:83
 #, kde-format
@@ -338,30 +338,8 @@ msgstr "Pourquoi faire cela ?"
 
 #: src/backup.cpp:87
 #, kde-format
-msgid ""
-"<p>You can move the folder where %1 store your baskets to:</p><ul><li>Store "
-"your baskets in a visible place in your home folder, like ~/Notes or ~/"
-"Baskets, so you can manually backup them when you want.</li><li>Store your "
-"baskets on a server to share them between two computers.<br>In this case, "
-"mount the shared-folder to the local file system and ask %1 to use that "
-"mount point.<br>Warning: you should not run %1 at the same time on both "
-"computers, or you risk to loss data while the two applications are desynced."
-"</li></ul><p>Please remember that you should not change the content of that "
-"folder manually (eg. adding a file in a basket folder will not add that file "
-"to the basket).</p>"
-msgstr ""
-"<p>Vous pouvez déplacer le dossier dans lequel %1 stocke vos paniers pour :</"
-"p><ul><li>Stocker vos paniers dans un endroit visible de votre dossier "
-"personnel, comme ~/Notes ou ~/Paniers, afin de pouvoir les sauvegarder "
-"manuellement lorsque vous le souhaitez.</li><li>Stocker vos paniers sur un "
-"serveur pour les partager entre deux ordinateurs.<br>Dans ce cas, montez le "
-"dossier partagé dans le système de fichiers local et demandez à %1 "
-"d'utiliser ce point de montage.<br>Attention : vous ne devez pas lancer %1 "
-"en même temps sur les deux ordinateurs, ou vous risquez de perdre des "
-"données lorsque que les deux applications seront désynchronisées.</li></"
-"ul><p>Veuillez noter que vous ne devez pas changer le contenu de ce dossier "
-"manuellement (par exemple, ajouter un fichier dans un dossier d'un panier "
-"n'ajoutera pas ce fichier dans ce panier).</p>"
+msgid "<p>You can move the folder where %1 stores its Mathom data to:</p><ul><li>Store your Mathom data in a visible place in your home folder, such as ~/Mathom, so you can back it up manually whenever you want.</li><li>Store your Mathom data on a server to share it between two computers.<br>In this case, mount the shared-folder to the local file system and ask %1 to use that mount point.<br>Warning: you should not run %1 at the same time on both computers, or you risk to loss data while the two applications are desynced.</li></ul><p>Please remember that you should not change the content of that folder manually (eg. adding a file directly to the data folder will not add a mathom to Mathom).</p>"
+msgstr "<p>Vous pouvez déplacer le dossier dans lequel %1 stocke les données de Mathom afin de :</p><ul><li>stocker les données de Mathom dans un emplacement visible de votre dossier personnel, par exemple ~/Mathom, afin de pouvoir les sauvegarder manuellement quand vous le souhaitez ;</li><li>stocker les données de Mathom sur un serveur afin de les partager entre deux ordinateurs.<br>Dans ce cas, montez le dossier partagé dans le système de fichiers local et demandez à %1 d'utiliser ce point de montage.<br>Attention : n'utilisez pas %1 simultanément sur les deux ordinateurs, afin d'éviter tout risque de désynchronisation et de perte de données.</li></ul><p>Ne modifiez pas manuellement le contenu de ce dossier : ajouter directement un fichier au dossier de données ne crée pas de mathom dans Mathom.</p>"
 
 #: src/backup.cpp:103
 #, kde-format
@@ -390,8 +368,8 @@ msgstr "Dernière sauvegarde : %1"
 
 #: src/backup.cpp:148 src/backup.cpp:179
 #, kde-format
-msgid "Choose a Folder Where to Move Baskets"
-msgstr "Choisir un dossier où déplacer les paniers"
+msgid "Choose a Folder Where to Move Mathom Data"
+msgstr "Choisir un dossier où déplacer les données de Mathom"
 
 #: src/backup.cpp:160
 #, kde-format
@@ -410,27 +388,19 @@ msgstr "Écras&er"
 
 #: src/backup.cpp:172
 #, kde-format
-msgid ""
-"Your baskets have been successfully moved to <b>%1</b>. %2 is going to be "
-"restarted to take this change into account."
-msgstr ""
-"Vos paniers ont été déplacés avec succès dans <b>%1</b>. %2 va être "
-"redémarré pour prendre en compte ces changements."
+msgid "Your Mathom data has been successfully moved to <b>%1</b>. %2 is going to be restarted to take this change into account."
+msgstr "Les données de Mathom ont été déplacées avec succès vers <b>%1</b>. %2 va redémarrer afin de prendre ce changement en compte."
 
 #: src/backup.cpp:184
 #, kde-format
-msgid ""
-"Your basket save folder has been successfully changed to <b>%1</b>. %2 is "
-"going to be restarted to take this change into account."
-msgstr ""
-"Votre dossier d'enregistrement a été modifié avec succès vers <b>%1</b>. %2 "
-"va être redémarré pour prendre en compte ces changements."
+msgid "Your Mathom data folder has been successfully changed to <b>%1</b>. %2 is going to be restarted to take this change into account."
+msgstr "Le dossier de données de Mathom a été remplacé par <b>%1</b>. %2 va redémarrer afin de prendre ce changement en compte."
 
 #: src/backup.cpp:196
 #, kde-format
 msgctxt "Backup filename (without extension), %1 is the date"
-msgid "Baskets_%1"
-msgstr "Paniers_%1"
+msgid "Mathom_Backup_%1"
+msgstr "Sauvegarde_Mathom_%1"
 
 #: src/backup.cpp:201 src/backup.cpp:250
 #, kde-format
@@ -445,18 +415,18 @@ msgstr "Tous les fichiers"
 
 #: src/backup.cpp:205 src/backup.cpp:213
 #, kde-format
-msgid "Backup Baskets"
-msgstr "Enregistrer les paniers"
+msgid "Back Up Mathom Data"
+msgstr "Sauvegarder les données de Mathom"
 
 #: src/backup.cpp:214
 #, kde-format
-msgid "Backing up baskets. Please wait..."
-msgstr "Enregistrement des paniers en cours. Veuillez patienter..."
+msgid "Backing up Mathom data. Please wait..."
+msgstr "Sauvegarde des données de Mathom en cours. Veuillez patienter..."
 
 #: src/backup.cpp:255 src/bnpview.cpp:2029
 #, kde-format
-msgid "Open Mathom-House Archive"
-msgstr "Ouvrir une archive de Mathom-House"
+msgid "Open Mathom Backup"
+msgstr "Ouvrir une sauvegarde de Mathom"
 
 #: src/backup.cpp:266
 #, kde-format
@@ -465,12 +435,8 @@ msgstr "LISEZMOI.txt"
 
 #: src/backup.cpp:270
 #, kde-format
-msgid ""
-"This is a safety copy of your baskets like they were before you started to "
-"restore the backup %1."
-msgstr ""
-"Ceci est une copie de sécurité de vos paniers comme ils étaient avant le "
-"démarrage de la restauration de la sauvegarde %1."
+msgid "This is a safety copy of your Mathom data as it was before you started to restore the backup %1."
+msgstr "Ceci est une copie de sécurité des données de Mathom telles qu'elles étaient avant la restauration de la sauvegarde %1."
 
 #: src/backup.cpp:273
 #, kde-format
@@ -483,22 +449,13 @@ msgstr ""
 
 #: src/backup.cpp:274
 #, kde-format
-msgid ""
-"If something went wrong during the restoration process, you can re-use this "
-"folder to store your baskets and nothing will be lost."
-msgstr ""
-"Si quelque chose s'est mal passé durant le processus de restauration, vous "
-"pouvez réutiliser ce dossier pour enregistrer vos paniers et rien ne sera "
-"perdu."
+msgid "If something went wrong during the restoration process, you can re-use this folder as your Mathom data folder and nothing will be lost."
+msgstr "Si un problème est survenu pendant la restauration, vous pouvez réutiliser ce dossier comme dossier de données de Mathom sans perdre vos données."
 
 #: src/backup.cpp:276
 #, kde-format
-msgid ""
-"Choose \"Basket\" -> \"Backup & Restore...\" -> \"Use Another Existing "
-"Folder...\" and select that folder."
-msgstr ""
-"Choisissez « Panier » / « Sauvegarder et restaurer... » / « Utiliser un "
-"autre dossier existant... » et sélectionnez ce dossier."
+msgid "Choose \"Backup & Restore...\" -> \"Use Another Existing Folder...\" and select that folder."
+msgstr "Choisissez « Sauvegarder et restaurer… » → « Utiliser un autre dossier existant… », puis sélectionnez ce dossier."
 
 #: src/backup.cpp:280
 #, kde-format
@@ -516,18 +473,13 @@ msgstr ""
 
 #: src/backup.cpp:284
 #, kde-format
-msgid "Restore Baskets"
-msgstr "Restaurer les paniers"
+msgid "Restore Mathom Data"
+msgstr "Restaurer les données de Mathom"
 
 #: src/backup.cpp:317
 #, kde-format
-msgid ""
-"This archive is either not a backup of baskets or is corrupted. It cannot be "
-"imported. Your old baskets have been preserved instead."
-msgstr ""
-"Soit cette archive n'est pas une sauvegarde de paniers, soit elle est "
-"corrompue. Il est impossible de l'importer. Vos anciens paniers ont été "
-"préservés à la place."
+msgid "This archive is either not a Mathom backup or is corrupted. It cannot be imported. Your previous Mathom data has been preserved instead."
+msgstr "Cette archive n'est pas une sauvegarde de Mathom ou elle est corrompue. Elle ne peut pas être importée. Les données Mathom précédentes ont été préservées."
 
 #: src/backup.cpp:318
 #, kde-format
@@ -550,15 +502,15 @@ msgstr "Redémarrage"
 
 #: src/backup.cpp:382
 #, kde-format
-msgctxt "Safety folder name before restoring a basket data archive"
-msgid "Baskets Before Restoration"
-msgstr "Panier avant restauration"
+msgctxt "Safety folder name before restoring Mathom data"
+msgid "Mathom Before Restoration"
+msgstr "Mathom avant restauration"
 
 #: src/backup.cpp:389
 #, kde-format
-msgctxt "Safety folder name before restoring a basket data archive"
-msgid "Baskets Before Restoration (%1)"
-msgstr "Paniers avant la restauration (%1)"
+msgctxt "Safety folder name before restoring Mathom data"
+msgid "Mathom Before Restoration (%1)"
+msgstr "Mathom avant restauration (%1)"
 
 #: src/basketfactory.cpp:53
 #, kde-format
@@ -1013,8 +965,8 @@ msgstr "<p>Cet emplacement est <b>déverrouillé</b>.<br>Cliquez pour le verroui
 #. i18n: ectx: Menu (basket)
 #: src/basketui.rc:6
 #, kde-format
-msgid "&Basket"
-msgstr "&Panier"
+msgid "&Mathom-House"
+msgstr "&Mathom-House"
 
 #. i18n: ectx: Menu
 #: src/basketui.rc:11 src/basketui.rc:169
@@ -1044,8 +996,8 @@ msgstr "A&ller"
 #. i18n: ectx: Menu (note)
 #: src/basketui.rc:62
 #, kde-format
-msgid "&Note"
-msgstr "&Note"
+msgid "&Mathom"
+msgstr "&Mathom"
 
 #. i18n: ectx: Menu (tags)
 #: src/basketui.rc:78
@@ -1554,10 +1506,10 @@ msgstr "Aucun mathom"
 
 #: src/bnpview.cpp:1580
 #, kde-format
-msgid "%1 note"
-msgid_plural "%1 notes"
-msgstr[0] "%1 note"
-msgstr[1] "%1 notes"
+msgid "%1 mathom"
+msgid_plural "%1 mathoms"
+msgstr[0] "%1 mathom"
+msgstr[1] "%1 mathoms"
 
 #: src/bnpview.cpp:1581
 #, kde-format
@@ -1585,7 +1537,7 @@ msgstr[1] "%1 correspondances"
 
 #: src/bnpview.cpp:1585
 #, kde-format
-msgctxt "e.g. '18 notes, 10 matches, 5 selected'"
+msgctxt "e.g. '18 mathoms, 10 matches, 5 selected'"
 msgid "%1, %2, %3"
 msgstr "%1, %2, %3"
 

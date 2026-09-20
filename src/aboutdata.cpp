@@ -12,17 +12,19 @@
 AboutData::AboutData()
     : KAboutData(AboutData::componentName(),
                  AboutData::displayName(),
-                 QStringLiteral(BASKET_VERSION_STRING),
+                 QStringLiteral("0.1.0"),
                  i18n("<p><b>Taking care of your ideas.</b></p>"
                       "<p>A note-taking application that makes it easy to record ideas as you think, and quickly find them later. "
                       "Organizing your notes has never been so easy.</p>"),
                  KAboutLicense::GPL_V2,
-                 i18n("Copyright © 2003–2007, Sébastien Laoût; Copyright © 2013–2019, Gleb Baryshev"),
+                 i18n("Copyright © 2026 Thorinux Systems; based on BasKet Note Pads. Original copyrights © 2003–2007 Sébastien Laoût and © 2013–2019 Gleb Baryshev"),
                  QString(),
-                 QStringLiteral("https://basket.kde.org/"))
+                 QString())
 {
-    // Pass basket.kde.org to constructor to be used as D-Bus domain name, but set the displayed address below
-    setHomepage(QStringLiteral("https://apps.kde.org/basket/"));
+    // Mathom homepage will be added when the Thorinux Systems project page is available.
+    setHomepage(QString());
+
+    addAuthor(QStringLiteral("Thorinux Systems"), i18n("Mathom fork maintainer"));
 
     addAuthor(i18n("Carl Schwan"), i18n("Co-Maintainer"), QStringLiteral("carl@carlschwan.eu"), QStringLiteral("https://carlschwan.eu"));
     addAuthor(i18n("Niccolò Venerandi"), i18n("Co-Maintainer"), QStringLiteral("niccolo@venerandi.com"), QStringLiteral("https://niccolo.venerandi.com/"));
@@ -43,5 +45,5 @@ QString AboutData::componentName()
 
 QString AboutData::displayName()
 {
-    return i18n("BasKet Note Pads");
+    return QStringLiteral("Mathom");
 }

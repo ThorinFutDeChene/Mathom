@@ -4,46 +4,11 @@
   <launchable type="desktop-id">org.kde.basket.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
-  <developer id="org.kde">
-    <name translate="no">KDE</name>
+  <developer id="fr.thorinux">
+    <name translate="no">Thorinux Systems</name>
   </developer>
-  <name>Basket</name>
-  <name xml:lang="ar">سلة</name>
-  <name xml:lang="ca">Basket</name>
-  <name xml:lang="ca-valencia">Basket</name>
-  <name xml:lang="cs">Basket</name>
-  <name xml:lang="da">Basket</name>
-  <name xml:lang="de">BasKet</name>
-  <name xml:lang="en-GB">Basket</name>
-  <name xml:lang="eo">Korbo</name>
-  <name xml:lang="es">Basket</name>
-  <name xml:lang="et">Basket</name>
-  <name xml:lang="eu">Basket</name>
-  <name xml:lang="fi">Basket</name>
-  <name xml:lang="fr">Basket</name>
-  <name xml:lang="gl">Basket</name>
-  <name xml:lang="he">Basket</name>
-  <name xml:lang="ia">Basket</name>
-  <name xml:lang="id">Basket</name>
-  <name xml:lang="it">Basket</name>
-  <name xml:lang="ka">კალათა</name>
-  <name xml:lang="ko">Basket</name>
-  <name xml:lang="nl">Basket</name>
-  <name xml:lang="nn">Basket</name>
-  <name xml:lang="pl">Koszyk</name>
-  <name xml:lang="pt">Basket</name>
-  <name xml:lang="pt-BR">Basket</name>
-  <name xml:lang="ru">BasKet</name>
-  <name xml:lang="sa">टोकरी</name>
-  <name xml:lang="sk">Basket</name>
-  <name xml:lang="sl">Basket</name>
-  <name xml:lang="sv">Basket</name>
-  <name xml:lang="tr">Basket</name>
-  <name xml:lang="ug">Basket خاتىرە دەپتەر</name>
-  <name xml:lang="uk">Basket</name>
-  <name xml:lang="zh-CN">Basket 笔记筐</name>
-  <name xml:lang="zh-TW">Basket</name>
-  <summary>Notes and to-dos organizer</summary>
+  <name>Mathom</name>
+  <summary>Notes and knowledge organizer</summary>
   <summary xml:lang="ar">منظم الملاحظات والمهام</summary>
   <summary xml:lang="ca">Organitzador de notes i tasques pendents</summary>
   <summary xml:lang="ca-valencia">Organitzador de notes i tasques pendents</summary>
@@ -55,7 +20,7 @@
   <summary xml:lang="et">Märkmete ja ülesannete korraldaja</summary>
   <summary xml:lang="eu">Oharren eta zereginen antolatzailea</summary>
   <summary xml:lang="fi">Muistiinpano- ja tehtäväjärjestäjä</summary>
-  <summary xml:lang="fr">Notes et organisateur de tâches à faire</summary>
+  <summary xml:lang="fr">Organisateur de notes et de connaissances</summary>
   <summary xml:lang="gl">Organizador de notas e tarefas</summary>
   <summary xml:lang="he">מארגן פתקיות ומטלות</summary>
   <summary xml:lang="ia">Organisator de Notas e Agenda</summary>

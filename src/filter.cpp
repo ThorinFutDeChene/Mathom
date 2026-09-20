@@ -51,7 +51,7 @@ FilterBar::FilterBar(QWidget *parent)
     label2->setBuddy(m_tagsBox);
     m_inAllBasketsButton = new QToolButton(this);
     m_inAllBasketsButton->setIcon(inAllIcon);
-    m_inAllBasketsButton->setText(i18n("Filter All Baskets")); //, /*groupText=*/QString(), this, &FilterBar::inAllBaskets, 0);
+    m_inAllBasketsButton->setText(i18n("Filter All Locations")); //, /*groupText=*/QString(), this, &FilterBar::inAllBaskets, 0);
     m_inAllBasketsButton->setAutoRaise(true);
 
     // Configure the Tags combobox:

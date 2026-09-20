@@ -3047,7 +3047,7 @@ void BasketScene::drawForeground(QPainter *painter, const QRectF &rect)
             connect(m_button, &QPushButton::clicked, this, &BasketScene::unlock);
 #endif
             auto *label = new QLabel(m_decryptBox);
-            QString text = QStringLiteral("<b>") + i18n("Password protected basket.") + QStringLiteral("</b><br/>");
+            QString text = QStringLiteral("<b>") + i18n("Password-protected location.") + QStringLiteral("</b><br/>");
 #ifdef HAVE_LIBGPGME
             label->setText(text + i18n("Press Unlock to access it."));
 #else
@@ -3063,7 +3063,7 @@ void BasketScene::drawForeground(QPainter *painter, const QRectF &rect)
             layout->addItem(spacer, 1, 1);
 
             label = new QLabel(QStringLiteral("<small>")
-                                   + i18n("To make baskets stay unlocked, change the automatic<br>"
+                                   + i18n("To keep protected locations unlocked, change the automatic<br>"
                                           "locking duration in the application settings.")
                                    + QStringLiteral("</small>"),
                                m_decryptBox);

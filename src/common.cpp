@@ -57,7 +57,7 @@ bool FileStorage::loadFromFile(const QString &fullPath, QByteArray *array)
             if (m_encryptionType == PrivateKeyEncryption)
                 m_gpg->setText(i18n("Please enter the password for the following private key:"), false);
             else
-                m_gpg->setText(i18n("Please enter the password for the basket <b>%1</b>:", basketName()), false); // Used when decrypting
+                m_gpg->setText(i18n("Please enter the password for <b>%1</b>:", basketName()), false); // Used when decrypting
             return m_gpg->decrypt(tmp, array);
         }
 #else
@@ -93,7 +93,7 @@ bool FileStorage::saveToFile(const QString &fullPath, const QByteArray &array, b
             // public key doesn't need password
             m_gpg->setText(QString(), false);
         } else
-            m_gpg->setText(i18n("Please assign a password to the basket <b>%1</b>:", basketName()), true); // Used when defining a new password
+            m_gpg->setText(i18n("Please assign a password to <b>%1</b>:", basketName()), true); // Used when defining a new password
 
         success = m_gpg->encrypt(array, length, &tmp, key);
         length = tmp.size();

@@ -156,10 +156,10 @@ void BasketStatusBar::setLockStatus(bool isLocked)
     if (isLocked) {
         QPixmap encryptedIcon = QIcon::fromTheme(QStringLiteral("encrypted.png")).pixmap(KIconLoader::SizeSmall);
         m_lockStatus->setPixmap(encryptedIcon);
-        m_lockStatus->setToolTip(i18n("<p>This basket is <b>locked</b>.<br>Click to unlock it.</p>").replace(QLatin1Char(' '), QStringLiteral("&nbsp;")));
+        m_lockStatus->setToolTip(i18n("<p>This location is <b>locked</b>.<br>Click to unlock it.</p>").replace(QLatin1Char(' '), QStringLiteral("&nbsp;")));
     } else {
         m_lockStatus->clear();
-        m_lockStatus->setToolTip(i18n("<p>This basket is <b>unlocked</b>.<br>Click to lock it.</p>").replace(QLatin1Char(' '), QStringLiteral("&nbsp;")));
+        m_lockStatus->setToolTip(i18n("<p>This location is <b>unlocked</b>.<br>Click to lock it.</p>").replace(QLatin1Char(' '), QStringLiteral("&nbsp;")));
     }
 }
 

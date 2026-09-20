@@ -881,8 +881,8 @@ msgstr "&Déverrouiller"
 
 #: src/basketscene.cpp:3049
 #, kde-format
-msgid "Password protected basket."
-msgstr "Panier protégé par mot de passe."
+msgid "Password-protected location."
+msgstr "Emplacement protégé par mot de passe."
 
 #: src/basketscene.cpp:3051
 #, kde-format
@@ -897,12 +897,8 @@ msgstr ""
 
 #: src/basketscene.cpp:3065
 #, kde-format
-msgid ""
-"To make baskets stay unlocked, change the automatic<br>locking duration in "
-"the application settings."
-msgstr ""
-"<small>Pour que les paniers restent déverrouillés, changez le temps<br>de "
-"verrouillage automatique dans les options de l'application.</small>"
+msgid "To keep protected locations unlocked, change the automatic<br>locking duration in the application settings."
+msgstr "Pour conserver les emplacements protégés déverrouillés, modifiez la durée<br>du verrouillage automatique dans les paramètres de l'application."
 
 #: src/basketscene.cpp:3092 src/basketstatusbar.cpp:88 src/bnpview.cpp:1576
 #, kde-format
@@ -1006,15 +1002,13 @@ msgstr ""
 
 #: src/basketstatusbar.cpp:159
 #, kde-format
-msgid "<p>This basket is <b>locked</b>.<br>Click to unlock it.</p>"
-msgstr ""
-"<p>Ce panier est <b>verrouillé</b>.<br>Cliquez pour le déverrouiller.</p>"
+msgid "<p>This location is <b>locked</b>.<br>Click to unlock it.</p>"
+msgstr "<p>Cet emplacement est <b>verrouillé</b>.<br>Cliquez pour le déverrouiller.</p>"
 
 #: src/basketstatusbar.cpp:162
 #, kde-format
-msgid "<p>This basket is <b>unlocked</b>.<br>Click to lock it.</p>"
-msgstr ""
-"<p>Ce panier est <b>déverrouillé</b>.<br>Cliquez pour le verrouiller.</p>"
+msgid "<p>This location is <b>unlocked</b>.<br>Click to lock it.</p>"
+msgstr "<p>Cet emplacement est <b>déverrouillé</b>.<br>Cliquez pour le verrouiller.</p>"
 
 #. i18n: ectx: Menu (basket)
 #: src/basketui.rc:6
@@ -1711,13 +1705,13 @@ msgstr "Veuillez saisir le mot de passe pour la clé privée suivante :"
 
 #: src/common.cpp:60
 #, kde-format
-msgid "Please enter the password for the basket <b>%1</b>:"
-msgstr "Veuillez saisir le mot de passe pour le panier <i>%1</i> :"
+msgid "Please enter the password for <b>%1</b>:"
+msgstr "Veuillez saisir le mot de passe pour <b>%1</b> :"
 
 #: src/common.cpp:96
 #, kde-format
-msgid "Please assign a password to the basket <b>%1</b>:"
-msgstr "Veuillez assigner un mot de passe au panier <i>%1</i> :"
+msgid "Please assign a password to <b>%1</b>:"
+msgstr "Veuillez attribuer un mot de passe à <b>%1</b> :"
 
 #: src/common.cpp:146
 #, kde-format
@@ -1746,8 +1740,8 @@ msgstr "Marqu&e : "
 
 #: src/filter.cpp:54
 #, kde-format
-msgid "Filter All Baskets"
-msgstr "Filtrer tous les paniers"
+msgid "Filter All Locations"
+msgstr "Filtrer tous les emplacements"
 
 #: src/filter.cpp:131
 #, kde-format
@@ -1784,8 +1778,8 @@ msgstr "Importation d'un dossier reflété"
 
 #: src/history.cpp:18
 #, kde-format
-msgid "Set current basket to %1"
-msgstr "Définit le panier courant comme %1"
+msgid "Set current location to %1"
+msgstr "Définir l'emplacement courant sur %1"
 
 #: src/htmlexporter.cpp:55
 #, kde-format
@@ -2034,10 +2028,8 @@ msgstr "Affichage la fenêtre de débogage"
 
 #: src/main.cpp:38
 #, kde-format
-msgid "Custom folder to load and save baskets and other application data."
-msgstr ""
-"Le dossier personnalisé pour les paniers et les autres données de "
-"l'application à charger et à enregistrer."
+msgid "Custom folder to load and save Mathom data."
+msgstr "Dossier personnalisé pour charger et enregistrer les données de Mathom."
 
 #: src/main.cpp:39
 #, kde-format
@@ -2054,8 +2046,8 @@ msgstr ""
 
 #: src/main.cpp:43
 #, kde-format
-msgid "Open a basket archive or template."
-msgstr "Ouvrir une archive de paniers ou un modèle."
+msgid "Open a Mathom-House archive or template."
+msgstr "Ouvrir une archive ou un modèle de Mathom-House."
 
 #: src/mainwindow.cpp:75
 #, kde-format
@@ -2526,13 +2518,13 @@ msgstr "Lier à %1"
 
 #: src/notecontent.cpp:2074
 #, kde-format
-msgid "Link has no basket to open."
-msgstr "Le lien n'a pas de panier à ouvrir."
+msgid "Link has no location to open."
+msgstr "Le lien ne contient aucun emplacement à ouvrir."
 
 #: src/notecontent.cpp:2078
 #, kde-format
-msgid "Opening basket..."
-msgstr "Ouverture d'un panier..."
+msgid "Opening location..."
+msgstr "Ouverture de l'emplacement..."
 
 #: src/notecontent.cpp:2183
 #, kde-format
@@ -2881,8 +2873,8 @@ msgstr "À droite"
 
 #: src/settings.cpp:456
 #, kde-format
-msgid "&Basket tree position:"
-msgstr "&Position de l'arborescence des paniers :"
+msgid "&Organization tree position:"
+msgstr "&Position de l'arborescence d'organisation :"
 
 #: src/settings.cpp:461 src/settings.cpp:719
 #, kde-format
@@ -2901,8 +2893,8 @@ msgstr "Position de la &barre de filtrage :"
 
 #: src/settings.cpp:510
 #, kde-format
-msgid "&Show tooltips in baskets"
-msgstr "Montr&er les info-bulles dans les paniers"
+msgid "&Show tooltips in Mathom-Houses and shelves"
+msgstr "Afficher les info-bulles dans les Mathom-Houses et les étagères"
 
 #: src/settings.cpp:514
 #, kde-format
@@ -3069,8 +3061,8 @@ msgstr "Protection par mot de passe"
 
 #: src/settings.cpp:619
 #, kde-format
-msgid "A&utomatically lock protected baskets when closed for"
-msgstr "&Verrouiller automatiquement les paniers fermés pendant"
+msgid "A&utomatically lock protected locations when closed for"
+msgstr "&Verrouiller automatiquement les emplacements protégés lorsqu'ils sont fermés pendant"
 
 #: src/settings.cpp:623
 #, kde-format
@@ -3079,10 +3071,8 @@ msgstr " minutes"
 
 #: src/settings.cpp:634
 #, kde-format
-msgid "Use GnuPG agent for &private/public key protected baskets"
-msgstr ""
-"Utiliser l'agent « GnuPG » pour les paniers prot&égés par clé privée / "
-"publique"
+msgid "Use GnuPG agent for &private/public key protected locations"
+msgstr "Utiliser l'agent GnuPG pour les emplacements prot&égés par clé privée / publique"
 
 #: src/settings.cpp:716
 #, kde-format
@@ -3161,8 +3151,8 @@ msgstr "Lancer %1"
 
 #: src/settings.cpp:846
 #, kde-format
-msgid "Another basket"
-msgstr "Autre panier"
+msgid "Another location"
+msgstr "Autre emplacement"
 
 #: src/settings.cpp:848
 #, kde-format
@@ -3325,59 +3315,58 @@ msgstr "Associations de fichiers"
 
 #: src/settings.cpp:973
 #, kde-format
-msgid "Specific Basket Associations"
-msgstr "Associations de paniers spécifiques"
+msgid "Specific Mathom Associations"
+msgstr "Associations spécifiques aux mathoms"
 
 #: src/settings.cpp:975
 #, kde-format
-msgid "Open &text notes with a custom application:"
-msgstr "Ouvrir les notes &textes avec une application personnalisée :"
+msgid "Open &text mathoms with a custom application:"
+msgstr "Ouvrir les mathoms &texte avec une application personnalisée :"
 
 #: src/settings.cpp:976
 #, kde-format
-msgid "Open text notes with:"
-msgstr "Ouvrir les notes textes avec :"
+msgid "Open text mathoms with:"
+msgstr "Ouvrir les mathoms texte avec :"
 
 #: src/settings.cpp:983
 #, kde-format
-msgid "Open &image notes with a custom application:"
-msgstr "Ouvrir les notes &images avec une application personnalisée :"
+msgid "Open &image mathoms with a custom application:"
+msgstr "Ouvrir les mathoms &image avec une application personnalisée :"
 
 #: src/settings.cpp:984
 #, kde-format
-msgid "Open image notes with:"
-msgstr "Ouvrir les notes images avec :"
+msgid "Open image mathoms with:"
+msgstr "Ouvrir les mathoms image avec :"
 
 #: src/settings.cpp:991
 #, kde-format
-msgid "Open a&nimation notes with a custom application:"
-msgstr "Ouvrir les notes &animations avec une application personnalisée :"
+msgid "Open a&nimation mathoms with a custom application:"
+msgstr "Ouvrir les mathoms a&nimation avec une application personnalisée :"
 
 #: src/settings.cpp:992
 #, kde-format
-msgid "Open animation notes with:"
-msgstr "Ouvrir les notes animations avec :"
+msgid "Open animation mathoms with:"
+msgstr "Ouvrir les mathoms animation avec :"
 
 #: src/settings.cpp:999
 #, kde-format
-msgid "Open so&und notes with a custom application:"
-msgstr "Ouvrir les notes &sons avec une application personnalisée :"
+msgid "Open so&und mathoms with a custom application:"
+msgstr "Ouvrir les mathoms &son avec une application personnalisée :"
 
 #: src/settings.cpp:1000
 #, kde-format
-msgid "Open sound notes with:"
-msgstr "Ouvrir les notes sons avec :"
+msgid "Open sound mathoms with:"
+msgstr "Ouvrir les mathoms son avec :"
 
 #: src/settings.cpp:1007
 #, kde-format
-msgid "Open http link notes with a custom application:"
-msgstr ""
-"Ouvrir les notes avec lien « http » avec une application personnalisée :"
+msgid "Open HTTP link mathoms with a custom application:"
+msgstr "Ouvrir les mathoms de lien HTTP avec une application personnalisée :"
 
 #: src/settings.cpp:1008
 #, kde-format
-msgid "Open http link notes with:"
-msgstr "Ouvrir des notes avec lien « http » avec :"
+msgid "Open HTTP link mathoms with:"
+msgstr "Ouvrir les mathoms de lien HTTP avec :"
 
 #: src/settings.cpp:1016
 #, kde-format
@@ -3699,8 +3688,8 @@ msgstr "[[/élément de haut niveau/enfant|titre optionnel]]"
 
 #: src/tagsedit.cpp:332
 #, kde-format
-msgid "Relative to the current basket:"
-msgstr "Concernant le panier courant :"
+msgid "Relative to the current location:"
+msgstr "Par rapport à l'emplacement courant :"
 
 #: src/tagsedit.cpp:333
 #, kde-format
@@ -3719,8 +3708,8 @@ msgstr "[[./enfant|titre optionnel]]"
 
 #: src/tagsedit.cpp:335
 #, kde-format
-msgid "Baskets matching is cAse inSEnsItive."
-msgstr "La correspondance de Basket est sensible à la casse."
+msgid "Location matching is cAse inSEnsItive."
+msgstr "La correspondance des emplacements est insensible à la casse."
 
 #: src/tagsedit.cpp:372
 #, kde-format

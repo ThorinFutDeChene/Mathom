@@ -2071,11 +2071,11 @@ QUrl CrossReferenceContent::urlToOpen(bool /*with*/)
 QString CrossReferenceContent::messageWhenOpening(OpenMessage where)
 {
     if (url().isEmpty())
-        return i18n("Link has no basket to open.");
+        return i18n("Link has no location to open.");
 
     switch (where) {
     case OpenOne:
-        return i18n("Opening basket...");
+        return i18n("Opening location...");
     default:
         return {};
     }

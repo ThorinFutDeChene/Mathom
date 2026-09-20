@@ -453,7 +453,7 @@ GeneralPage::GeneralPage(QObject *parent, const KPluginMetaData &data)
     m_treeOnLeft->addItem(i18n("On left"));
     m_treeOnLeft->addItem(i18n("On right"));
 
-    layout->addRow(i18n("&Basket tree position:"), m_treeOnLeft);
+    layout->addRow(i18n("&Organization tree position:"), m_treeOnLeft);
     connect(m_treeOnLeft, &QComboBox::activated, this, &KCModule::markAsChanged);
 
     // Filter Bar Position:
@@ -507,7 +507,7 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
     appearanceBox->setLayout(appearanceLayout);
     layout->addWidget(appearanceBox);
 
-    m_showNotesToolTip = new QCheckBox(i18n("&Show tooltips in baskets"), appearanceBox);
+    m_showNotesToolTip = new QCheckBox(i18n("&Show tooltips in Mathom-Houses and shelves"), appearanceBox);
     appearanceLayout->addWidget(m_showNotesToolTip);
     connect(m_showNotesToolTip, &QCheckBox::toggled, this, &KCModule::markAsChanged);
 
@@ -616,7 +616,7 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
 
     // Re-Lock timeout configuration
     hLay = new QHBoxLayout(widget);
-    m_enableReLockTimeoutMinutes = new QCheckBox(i18n("A&utomatically lock protected baskets when closed for"), widget);
+    m_enableReLockTimeoutMinutes = new QCheckBox(i18n("A&utomatically lock protected locations when closed for"), widget);
     hLay->addWidget(m_enableReLockTimeoutMinutes);
     m_reLockTimeoutMinutes = new QSpinBox(widget);
     m_reLockTimeoutMinutes->setMinimum(0);
@@ -631,7 +631,7 @@ BasketsPage::BasketsPage(QObject *parent, const KPluginMetaData &data)
     connect(m_enableReLockTimeoutMinutes, &QCheckBox::toggled, m_reLockTimeoutMinutes, &QWidget::setEnabled);
 
 #ifdef HAVE_LIBGPGME
-    m_useGnuPGAgent = new QCheckBox(i18n("Use GnuPG agent for &private/public key protected baskets"), protectionBox);
+    m_useGnuPGAgent = new QCheckBox(i18n("Use GnuPG agent for &private/public key protected locations"), protectionBox);
     protectionLayout->addWidget(m_useGnuPGAgent);
     //  hLay->addWidget(m_useGnuPGAgent);
     connect(m_useGnuPGAgent, &QCheckBox::toggled, this, &KCModule::markAsChanged);
@@ -843,7 +843,7 @@ NotesAppearancePage::NotesAppearancePage(QObject *parent, const KPluginMetaData 
     m_localLinkLook = new LinkLookEditWidget(this, i18n("Home folder"), QStringLiteral("user-home"), tabs);
     m_networkLinkLook = new LinkLookEditWidget(this, QStringLiteral("kde.org"), KIO::iconNameForUrl(QUrl(QStringLiteral("https://kde.org"))), tabs);
     m_launcherLook = new LinkLookEditWidget(this, i18n("Launch %1", QGuiApplication::applicationDisplayName()), QStringLiteral("basket"), tabs);
-    m_crossReferenceLook = new LinkLookEditWidget(this, i18n("Another basket"), QStringLiteral("basket"), tabs);
+    m_crossReferenceLook = new LinkLookEditWidget(this, i18n("Another location"), QStringLiteral("basket"), tabs);
 
     tabs->addTab(m_soundLook, i18n("&Sounds"));
     tabs->addTab(m_fileLook, i18n("&Files"));
@@ -970,42 +970,42 @@ ApplicationsPage::ApplicationsPage(QObject *parent, const KPluginMetaData &data)
     layout->addWidget(launchGroup);
 
     vLay = new QVBoxLayout(this->widget());
-    auto *basketLaunchGroup = new QGroupBox(i18n("Specific Basket Associations"), this->widget());
+    auto *basketLaunchGroup = new QGroupBox(i18n("Specific Mathom Associations"), this->widget());
 
-    m_htmlUseProg = new QCheckBox(i18n("Open &text notes with a custom application:"), this->widget());
-    m_htmlProg = new ServiceLaunchRequester(QString(), i18n("Open text notes with:"), this->widget());
+    m_htmlUseProg = new QCheckBox(i18n("Open &text mathoms with a custom application:"), this->widget());
+    m_htmlProg = new ServiceLaunchRequester(QString(), i18n("Open text mathoms with:"), this->widget());
     auto *hLayH = new QHBoxLayout();
     hLayH->insertSpacing(-1, 20);
     hLayH->addWidget(m_htmlProg);
     connect(m_htmlUseProg, &QCheckBox::toggled, this, &KCModule::markAsChanged);
     connect(m_htmlProg, &ServiceLaunchRequester::launcherChanged, this, &KCModule::markAsChanged);
 
-    m_imageUseProg = new QCheckBox(i18n("Open &image notes with a custom application:"), this->widget());
-    m_imageProg = new ServiceLaunchRequester(QString(), i18n("Open image notes with:"), this->widget());
+    m_imageUseProg = new QCheckBox(i18n("Open &image mathoms with a custom application:"), this->widget());
+    m_imageProg = new ServiceLaunchRequester(QString(), i18n("Open image mathoms with:"), this->widget());
     auto *hLayI = new QHBoxLayout();
     hLayI->insertSpacing(-1, 20);
     hLayI->addWidget(m_imageProg);
     connect(m_imageUseProg, &QCheckBox::toggled, this, &KCModule::markAsChanged);
     connect(m_imageProg, &ServiceLaunchRequester::launcherChanged, this, &KCModule::markAsChanged);
 
-    m_animationUseProg = new QCheckBox(i18n("Open a&nimation notes with a custom application:"), this->widget());
-    m_animationProg = new ServiceLaunchRequester(QString(), i18n("Open animation notes with:"), this->widget());
+    m_animationUseProg = new QCheckBox(i18n("Open a&nimation mathoms with a custom application:"), this->widget());
+    m_animationProg = new ServiceLaunchRequester(QString(), i18n("Open animation mathoms with:"), this->widget());
     auto *hLayA = new QHBoxLayout();
     hLayA->insertSpacing(-1, 20);
     hLayA->addWidget(m_animationProg);
     connect(m_animationUseProg, &QCheckBox::toggled, this, &KCModule::markAsChanged);
     connect(m_animationProg, &ServiceLaunchRequester::launcherChanged, this, &KCModule::markAsChanged);
 
-    m_soundUseProg = new QCheckBox(i18n("Open so&und notes with a custom application:"), this->widget());
-    m_soundProg = new ServiceLaunchRequester(QString(), i18n("Open sound notes with:"), this->widget());
+    m_soundUseProg = new QCheckBox(i18n("Open so&und mathoms with a custom application:"), this->widget());
+    m_soundProg = new ServiceLaunchRequester(QString(), i18n("Open sound mathoms with:"), this->widget());
     auto *hLayS = new QHBoxLayout();
     hLayS->insertSpacing(-1, 20);
     hLayS->addWidget(m_soundProg);
     connect(m_soundUseProg, &QCheckBox::toggled, this, &KCModule::markAsChanged);
     connect(m_soundProg, &ServiceLaunchRequester::launcherChanged, this, &KCModule::markAsChanged);
 
-    m_linkUseProg = new QCheckBox(i18n("Open http link notes with a custom application:"), this->widget());
-    m_linkProg = new ServiceLaunchRequester(QString(), i18n("Open http link notes with:"), this->widget());
+    m_linkUseProg = new QCheckBox(i18n("Open HTTP link mathoms with a custom application:"), this->widget());
+    m_linkProg = new ServiceLaunchRequester(QString(), i18n("Open HTTP link mathoms with:"), this->widget());
     auto *hLayL = new QHBoxLayout();
     hLayL->insertSpacing(-1, 20);
     hLayL->addWidget(m_linkProg);

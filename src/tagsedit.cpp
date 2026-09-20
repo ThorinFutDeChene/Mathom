@@ -329,10 +329,10 @@ TagsEditDialog::TagsEditDialog(QWidget *parent, State *stateToEdit, bool addNewT
         QStringLiteral("<p>")
         + i18n("This option will enable you to type a cross reference link directly into a text note. Cross Reference links can have the following syntax:")
         + QStringLiteral("</p>") + QStringLiteral("<p>") + i18n("From the top of the tree (Absolute path):") + QStringLiteral("<br />")
-        + i18n("[[/top level item/child|optional title]]") + QStringLiteral("<p>") + QStringLiteral("<p>") + i18n("Relative to the current basket:")
+        + i18n("[[/top level item/child|optional title]]") + QStringLiteral("<p>") + QStringLiteral("<p>") + i18n("Relative to the current location:")
         + QStringLiteral("<br />") + i18n("[[../sibling|optional title]]") + QStringLiteral("<br />") + i18n("[[child|optional title]]")
         + QStringLiteral("<br />") + i18n("[[./child|optional title]]") + QStringLiteral("<p>") + QStringLiteral("<p>")
-        + i18n("Baskets matching is cAse inSEnsItive.") + QStringLiteral("</p>"));
+        + i18n("Location matching is cAse inSEnsItive.") + QStringLiteral("</p>"));
 
     m_ui->emblem->setIconType(KIconLoader::NoGroup, KIconLoader::Action);
     connect(m_ui->removeEmblem, &QPushButton::clicked, this, &TagsEditDialog::removeEmblem); // m_emblem.resetIcon() is not a slot!

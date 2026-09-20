@@ -35,12 +35,12 @@ int main(int argc, char *argv[])
     QCommandLineParser opts;
     opts.addOption(QCommandLineOption(QStringList() << QStringLiteral("d") << QStringLiteral("debug"), i18n("Show the debug window")));
     opts.addOption(QCommandLineOption(QStringList() << QStringLiteral("f") << QStringLiteral("data-folder"),
-                                      i18n("Custom folder to load and save baskets and other application data."),
+                                      i18n("Custom folder to load and save Mathom data."),
                                       i18nc("Command line help: --data-folder <FOLDER>", "folder")));
     opts.addOption(QCommandLineOption(QStringLiteral("start-hidden"),
                                       i18n("Automatically hide the main window in the system tray on startup."))); //
 
-    opts.addPositionalArgument(QStringLiteral("file"), i18n("Open a basket archive or template."));
+    opts.addPositionalArgument(QStringLiteral("file"), i18n("Open a Mathom-House archive or template."));
     KAboutData::applicationData().setupCommandLine(&opts); //--author, --license
     opts.process(app);
     KAboutData::applicationData().processCommandLine(&opts); // show author, license information and exit

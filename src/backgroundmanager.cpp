@@ -4,11 +4,14 @@
  */
 
 #include "backgroundmanager.h"
+#include "global.h"
 
 #include <KConfig>
 #include <KConfigGroup>
 
+#include <QSet>
 #include <QDir>
+#include <QFileInfo>
 #include <QImage>
 #include <QPainter>
 #include <QPixmap>
@@ -54,24 +57,36 @@ OpaqueBackgroundEntry::~OpaqueBackgroundEntry()
 
 BackgroundManager::BackgroundManager()
 {
-    /// qCDebug(BASKET_LOG) << "BackgroundManager: Found the following background images in  ";
-    QStringList directories = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
-    // For each folder:
-    for (QStringList::Iterator it = directories.begin(); it != directories.end(); ++it) {
-        // For each file in those directories:
-        QDir dir(*it + QStringLiteral("/basket/backgrounds/"),
-                 /*nameFilder=*/QStringLiteral("*.png"),
-                 /*sortSpec=*/QDir::Name | QDir::IgnoreCase,
-                 /*filterSpec=*/QDir::Files | QDir::NoSymLinks);
-        ///     qCDebug(BASKET_LOG) << *it + "basket/backgrounds/  ";
-        QStringList files = dir.entryList();
-        for (QStringList::Iterator it2 = files.begin(); it2 != files.end(); ++it2) // TODO: If an image name is present in two folders?
-            addImage(*it + QStringLiteral("/basket/backgrounds/") + *it2);
-    }
+    const QStringList directories =
+        QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
 
-    /// qCDebug(BASKET_LOG) << ":";
-    /// for (BackgroundsList::Iterator it = m_backgroundsList.begin(); it != m_backgroundsList.end(); ++it)
-    ///     qCDebug(BASKET_LOG) << "* " << (*it)->location << "  [ref: " << (*it)->name << "]";
+    QSet<QString> seenNames;
+
+    const auto loadBackgrounds = [this, &seenNames](const QString &folder) {
+        QDir dir(folder,
+                 QStringLiteral("*.png"),
+                 QDir::Name | QDir::IgnoreCase,
+                 QDir::Files | QDir::NoSymLinks);
+
+        const QStringList files = dir.entryList();
+
+        for (const QString &file : files) {
+            if (seenNames.contains(file)) {
+                continue;
+            }
+
+            seenNames.insert(file);
+            addImage(dir.filePath(file));
+        }
+    };
+
+    for (const QString &directory : directories) {
+        // Mathom backgrounds have priority.
+        loadBackgrounds(QDir(directory).filePath(QStringLiteral("mathom/backgrounds")));
+
+        // Keep compatibility with bundled and legacy BasKet backgrounds.
+        loadBackgrounds(QDir(directory).filePath(QStringLiteral("basket/backgrounds")));
+    }
 
     connect(&m_garbageTimer, &QTimer::timeout, this, [this]() {
         doGarbage();
@@ -260,7 +275,12 @@ QPixmap *BackgroundManager::preview(const QString &image)
         return entry->preview;
 
     // Then, try to load the preview from file:
-    QString previewPath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("basket/backgrounds/previews/") + entry->name);
+    QString previewPath = Global::backgroundsFolder() + QStringLiteral("previews/") + entry->name;
+    if (!QFileInfo::exists(previewPath)) {
+        previewPath = QStandardPaths::locate(
+            QStandardPaths::GenericDataLocation,
+            QStringLiteral("basket/backgrounds/previews/") + entry->name);
+    }
     auto *previewPixmap = new QPixmap(previewPath);
     // Success:
     if (!previewPixmap->isNull()) {
@@ -313,7 +333,8 @@ QPixmap *BackgroundManager::preview(const QString &image)
     painter.end();
 
     // Saving it to file for later:
-    QString folder = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QStringLiteral("/basket/backgrounds/previews/");
+    QString folder = Global::backgroundsFolder() + QStringLiteral("previews/");
+    QDir().mkpath(folder);
     result->save(folder + entry->name, "PNG");
 
     // Ouf! That's done:
@@ -337,7 +358,12 @@ QString BackgroundManager::previewPathForImageName(const QString &image)
     if (entry == nullptr) {
         return {};
     } else {
-        QString previewPath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("basket/backgrounds/previews/") + entry->name);
+        QString previewPath = Global::backgroundsFolder() + QStringLiteral("previews/") + entry->name;
+    if (!QFileInfo::exists(previewPath)) {
+        previewPath = QStandardPaths::locate(
+            QStandardPaths::GenericDataLocation,
+            QStringLiteral("basket/backgrounds/previews/") + entry->name);
+    }
         QDir dir;
         if (!dir.exists(previewPath))
             return {};

@@ -1731,7 +1731,7 @@ QMenu *BNPView::popupMenu(const QString &menuName)
         }
     }
     if (menu == nullptr) {
-        QString basketDataPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QStringLiteral("/basket/");
+        QString basketDataPath = Global::savesFolder();
 
         KMessageBox::error(this,
                            i18n("<p><b>The file mathomui.rc seems to not exist or is too old.<br>"

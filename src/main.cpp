@@ -11,6 +11,11 @@
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QDir>
+#include <QDirIterator>
+#include <QDateTime>
+#include <QFile>
+#include <QFileInfo>
+#include <QStandardPaths>
 #include <config.h>
 #include <kconfig.h> // TMP IN ALPHA 1
 
@@ -23,6 +28,44 @@
 #include "debugwindow.h"
 #endif
 #include "settings.h"
+
+static bool copyDirectoryRecursively(const QString &sourcePath, const QString &destinationPath)
+{
+    QDir sourceDir(sourcePath);
+    if (!sourceDir.exists()) {
+        return false;
+    }
+
+    if (!QDir().mkpath(destinationPath)) {
+        return false;
+    }
+
+    QDirIterator it(sourcePath,
+                    QDir::NoDotAndDotDot | QDir::AllEntries | QDir::Hidden | QDir::System,
+                    QDirIterator::Subdirectories);
+
+    while (it.hasNext()) {
+        const QString sourceItem = it.next();
+        const QFileInfo info = it.fileInfo();
+        const QString relativePath = sourceDir.relativeFilePath(sourceItem);
+        const QString destinationItem = QDir(destinationPath).filePath(relativePath);
+
+        if (info.isDir()) {
+            if (!QDir().mkpath(destinationItem)) {
+                return false;
+            }
+        } else if (info.isFile()) {
+            if (!QDir().mkpath(QFileInfo(destinationItem).path())) {
+                return false;
+            }
+            if (!QFile::copy(sourceItem, destinationItem)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
 
 int main(int argc, char *argv[])
 {
@@ -54,10 +97,84 @@ int main(int argc, char *argv[])
             Global::setCustomSavesFolder(customDataFolder);
         }
     }
+    // First-run migration from BasKet to Mathom.
+    // Keep the original BasKet profile untouched.
+    if (opts.value(QStringLiteral("data-folder")).isEmpty()) {
+        const QString genericData =
+            QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+        const QString configDir =
+            QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+
+        const QString newData =
+            QDir(genericData).filePath(QStringLiteral("mathom"));
+        const QString newConfig =
+            QDir(configDir).filePath(QStringLiteral("mathomrc"));
+
+        struct LegacyProfile {
+            QString data;
+            QString config;
+            QDateTime modified;
+        };
+
+        QList<LegacyProfile> candidates;
+
+        // BasKet installed as Flatpak.
+        const QString flatpakRoot =
+            QDir::home().filePath(QStringLiteral(".var/app/org.kde.basket"));
+
+        const QString flatpakData =
+            QDir(flatpakRoot).filePath(QStringLiteral("data/basket"));
+        const QString flatpakConfig =
+            QDir(flatpakRoot).filePath(QStringLiteral("config/basketrc"));
+        const QString flatpakTree =
+            QDir(flatpakData).filePath(QStringLiteral("baskets/baskets.xml"));
+
+        if (QFileInfo::exists(flatpakTree)) {
+            candidates.append({
+                flatpakData,
+                flatpakConfig,
+                QFileInfo(flatpakTree).lastModified()
+            });
+        }
+
+        // BasKet installed natively.
+        const QString nativeData =
+            QDir(genericData).filePath(QStringLiteral("basket"));
+        const QString nativeConfig =
+            QDir(configDir).filePath(QStringLiteral("basketrc"));
+        const QString nativeTree =
+            QDir(nativeData).filePath(QStringLiteral("baskets/baskets.xml"));
+
+        if (QFileInfo::exists(nativeTree)) {
+            candidates.append({
+                nativeData,
+                nativeConfig,
+                QFileInfo(nativeTree).lastModified()
+            });
+        }
+
+        if (!QDir(newData).exists() && !candidates.isEmpty()) {
+            const LegacyProfile *source = &candidates.first();
+
+            for (const LegacyProfile &candidate : candidates) {
+                if (candidate.modified > source->modified) {
+                    source = &candidate;
+                }
+            }
+
+            if (!copyDirectoryRecursively(source->data, newData)) {
+                QDir(newData).removeRecursively();
+            } else if (QFileInfo::exists(source->config)
+                       && !QFileInfo::exists(newConfig)) {
+                QFile::copy(source->config, newConfig);
+            }
+        }
+    }
+
     app.tryLoadFile(opts.positionalArguments(), QDir::currentPath());
 
     // Initialize the config file
-    Global::basketConfig = KSharedConfig::openConfig(QStringLiteral("basketrc"));
+    Global::basketConfig = KSharedConfig::openConfig(QStringLiteral("mathomrc"));
 
     Backup::figureOutBinaryPath(argv0, app);
 

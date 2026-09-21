@@ -42,7 +42,7 @@ QString Global::savesFolder()
         } else if (!Settings::dataFolder().isEmpty()) { // Set by config option (in Basket -> Backup & Restore)
             folder = new QString(Settings::dataFolder().endsWith(QStringLiteral("/")) ? Settings::dataFolder() : Settings::dataFolder() + QLatin1Char('/'));
         } else { // The default path (should be that for most computers)
-            folder = new QString(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QLatin1Char('/') + QStringLiteral("basket/"));
+            folder = new QString(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QLatin1Char('/') + QStringLiteral("mathom/"));
             initializeGitIfNeeded(*folder);
         }
     }

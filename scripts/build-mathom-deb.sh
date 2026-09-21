@@ -1,0 +1,208 @@
+#!/bin/sh
+set -eu
+
+VERSION="${MATHOM_VERSION:-0.1.0}"
+REVISION="${MATHOM_DEB_REVISION:-1}"
+ARCH="amd64"
+
+ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+PACKAGING="$ROOT/packaging"
+APPDIR="$PACKAGING/Mathom.AppDir"
+DEBROOT="$PACKAGING/mathom-debroot"
+OUTPUT="$PACKAGING/mathom_${VERSION}-${REVISION}_${ARCH}.deb"
+MANIFEST="$ROOT/.flatpak-manifest.json"
+
+LINUXDEPLOY="$PACKAGING/tools/linuxdeploy-x86_64.AppImage"
+
+cd "$ROOT"
+
+echo "=== Mathom ${VERSION}-${REVISION} : construction ==="
+
+if [ ! -x "$LINUXDEPLOY" ]; then
+    echo "Erreur : linuxdeploy absent ou non exécutable :"
+    echo "$LINUXDEPLOY"
+    exit 1
+fi
+
+if [ ! -x "$PACKAGING/tools/linuxdeploy-plugin-qt-x86_64.AppImage" ]; then
+    echo "Erreur : plugin Qt de linuxdeploy absent."
+    exit 1
+fi
+
+echo
+echo "=== 1/7 Compilation dans le SDK KDE ==="
+
+flatpak-builder \
+    --user \
+    --force-clean \
+    flatpak-build \
+    "$MANIFEST"
+
+echo
+echo "=== 2/7 Création du Mathom.AppDir ==="
+
+rm -rf "$APPDIR"
+mkdir -p "$APPDIR/usr"
+
+cp -a "$ROOT/flatpak-build/files/." "$APPDIR/usr/"
+rm -rf "$APPDIR/usr/lib/debug"
+
+ln -s usr/bin/mathom "$APPDIR/AppRun"
+
+if [ ! -x "$APPDIR/usr/bin/mathom" ]; then
+    echo "Erreur : le binaire mathom n'a pas été produit."
+    exit 1
+fi
+
+ICON="$APPDIR/usr/share/icons/hicolor/128x128/apps/fr.thorinux.mathom.png"
+
+if ! file "$ICON" | grep -q '128 x 128'; then
+    echo "Erreur : l'icône principale n'est pas réellement en 128x128."
+    file "$ICON"
+    exit 1
+fi
+
+echo
+echo "=== 3/7 Déploiement Qt/KF6 ==="
+
+flatpak-builder --run flatpak-build "$MANIFEST" \
+    env \
+    APPIMAGE_EXTRACT_AND_RUN=1 \
+    PATH="$PACKAGING/tools:$PATH" \
+    "$LINUXDEPLOY" \
+        --appdir "$APPDIR" \
+        --executable "$APPDIR/usr/bin/mathom" \
+        --desktop-file "$APPDIR/usr/share/applications/fr.thorinux.mathom.desktop" \
+        --icon-file "$ICON" \
+        --plugin qt
+
+echo
+echo "=== 4/7 Correctifs du runtime natif ==="
+
+flatpak-builder --run flatpak-build "$MANIFEST" \
+    sh -c '
+        set -eu
+
+        APPDIR="'"$APPDIR"'"
+
+        wayland="$(readlink -f /usr/lib/x86_64-linux-gnu/libwayland-client.so.0)"
+        cp -a "$wayland" "$APPDIR/usr/lib/"
+        ln -sf "$(basename "$wayland")" \
+            "$APPDIR/usr/lib/libwayland-client.so.0"
+
+        cp -a /usr/bin/kbuildsycoca6 \
+            "$APPDIR/usr/bin/kbuildsycoca6"
+    '
+
+if env LD_LIBRARY_PATH="$APPDIR/usr/lib" \
+    ldd "$APPDIR/usr/bin/kbuildsycoca6" | grep -q 'not found'; then
+    echo "Erreur : bibliothèque manquante pour kbuildsycoca6 :"
+    env LD_LIBRARY_PATH="$APPDIR/usr/lib" \
+        ldd "$APPDIR/usr/bin/kbuildsycoca6" | grep 'not found'
+    exit 1
+fi
+
+echo
+echo "=== 5/7 Création de l'arborescence Debian ==="
+
+rm -rf "$DEBROOT"
+
+mkdir -p \
+    "$DEBROOT/DEBIAN" \
+    "$DEBROOT/opt" \
+    "$DEBROOT/usr/bin" \
+    "$DEBROOT/usr/share/applications" \
+    "$DEBROOT/usr/share/metainfo"
+
+cp -a "$APPDIR" "$DEBROOT/opt/mathom"
+
+cat > "$DEBROOT/usr/bin/mathom" <<'WRAPPER'
+#!/bin/sh
+
+APPDIR="/opt/mathom"
+
+if [ -z "${XDG_MENU_PREFIX:-}" ]; then
+    if [ -f /etc/xdg/menus/mate-applications.menu ]; then
+        export XDG_MENU_PREFIX="mate-"
+    elif [ -f /etc/xdg/menus/gnome-applications.menu ]; then
+        export XDG_MENU_PREFIX="gnome-"
+    elif [ -f /etc/xdg/menus/plasma-applications.menu ]; then
+        export XDG_MENU_PREFIX="plasma-"
+    elif [ -f /etc/xdg/menus/kf5-applications.menu ]; then
+        export XDG_MENU_PREFIX="kf5-"
+    fi
+fi
+
+export XDG_DATA_DIRS="$APPDIR/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+export PATH="$APPDIR/usr/bin:$PATH"
+
+if [ -x "$APPDIR/usr/bin/kbuildsycoca6" ]; then
+    env \
+        LD_LIBRARY_PATH="$APPDIR/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+        XDG_DATA_DIRS="$XDG_DATA_DIRS" \
+        XDG_MENU_PREFIX="${XDG_MENU_PREFIX:-}" \
+        "$APPDIR/usr/bin/kbuildsycoca6" >/dev/null 2>&1 || true
+fi
+
+exec "$APPDIR/AppRun" "$@"
+WRAPPER
+
+chmod 755 "$DEBROOT/usr/bin/mathom"
+
+cp "$APPDIR/usr/share/applications/fr.thorinux.mathom.desktop" \
+    "$DEBROOT/usr/share/applications/"
+
+cp "$APPDIR/usr/share/metainfo/fr.thorinux.mathom.metainfo.xml" \
+    "$DEBROOT/usr/share/metainfo/"
+
+# Installer toutes les tailles de l'icône Mathom disponibles.
+find "$APPDIR/usr/share/icons/hicolor" \
+    -type f -name 'fr.thorinux.mathom.png' |
+while IFS= read -r icon; do
+    relative="${icon#"$APPDIR/usr/share/"}"
+    destination="$DEBROOT/usr/share/$(dirname "$relative")"
+    mkdir -p "$destination"
+    cp "$icon" "$destination/"
+done
+
+cat > "$DEBROOT/DEBIAN/control" <<CONTROL
+Package: mathom
+Version: ${VERSION}-${REVISION}
+Section: office
+Priority: optional
+Architecture: ${ARCH}
+Maintainer: Thorinux Systems
+Depends: libc6
+Description: Mathom - notes and information organizer
+ Mathom is an application for recording ideas as mathoms and
+ organizing them into Mathom-Houses and shelves.
+ .
+ Mathom is developed by Thorinux Systems and is based on
+ BasKet Note Pads.
+CONTROL
+
+echo
+echo "=== 6/7 Construction du paquet ==="
+
+rm -f "$OUTPUT"
+
+dpkg-deb --build --root-owner-group \
+    "$DEBROOT" \
+    "$OUTPUT"
+
+echo
+echo "=== 7/7 Contrôles ==="
+
+test "$(dpkg-deb -f "$OUTPUT" Package)" = "mathom"
+test "$(dpkg-deb -f "$OUTPUT" Version)" = "${VERSION}-${REVISION}"
+test "$(dpkg-deb -f "$OUTPUT" Architecture)" = "$ARCH"
+
+if dpkg-deb -c "$OUTPUT" |
+    grep -Eq '/opt/basket(/|$)|org\.kde\.basket\.desktop|Mathom \(Nightly\)'; then
+    echo "Erreur : ancienne identité BasKet/Nightly trouvée dans le paquet."
+    exit 1
+fi
+
+echo
+echo "Paquet créé avec succès :"
+ls -lh "$OUTPUT"

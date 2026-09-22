@@ -745,7 +745,9 @@ void BasketScene::setAppearance(const QString &icon,
     // Basket should ALWAYS have an icon (the "basket" icon by default):
     QPixmap iconTest =
         KIconLoader::global()->loadIcon(icon, KIconLoader::NoGroup, 16, KIconLoader::DefaultState, QStringList(), nullptr, /*canReturnNull=*/true);
-    if (!iconTest.isNull())
+    const bool isBundledMathomIcon = icon == QStringLiteral("mathom-house")
+        || icon == QStringLiteral("mathom-shelf");
+    if (isBundledMathomIcon || !iconTest.isNull())
         m_icon = icon;
 
     // We don't request the background images if it's not loaded yet (to make the application startup fast).

@@ -70,7 +70,7 @@ QItemSelectionModel::SelectionFlags UnselectableListWidget::selectionCommand(con
 /** class NewBasketDefaultProperties: */
 
 NewBasketDefaultProperties::NewBasketDefaultProperties()
-    : icon(QStringLiteral("fr.thorinux.mathom"))
+    : icon(QStringLiteral("mathom-house"))
     , backgroundImage(QString())
     , backgroundColor()
     , textColor()
@@ -225,6 +225,16 @@ NewBasketDialog::NewBasketDialog(BasketScene *parentBasket, const NewBasketDefau
             [this](int index) {
                 setWindowTitle(index == 0 ? i18n("New Mathom-House")
                                           : i18n("New Shelf"));
+
+                // Keep Mathom's semantic defaults in sync with the selected
+                // hierarchy level, without overwriting a user-selected icon.
+                const QString currentIcon = m_icon->icon();
+                if (currentIcon == QStringLiteral("mathom-house")
+                    || currentIcon == QStringLiteral("mathom-shelf")) {
+                    m_icon->setIcon(index == 0
+                                        ? QStringLiteral("mathom-house")
+                                        : QStringLiteral("mathom-shelf"));
+                }
             });
     label = new QLabel(page);
     label->setText(i18n("C&reate in:"));

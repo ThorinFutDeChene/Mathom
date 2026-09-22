@@ -13,6 +13,7 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QFocusEvent>
+#include <QIcon>
 #include <QMimeData>
 #include <QPainter>
 #include <QPixmap>
@@ -91,8 +92,20 @@ void BasketListViewItem::setup()
 {
     setText(/*column=*/0, escapedName(m_basket->basketName()));
 
-    QPixmap icon =
-        KIconLoader::global()->loadIcon(m_basket->icon(), KIconLoader::NoGroup, 16, KIconLoader::DefaultState, QStringList(), nullptr, /*canReturnNull=*/false);
+    QPixmap icon;
+    if (m_basket->icon() == QStringLiteral("mathom-house")) {
+        icon = QIcon(QStringLiteral(":/images/sc-actions-mathom-house.svg")).pixmap(16, 16);
+    } else if (m_basket->icon() == QStringLiteral("mathom-shelf")) {
+        icon = QIcon(QStringLiteral(":/images/sc-actions-mathom-shelf.svg")).pixmap(16, 16);
+    } else {
+        icon = KIconLoader::global()->loadIcon(m_basket->icon(),
+                                               KIconLoader::NoGroup,
+                                               16,
+                                               KIconLoader::DefaultState,
+                                               QStringList(),
+                                               nullptr,
+                                               /*canReturnNull=*/false);
+    }
 
     setIcon(/*column=*/0, icon);
     /*

@@ -1226,7 +1226,7 @@ void BNPView::removeBasket(BasketScene *basket)
 
     // If there is no basket anymore, add a new one:
     if (!nextBasketItem) {
-        BasketFactory::newBasket(QString(), i18n("General"));
+        BasketFactory::newBasket(QStringLiteral("mathom-house"), i18n("General"));
     } else { // No need to save two times if we add a basket
         save();
     }

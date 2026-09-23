@@ -7,6 +7,7 @@
 #include <KAboutData>
 #include <KCrash>
 #include <KDBusService>
+#include <KIconTheme>
 #include <KLocalizedString>
 #include <QCommandLineOption>
 #include <QCommandLineParser>
@@ -70,6 +71,11 @@ static bool copyDirectoryRecursively(const QString &sourcePath, const QString &d
 int main(int argc, char *argv[])
 {
     const char *argv0 = (argc >= 1 ? argv[0] : "");
+
+    // KF6 icon handling must be initialized before QApplication.
+    // This installs KIconEngine and lets Mathom use the KDE icon theme
+    // (Breeze in our bundled runtime) even when running under MATE/GNOME.
+    KIconTheme::initTheme();
 
     Application app(argc, argv);
 

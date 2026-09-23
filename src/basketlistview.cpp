@@ -101,9 +101,9 @@ void BasketListViewItem::setup()
 
     QPixmap icon;
     if (iconName == QStringLiteral("mathom-house")) {
-        icon = QIcon(QStringLiteral(":/images/sc-actions-mathom-house.svg")).pixmap(16, 16);
+        icon = QIcon(QStringLiteral(":/images/128-actions-mathom-house.png")).pixmap(16, 16);
     } else if (iconName == QStringLiteral("mathom-shelf")) {
-        icon = QIcon(QStringLiteral(":/images/sc-actions-mathom-shelf.svg")).pixmap(16, 16);
+        icon = QIcon(QStringLiteral(":/images/128-actions-mathom-shelf.png")).pixmap(16, 16);
     } else {
         icon = KIconLoader::global()->loadIcon(iconName,
                                                KIconLoader::NoGroup,

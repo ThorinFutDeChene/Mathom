@@ -27,6 +27,7 @@ set(libbasket_SRCS
     kcolorcombo2.cpp kcolorcombo2.h
     kgpgme.cpp kgpgme.h
     linklabel.cpp linklabel.h
+    mathomicons.cpp mathomicons.h
     newbasketdialog.cpp newbasketdialog.h
     note.cpp note.h
     notecontent.cpp notecontent.h

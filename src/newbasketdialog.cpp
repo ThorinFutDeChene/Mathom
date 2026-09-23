@@ -357,7 +357,15 @@ void NewBasketDialog::slotOk()
         textColor = m_defaultProperties.textColor;
     }
 
-    BasketFactory::newBasket(m_icon->icon(),
+    QString selectedIcon = m_icon->icon();
+    if (selectedIcon.isEmpty()
+        || selectedIcon == QStringLiteral("fr.thorinux.mathom")) {
+        selectedIcon = m_createIn->currentIndex() == 0
+            ? QStringLiteral("mathom-house")
+            : QStringLiteral("mathom-shelf");
+    }
+
+    BasketFactory::newBasket(selectedIcon,
                              m_name->text(),
                              m_basketsMap[m_createIn->currentIndex()],
                              backgroundImage,

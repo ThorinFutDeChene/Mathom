@@ -2,7 +2,7 @@
 set -eu
 
 VERSION="${MATHOM_VERSION:-0.1.1}"
-REVISION="${MATHOM_DEB_REVISION:-4}"
+REVISION="${MATHOM_DEB_REVISION:-5}"
 ARCH="amd64"
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"

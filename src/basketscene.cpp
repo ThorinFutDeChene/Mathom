@@ -743,14 +743,11 @@ void BasketScene::setAppearance(const QString &icon,
     // Where is this shown?
     m_action->setText(QStringLiteral("BASKET SHORTCUT: ") + name);
 
-    // Preserve the stored semantic/custom identifier. Rendering and legacy
-    // migration are centralized in MathomIcons, so loading a Mathom-House no
-    // longer depends on the desktop icon theme.
+    // Preserve the stored semantic/custom identifier even when the current
+    // desktop theme cannot render it. Rendering fallback belongs to
+    // MathomIcons; loading must never destroy a user's icon choice.
     const QString customIcon = MathomIcons::resolveCustomPath(icon);
-    if (!customIcon.isEmpty())
-        m_icon = customIcon;
-    else if (!MathomIcons::icon(icon).isNull())
-        m_icon = icon;
+    m_icon = customIcon.isEmpty() ? icon : customIcon;
 
     // We don't request the background images if it's not loaded yet (to make the application startup fast).
     // When the basket is loading (because requested by the user: he/she want to access it)

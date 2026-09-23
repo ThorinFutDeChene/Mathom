@@ -45,6 +45,7 @@
 #include <KIO/Paste>
 
 #include "basketlistview.h"
+#include "mathomicons.h"
 #include "basketscene.h"
 #include "file_mimetypes.h"
 #include "global.h"
@@ -482,15 +483,15 @@ Note *NoteFactory::dropURLs(QList<QUrl> urls, BasketScene *parent, Qt::DropActio
         if (shouldAsk) {
             QMenu menu(parent->graphicsView());
             QList<QAction *> actList;
-            actList << new QAction(QIcon::fromTheme(QStringLiteral("go-jump")), i18n("&Move Here\tShift"), &menu)
-                    << new QAction(QIcon::fromTheme(QStringLiteral("edit-copy")), i18n("&Copy Here\tCtrl"), &menu)
-                    << new QAction(QIcon::fromTheme(QStringLiteral("insert-link")), i18n("&Link Here\tCtrl+Shift"), &menu);
+            actList << new QAction(MathomIcons::icon(QStringLiteral("go-jump")), i18n("&Move Here\tShift"), &menu)
+                    << new QAction(MathomIcons::icon(QStringLiteral("edit-copy")), i18n("&Copy Here\tCtrl"), &menu)
+                    << new QAction(MathomIcons::icon(QStringLiteral("insert-link")), i18n("&Link Here\tCtrl+Shift"), &menu);
 
             for (QAction *a : actList)
                 menu.addAction(a);
 
             menu.addSeparator();
-            menu.addAction(QIcon::fromTheme(QStringLiteral("dialog-cancel")), i18n("C&ancel\tEscape"));
+            menu.addAction(MathomIcons::icon(QStringLiteral("dialog-cancel")), i18n("C&ancel\tEscape"));
             int id = actList.indexOf(menu.exec(QCursor::pos()));
             switch (id) {
             case 0:
@@ -994,7 +995,7 @@ Note *NoteFactory::importIcon(BasketScene *parent)
         if (dialog->iconSize() > 0) {
             Settings::setDefIconSize(dialog->iconSize());
             Settings::saveConfig();
-            return createNoteImage(QIcon::fromTheme(iconName).pixmap(dialog->iconSize()), parent); // TODO: wantedName = iconName !
+            return createNoteImage(MathomIcons::icon(iconName).pixmap(dialog->iconSize()), parent); // TODO: wantedName = iconName !
         }
     }
     return nullptr;

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-VERSION="${MATHOM_VERSION:-0.1.0}"
+VERSION="${MATHOM_VERSION:-0.1.1}"
 REVISION="${MATHOM_DEB_REVISION:-1}"
 ARCH="amd64"
 

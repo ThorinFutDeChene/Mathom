@@ -31,6 +31,7 @@
 #include "bnpview.h"
 #include "decoratedbasket.h"
 #include "global.h"
+#include "mathomicons.h"
 #include "notedrag.h"
 #include "settings.h"
 #include "tools.h"
@@ -93,52 +94,8 @@ void BasketListViewItem::setup()
 {
     setText(/*column=*/0, escapedName(m_basket->basketName()));
 
-    QString iconName = m_basket->icon();
-    if (iconName.isEmpty()
-        || iconName == QStringLiteral("fr.thorinux.mathom")
-        || iconName == QStringLiteral("org.kde.basket")
-        || iconName == QStringLiteral("basket")) {
-        iconName = parent()
-            ? QStringLiteral("mathom-shelf")
-            : QStringLiteral("mathom-house");
-    }
-
-    QPixmap icon;
-    if (iconName == QStringLiteral("mathom-house")) {
-        icon = QIcon(QStringLiteral(":/images/128-actions-mathom-house.png")).pixmap(16, 16);
-    } else if (iconName == QStringLiteral("mathom-shelf")) {
-        icon = QIcon(QStringLiteral(":/images/128-actions-mathom-shelf.png")).pixmap(16, 16);
-    } else if (QFileInfo::exists(iconName)) {
-        // Custom Mathom/BasKet icons can be stored as absolute file paths.
-        // Do not send those paths through KIconLoader: load the file directly.
-        icon = QIcon(iconName).pixmap(16, 16);
-    } else {
-        // Older profiles can point to the former BasKet basket-icons folder.
-        // If the basename has already been migrated to Mathom, use it.
-        const QString migratedIcon =
-            Global::savesFolder() + QStringLiteral("basket-icons/") + QFileInfo(iconName).fileName();
-        if (!QFileInfo(iconName).fileName().isEmpty() && QFileInfo::exists(migratedIcon)) {
-            icon = QIcon(migratedIcon).pixmap(16, 16);
-        } else {
-            icon = KIconLoader::global()->loadIcon(iconName,
-                                               KIconLoader::NoGroup,
-                                               16,
-                                               KIconLoader::DefaultState,
-                                               QStringList(),
-                                                   nullptr,
-                                                   /*canReturnNull=*/false);
-        }
-    }
-
+    const QIcon icon = MathomIcons::hierarchy(m_basket->icon(), parent() == nullptr);
     setIcon(/*column=*/0, icon);
-    /*
-        QBrush brush;
-
-        bool withIcon = m_stateCopy || (m_tagCopy && !m_tagCopy->isMultiState());
-        State* state = (m_tagCopy ? m_tagCopy->stateCopies[0]->newState : m_stateCopy->newState);
-        brush.setColor(isSelected() ? qApp->palette().color(QPalette::Highlight)  : (withIcon && state->backgroundColor().isValid() ? state->backgroundColor() :
-       viewport->palette().color(viewwport->backgroundRole()))); setBackground(brush);
-        */
 }
 
 BasketListViewItem *BasketListViewItem::lastChild()

@@ -2,7 +2,7 @@
 set -eu
 
 VERSION="${MATHOM_VERSION:-0.1.1}"
-REVISION="${MATHOM_DEB_REVISION:-3}"
+REVISION="${MATHOM_DEB_REVISION:-4}"
 ARCH="amd64"
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
@@ -103,6 +103,17 @@ flatpak-builder --run flatpak-build "$MANIFEST" \
         mkdir -p "$APPDIR/usr/share/icons"
         rm -rf "$APPDIR/usr/share/icons/breeze"
         cp -a /usr/share/icons/breeze "$APPDIR/usr/share/icons/"
+
+        # The AppDir is executed outside Flatpak. Qt/KF6 libraries alone are
+        # not enough: their standard actions (Cut/Copy/Paste/etc.) are
+        # translated by framework catalogs supplied by the KDE runtime.
+        # Copy the French runtime catalogs so the native Debian package has
+        # the same translations as the Flatpak laboratory environment.
+        mkdir -p "$APPDIR/usr/share/locale/fr/LC_MESSAGES"
+        for mo in /usr/share/locale/fr/LC_MESSAGES/*.mo; do
+            [ -f "$mo" ] || continue
+            cp -a "$mo" "$APPDIR/usr/share/locale/fr/LC_MESSAGES/"
+        done
     '
 
 if env LD_LIBRARY_PATH="$APPDIR/usr/lib" \
@@ -146,6 +157,11 @@ fi
 
 export XDG_DATA_DIRS="$APPDIR/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export PATH="$APPDIR/usr/bin:$PATH"
+
+# The self-contained KF6 runtime must search its own translations as well as
+# the host locale tree. This keeps the installed .deb identical to the lab
+# build for KStandardAction/KXmlGui strings.
+export XLOCALEDIR="$APPDIR/usr/share/locale"
 
 if [ -x "$APPDIR/usr/bin/kbuildsycoca6" ]; then
     env \
@@ -247,6 +263,7 @@ CONTENTS_LIST="$PACKAGING/mathom-deb-contents.txt"
 dpkg-deb -c "$OUTPUT" > "$CONTENTS_LIST"
 
 grep -q './opt/mathom/usr/share/icons/breeze/index.theme' "$CONTENTS_LIST"
+grep -q './opt/mathom/usr/share/locale/fr/LC_MESSAGES/' "$CONTENTS_LIST"
 grep -q './usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg' "$CONTENTS_LIST"
 
 if grep -Eq '/opt/basket(/|$)|org\.kde\.basket\.desktop|Mathom \(Nightly\)' "$CONTENTS_LIST"; then

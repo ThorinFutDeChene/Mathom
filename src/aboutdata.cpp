@@ -8,6 +8,7 @@
 
 #include <KLocalizedString>
 #include <QApplication>
+#include <QIcon>
 
 AboutData::AboutData()
     : KAboutData(AboutData::componentName(),
@@ -25,6 +26,7 @@ AboutData::AboutData()
     setHomepage(QString());
     setOrganizationDomain(QByteArrayLiteral("thorinux.fr"));
     setDesktopFileName(QStringLiteral("fr.thorinux.mathom"));
+    setProgramLogo(QIcon(QStringLiteral(":/images/sc-apps-fr.thorinux.mathom.svg")));
 
     addAuthor(QStringLiteral("Thorinux Systems"), i18n("Mathom fork maintainer"));
 

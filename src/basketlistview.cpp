@@ -92,13 +92,20 @@ void BasketListViewItem::setup()
 {
     setText(/*column=*/0, escapedName(m_basket->basketName()));
 
+    QString iconName = m_basket->icon();
+    if (iconName.isEmpty() || iconName == QStringLiteral("fr.thorinux.mathom")) {
+        iconName = parent()
+            ? QStringLiteral("mathom-shelf")
+            : QStringLiteral("mathom-house");
+    }
+
     QPixmap icon;
-    if (m_basket->icon() == QStringLiteral("mathom-house")) {
+    if (iconName == QStringLiteral("mathom-house")) {
         icon = QIcon(QStringLiteral(":/images/sc-actions-mathom-house.svg")).pixmap(16, 16);
-    } else if (m_basket->icon() == QStringLiteral("mathom-shelf")) {
+    } else if (iconName == QStringLiteral("mathom-shelf")) {
         icon = QIcon(QStringLiteral(":/images/sc-actions-mathom-shelf.svg")).pixmap(16, 16);
     } else {
-        icon = KIconLoader::global()->loadIcon(m_basket->icon(),
+        icon = KIconLoader::global()->loadIcon(iconName,
                                                KIconLoader::NoGroup,
                                                16,
                                                KIconLoader::DefaultState,

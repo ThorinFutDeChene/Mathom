@@ -38,6 +38,7 @@
 #include "common.h"
 #include "formatimporter.h"
 #include "global.h"
+#include "mathomicons.h"
 #include "tag.h"
 #include "tools.h"
 #include "xmlwork.h"
@@ -722,11 +723,12 @@ void Archive::importBasketIcon(QDomElement properties, const QString &extraction
         // The icon does not exists on that computer, import it:
         if (icon.isNull()) {
             QDir dir;
-            dir.mkdir(Global::savesFolder() + QStringLiteral("basket-icons/"));
+            dir.mkpath(MathomIcons::customIconsFolder());
             FormatImporter copier; // Only used to copy files synchronously
-            // Archive::saveBasketToArchive() flattens '/' to '_' in the
-            // archived file name. Rebuild that exact name here, then restore
-            // the original basename in Mathom's private basket-icons folder.
+
+            // Archive::saveBasketToArchive() stores custom icon paths with '/'
+            // flattened to '_'. Restore the file into Mathom's single custom
+            // icon catalogue and rewrite the basket property to that path.
             const QString iconFileName = QFileInfo(iconName).fileName().isEmpty()
                 ? iconName
                 : QFileInfo(iconName).fileName();
@@ -736,7 +738,7 @@ void Archive::importBasketIcon(QDomElement properties, const QString &extraction
             const QString source =
                 extractionFolder + QStringLiteral("basket-icons/") + archivedIconName;
             const QString destination =
-                Global::savesFolder() + QStringLiteral("basket-icons/") + iconFileName;
+                MathomIcons::customIconsFolder() + iconFileName;
 
             if (QFileInfo::exists(source) && !QFileInfo::exists(destination))
                 copier.copyFolder(source, destination);

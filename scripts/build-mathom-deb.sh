@@ -2,7 +2,7 @@
 set -eu
 
 VERSION="${MATHOM_VERSION:-0.1.1}"
-REVISION="${MATHOM_DEB_REVISION:-6}"
+REVISION="${MATHOM_DEB_REVISION:-7}"
 ARCH="amd64"
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
@@ -182,6 +182,14 @@ cp "$APPDIR/usr/share/applications/fr.thorinux.mathom.desktop" \
 cp "$APPDIR/usr/share/metainfo/fr.thorinux.mathom.metainfo.xml" \
     "$DEBROOT/usr/share/metainfo/"
 
+# Install the validated Mathom launcher icon directly for native desktops.
+# This happens after Flatpak/AppStream composition, so it cannot break the
+# compose step. MATE reliably resolves the hicolor PNG, with pixmaps fallback.
+install -Dm644 "$ROOT/resources/icons/app/mathom.png" \
+    "$DEBROOT/usr/share/icons/hicolor/48x48/apps/fr.thorinux.mathom.png"
+install -Dm644 "$ROOT/resources/icons/app/mathom.png" \
+    "$DEBROOT/usr/share/pixmaps/fr.thorinux.mathom.png"
+
 # Installer les icônes Mathom disponibles (PNG et SVG).
 find "$APPDIR/usr/share/icons/hicolor" \
     -type f \( -name 'fr.thorinux.mathom.png' -o -name 'fr.thorinux.mathom.svg' \) |
@@ -265,6 +273,8 @@ dpkg-deb -c "$OUTPUT" > "$CONTENTS_LIST"
 grep -q './opt/mathom/usr/share/icons/breeze/index.theme' "$CONTENTS_LIST"
 grep -q './opt/mathom/usr/share/locale/fr/LC_MESSAGES/' "$CONTENTS_LIST"
 grep -q './usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg' "$CONTENTS_LIST"
+grep -q './usr/share/icons/hicolor/48x48/apps/fr.thorinux.mathom.png' "$CONTENTS_LIST"
+grep -q './usr/share/pixmaps/fr.thorinux.mathom.png' "$CONTENTS_LIST"
 
 if grep -Eq '/opt/basket(/|$)|org\.kde\.basket\.desktop|Mathom \(Nightly\)' "$CONTENTS_LIST"; then
     echo "Erreur : ancienne identité BasKet/Nightly trouvée dans le paquet."

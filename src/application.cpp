@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QIcon>
 #include <QString>
 #include <QTimer>
 
@@ -33,6 +34,10 @@ Application::Application(int &argc, char **argv)
     , m_mainWindow(nullptr)
 {
     KLocalizedString::setApplicationDomain("basket");
+    // Mathom is distributed as a self-contained application on non-KDE
+    // desktops. Keep the desktop theme first, but use the bundled Breeze
+    // theme whenever MATE/GNOME does not provide an icon used by KF6/BasKet.
+    QIcon::setFallbackThemeName(QStringLiteral("breeze"));
     // Use the bundled Mathom logo directly. This avoids picking up an
     // older system-installed Basket/Mathom icon from the host icon theme.
     setWindowIcon(QIcon(QStringLiteral(":/images/128-apps-fr.thorinux.mathom.png")));

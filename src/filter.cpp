@@ -17,6 +17,7 @@
 #include <KLocalizedString>
 
 #include "bnpview.h"
+#include "mathomicons.h"
 #include "focusedwidgets.h"
 #include "global.h"
 #include "tag.h"
@@ -33,8 +34,8 @@ FilterBar::FilterBar(QWidget *parent)
     // (Aaron Seigo says we don't need to worry about the
     //  "Toolbar group" stuff anymore.)
 
-    QIcon resetIcon = QIcon::fromTheme(QStringLiteral("dialog-close"));
-    QIcon inAllIcon = QIcon::fromTheme(QStringLiteral("edit-find"));
+    QIcon resetIcon = MathomIcons::icon(QStringLiteral("dialog-close"));
+    QIcon inAllIcon = MathomIcons::icon(QStringLiteral("edit-find"));
 
     m_resetButton = new QToolButton(this);
     m_resetButton->setIcon(resetIcon);

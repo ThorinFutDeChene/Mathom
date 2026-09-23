@@ -871,7 +871,9 @@ void BNPView::load(QTreeWidgetItem *item, const QDomElement &baskets)
                 // The first Mathom builds used the application icon as the
                 // default for every node. Map only that legacy default to the
                 // new hierarchy icons; explicit/custom icons are untouched.
-                if (basket->icon() == QStringLiteral("fr.thorinux.mathom")) {
+                if (basket->icon() == QStringLiteral("fr.thorinux.mathom")
+                    || basket->icon() == QStringLiteral("org.kde.basket")
+                    || basket->icon() == QStringLiteral("basket")) {
                     basket->setAppearance(item
                                               ? QStringLiteral("mathom-shelf")
                                               : QStringLiteral("mathom-house"),

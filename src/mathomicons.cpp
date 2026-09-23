@@ -16,8 +16,8 @@ namespace
 QString resourceForName(const QString &name)
 {
     static const QHash<QString, QString> resources = {
-        {QStringLiteral("fr.thorinux.mathom"), QStringLiteral(":/images/128-apps-fr.thorinux.mathom.png")},
-        {QStringLiteral("mathom-app"), QStringLiteral(":/images/128-apps-fr.thorinux.mathom.png")},
+        {QStringLiteral("fr.thorinux.mathom"), QStringLiteral(":/images/48-apps-fr.thorinux.mathom.png")},
+        {QStringLiteral("mathom-app"), QStringLiteral(":/images/48-apps-fr.thorinux.mathom.png")},
         {QStringLiteral("mathom-house"), QStringLiteral(":/images/128-actions-mathom-house.png")},
         {QStringLiteral("mathom-shelf"), QStringLiteral(":/images/128-actions-mathom-shelf.png")},
         {QStringLiteral("tag_checkbox"), QStringLiteral(":/tags/16-actions-tag_checkbox.png")},
@@ -49,12 +49,12 @@ QString legacyCustomIconsFolder()
 
 QIcon MathomIcons::application()
 {
-    return QIcon(QStringLiteral(":/images/128-apps-fr.thorinux.mathom.png"));
+    return QIcon(QStringLiteral(":/images/48-apps-fr.thorinux.mathom.png"));
 }
 
 QString MathomIcons::customIconsFolder()
 {
-    return Global::savesFolder() + QStringLiteral("basket-icons/");
+    return Global::savesFolder() + QStringLiteral("icons/");
 }
 
 QString MathomIcons::resolveCustomPath(const QString &nameOrPath)
@@ -73,6 +73,11 @@ QString MathomIcons::resolveCustomPath(const QString &nameOrPath)
     const QString mathomPath = customIconsFolder() + baseName;
     if (QFileInfo::exists(mathomPath))
         return mathomPath;
+
+    const QString previousMathomPath =
+        Global::savesFolder() + QStringLiteral("basket-icons/") + baseName;
+    if (QFileInfo::exists(previousMathomPath))
+        return previousMathomPath;
 
     const QString legacyPath = legacyCustomIconsFolder() + baseName;
     if (QFileInfo::exists(legacyPath))

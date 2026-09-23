@@ -16,10 +16,10 @@ namespace
 QString resourceForName(const QString &name)
 {
     static const QHash<QString, QString> resources = {
-        {QStringLiteral("fr.thorinux.mathom"), QStringLiteral(":/images/48-apps-fr.thorinux.mathom.png")},
-        {QStringLiteral("mathom-app"), QStringLiteral(":/images/48-apps-fr.thorinux.mathom.png")},
-        {QStringLiteral("mathom-house"), QStringLiteral(":/images/128-actions-mathom-house.png")},
-        {QStringLiteral("mathom-shelf"), QStringLiteral(":/images/128-actions-mathom-shelf.png")},
+        {QStringLiteral("fr.thorinux.mathom"), QStringLiteral(":/mathom/icons/app.png")},
+        {QStringLiteral("mathom-app"), QStringLiteral(":/mathom/icons/app.png")},
+        {QStringLiteral("mathom-house"), QStringLiteral(":/mathom/icons/house.png")},
+        {QStringLiteral("mathom-shelf"), QStringLiteral(":/mathom/icons/shelf.png")},
         {QStringLiteral("tag_checkbox"), QStringLiteral(":/tags/16-actions-tag_checkbox.png")},
         {QStringLiteral("tag_checkbox_checked"), QStringLiteral(":/tags/16-actions-tag_checkbox_checked.png")},
         {QStringLiteral("tag_for_later"), QStringLiteral(":/tags/sc-actions-tag_for_later.svgz")},
@@ -49,7 +49,7 @@ QString legacyCustomIconsFolder()
 
 QIcon MathomIcons::application()
 {
-    return QIcon(QStringLiteral(":/images/48-apps-fr.thorinux.mathom.png"));
+    return QIcon(QStringLiteral(":/mathom/icons/app.png"));
 }
 
 QString MathomIcons::customIconsFolder()

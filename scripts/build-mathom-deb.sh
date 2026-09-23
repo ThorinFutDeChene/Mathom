@@ -2,7 +2,7 @@
 set -eu
 
 VERSION="${MATHOM_VERSION:-0.1.1}"
-REVISION="${MATHOM_DEB_REVISION:-1}"
+REVISION="${MATHOM_DEB_REVISION:-2}"
 ARCH="amd64"
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
@@ -54,11 +54,11 @@ if [ ! -x "$APPDIR/usr/bin/mathom" ]; then
     exit 1
 fi
 
-ICON="$APPDIR/usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg"
+ICON="$APPDIR/usr/share/icons/hicolor/128x128/apps/fr.thorinux.mathom.png"
 
-if [ ! -s "$ICON" ]; then
-    echo "Erreur : l'icône principale Mathom est absente :"
-    echo "$ICON"
+if ! file "$ICON" | grep -q '128 x 128'; then
+    echo "Erreur : l'icône principale Mathom n'est pas un vrai PNG 128x128 :"
+    file "$ICON"
     exit 1
 fi
 
@@ -92,6 +92,17 @@ flatpak-builder --run flatpak-build "$MANIFEST" \
 
         cp -a /usr/bin/kbuildsycoca6 \
             "$APPDIR/usr/bin/kbuildsycoca6"
+
+        # BasKet/KF6 relies on many standard KDE icon names. Ubuntu MATE
+        # does not provide all of them, so Mathom ships Breeze as a fallback
+        # theme while still allowing the desktop theme to remain primary.
+        if [ ! -d /usr/share/icons/breeze ]; then
+            echo "Erreur : le thème Breeze est absent du SDK KDE."
+            exit 1
+        fi
+        mkdir -p "$APPDIR/usr/share/icons"
+        rm -rf "$APPDIR/usr/share/icons/breeze"
+        cp -a /usr/share/icons/breeze "$APPDIR/usr/share/icons/"
     '
 
 if env LD_LIBRARY_PATH="$APPDIR/usr/lib" \
@@ -196,6 +207,9 @@ echo "=== 7/7 Contrôles ==="
 test "$(dpkg-deb -f "$OUTPUT" Package)" = "mathom"
 test "$(dpkg-deb -f "$OUTPUT" Version)" = "${VERSION}-${REVISION}"
 test "$(dpkg-deb -f "$OUTPUT" Architecture)" = "$ARCH"
+
+dpkg-deb -c "$OUTPUT" | grep -q './opt/mathom/usr/share/icons/breeze/index.theme'
+dpkg-deb -c "$OUTPUT" | grep -q './usr/share/icons/hicolor/128x128/apps/fr.thorinux.mathom.png'
 
 if dpkg-deb -c "$OUTPUT" |
     grep -Eq '/opt/basket(/|$)|org\.kde\.basket\.desktop|Mathom \(Nightly\)'; then

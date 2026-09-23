@@ -33,8 +33,9 @@ Application::Application(int &argc, char **argv)
     , m_mainWindow(nullptr)
 {
     KLocalizedString::setApplicationDomain("basket");
-    setWindowIcon(QIcon::fromTheme(QStringLiteral("fr.thorinux.mathom"),
-                                   QIcon(QStringLiteral(":/images/sc-apps-fr.thorinux.mathom.svg"))));
+    // Use the bundled Mathom logo directly. This avoids picking up an
+    // older system-installed Basket/Mathom icon from the host icon theme.
+    setWindowIcon(QIcon(QStringLiteral(":/images/sc-apps-fr.thorinux.mathom.svg")));
 
     KAboutData::setApplicationData(AboutData());
     // BasketPart::createAboutData();

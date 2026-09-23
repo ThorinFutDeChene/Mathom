@@ -32,6 +32,7 @@
 #include <algorithm>
 
 #include "global.h"
+#include "mathomicons.h"
 #include "htmlexporter.h"
 #include "kcolorcombo2.h"
 #include "tools.h"
@@ -214,7 +215,7 @@ void LinkLabel::setLink(const QString &title, const QString &icon, LinkLook *loo
     if (icon.isEmpty())
         m_icon->clear();
     else {
-        QPixmap pixmap = QIcon::fromTheme(icon).pixmap(m_look->iconSize());
+        QPixmap pixmap = MathomIcons::icon(icon).pixmap(m_look->iconSize());
         if (!pixmap.isNull())
             m_icon->setPixmap(pixmap);
     }

@@ -745,7 +745,9 @@ void BasketScene::setAppearance(const QString &icon,
     // Basket should ALWAYS have an icon (the "basket" icon by default):
     QPixmap iconTest =
         KIconLoader::global()->loadIcon(icon, KIconLoader::NoGroup, 16, KIconLoader::DefaultState, QStringList(), nullptr, /*canReturnNull=*/true);
-    if (!iconTest.isNull())
+    const bool isBundledMathomIcon = icon == QStringLiteral("mathom-house")
+        || icon == QStringLiteral("mathom-shelf");
+    if (isBundledMathomIcon || !iconTest.isNull())
         m_icon = icon;
 
     // We don't request the background images if it's not loaded yet (to make the application startup fast).
@@ -1202,7 +1204,7 @@ BasketScene::BasketScene(QWidget *parent, const QString &folderName)
     , m_count(0)
     , m_countFounds(0)
     , m_countSelecteds(0)
-    , m_icon(QStringLiteral("fr.thorinux.mathom"))
+    , m_icon(QStringLiteral("mathom-house"))
     , m_folderName(folderName)
     , m_editor(nullptr)
     , m_redirectEditActions(false)

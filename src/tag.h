@@ -13,6 +13,7 @@
 
 class QColor;
 class QFont;
+class QIcon;
 class QString;
 
 class QKeySequence;
@@ -158,6 +159,7 @@ public:
     State *nextState(bool cycle = true);
     QString fullName();
     QFont font(QFont base);
+    QIcon icon() const;
     QString toCSS(const QString &gradientFolderPath, const QString &gradientFolderName, const QFont &baseFont);
     static void merge(const List &states, State *result, int *emblemsCount, bool *haveInvisibleTags, const QColor &backgroundColor);
     void copyTo(State *other);

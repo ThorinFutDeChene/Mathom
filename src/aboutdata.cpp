@@ -8,11 +8,12 @@
 
 #include <KLocalizedString>
 #include <QApplication>
+#include <QIcon>
 
 AboutData::AboutData()
     : KAboutData(AboutData::componentName(),
                  AboutData::displayName(),
-                 QStringLiteral("0.1.0"),
+                 QStringLiteral("0.1.1"),
                  i18n("<p><b>Taking care of your ideas.</b></p>"
                       "<p>A note-taking application that makes it easy to record ideas as you think, and quickly find them later. "
                       "Organizing your notes has never been so easy.</p>"),
@@ -25,6 +26,7 @@ AboutData::AboutData()
     setHomepage(QString());
     setOrganizationDomain(QByteArrayLiteral("thorinux.fr"));
     setDesktopFileName(QStringLiteral("fr.thorinux.mathom"));
+    setProgramLogo(QIcon(QStringLiteral(":/images/128-apps-fr.thorinux.mathom.png")));
 
     addAuthor(QStringLiteral("Thorinux Systems"), i18n("Mathom fork maintainer"));
 

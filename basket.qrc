@@ -9,6 +9,8 @@
 	<file>images/48-apps-fr.thorinux.mathom.png</file>
 	<file>images/64-apps-fr.thorinux.mathom.png</file>
 	<file>images/128-apps-fr.thorinux.mathom.png</file>
+	<file>images/128-actions-mathom-house.png</file>
+	<file>images/128-actions-mathom-shelf.png</file>
 	<file>tags/16-actions-tag_checkbox.png</file>
 	<file>tags/16-actions-tag_checkbox_checked.png</file>
 	<file>tags/sc-actions-tag_for_later.svgz</file>
@@ -22,6 +24,7 @@
 	<file>tags/sc-actions-tag_priority_medium.svgz</file>
 	<file>tags/sc-actions-tag_progress_000.svgz</file>
 	<file>tags/sc-actions-tag_progress_025.svgz</file>
+	<file>tags/sc-actions-tag_progress_050.svgz</file>
 	<file>tags/sc-actions-tag_progress_075.svgz</file>
 	<file>tags/sc-actions-tag_progress_100.svgz</file>
 </qresource>

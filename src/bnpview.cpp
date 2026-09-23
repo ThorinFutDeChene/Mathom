@@ -164,7 +164,7 @@ void BNPView::lateInit()
         }
         if (topLevelItemCount() <= 0) {
             // Create first basket:
-            BasketFactory::newBasket(QString(), i18n("General"));
+            BasketFactory::newBasket(QStringLiteral("mathom-house"), i18n("General"));
             GitWrapper::commitBasket(currentBasket());
             GitWrapper::commitTagsXml();
         }
@@ -593,12 +593,13 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("basket_new"), this, qOverload<>(&BNPView::askNewBasket));
     a->setText(i18n("&New Mathom-House..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("document-new")));
+    a->setIcon(QIcon::fromTheme(QStringLiteral("mathom-house")));
     m_actionCollection->setDefaultShortcuts(a, KStandardShortcut::shortcut(KStandardShortcut::New));
     actNewBasket = a;
 
     a = ac->addAction(QStringLiteral("basket_new_sub"), this, &BNPView::askNewSubBasket);
     a->setText(i18n("New &Shelf..."));
+    a->setIcon(QIcon::fromTheme(QStringLiteral("mathom-shelf")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_N));
     actNewSubBasket = a;
 
@@ -866,6 +867,20 @@ void BNPView::load(QTreeWidgetItem *item, const QDomElement &baskets)
                 BasketListViewItem *basketItem = appendBasket(basket, item);
                 basketItem->setExpanded(!XMLWork::trueOrFalse(element.attribute(QStringLiteral("folded"), QStringLiteral("false")), false));
                 basket->loadProperties(XMLWork::getElement(element, QStringLiteral("properties")));
+
+                // The first Mathom builds used the application icon as the
+                // default for every node. Map only that legacy default to the
+                // new hierarchy icons; explicit/custom icons are untouched.
+                if (basket->icon() == QStringLiteral("fr.thorinux.mathom")) {
+                    basket->setAppearance(item
+                                              ? QStringLiteral("mathom-shelf")
+                                              : QStringLiteral("mathom-house"),
+                                          basket->basketName(),
+                                          basket->backgroundImageName(),
+                                          basket->backgroundColorSetting(),
+                                          basket->textColorSetting());
+                }
+
                 if (XMLWork::trueOrFalse(
                         element.attribute(QStringLiteral("lastOpened"), element.attribute(QStringLiteral("lastOpened"), QStringLiteral("false"))),
                         false)) // Compat with 0.6.0-Alphas
@@ -1211,7 +1226,7 @@ void BNPView::removeBasket(BasketScene *basket)
 
     // If there is no basket anymore, add a new one:
     if (!nextBasketItem) {
-        BasketFactory::newBasket(QString(), i18n("General"));
+        BasketFactory::newBasket(QStringLiteral("mathom-house"), i18n("General"));
     } else { // No need to save two times if we add a basket
         save();
     }
@@ -2104,7 +2119,6 @@ void BNPView::askNewBasket(BasketScene *parent, BasketScene *pickProperties)
 {
     NewBasketDefaultProperties properties;
     if (pickProperties) {
-        properties.icon = pickProperties->icon();
         properties.backgroundImage = pickProperties->backgroundImageName();
         properties.backgroundColor = pickProperties->backgroundColorSetting();
         properties.textColor = pickProperties->textColorSetting();

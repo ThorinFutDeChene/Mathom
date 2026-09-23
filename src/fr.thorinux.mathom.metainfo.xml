@@ -44,7 +44,7 @@
   <summary xml:lang="zh-CN">记事贴和待办事项组织工具</summary>
   <summary xml:lang="zh-TW">筆記與待辦事項管理工具</summary>
   <description>
-    <p>This application provides as many baskets as you wish, and you can drag and drop.</p>
+    <p>Mathom lets you organize information in Mathom-Houses, shelves and mathoms, with drag and drop.</p>
     <p xml:lang="ar">يوفر هذا التطبيق عددًا غير محدود من السلال، ويمكنك سحبها وإفلاتها.</p>
     <p xml:lang="ca">Aquesta aplicació proporciona tantes cistelles com desitgeu, i les podeu arrossegar i deixar anar.</p>
     <p xml:lang="ca-valencia">Esta aplicació proporciona tantes cistelles com voleu, i les podeu arrossegar i deixar anar.</p>
@@ -56,7 +56,7 @@
     <p xml:lang="et">See rakendus pakub nii palju korve, kui vähegi vaja, ning siin saab ka lohistada.</p>
     <p xml:lang="eu">Aplikazio honek nahi adina saski hornitzen ditu, eta arrastatu eta jaregin daiteke.</p>
     <p xml:lang="fi">Sovellus tarjoaa niin monta koria kuin haluat, ja se tukee vetämistä ja pudottamista.</p>
-    <p xml:lang="fr">Cette application fournit autant de paniers que vous désirez et que vous pouvez utiliser par glisser/déposer.</p>
+    <p xml:lang="fr">Mathom organise vos informations en Mathom-Houses, étagères et mathoms, avec prise en charge du glisser-déposer.</p>
     <p xml:lang="gl">Esta aplicación fornece todos os cestos que queira, e permite arrastrar e soltar.</p>
     <p xml:lang="he">היישום הזה מספק כמה סלים שנחוץ לך, אפשר גם לגרור.</p>
     <p xml:lang="ia">Iste application provide omne le panieros que on vole, e tu pote traher e deponer. </p>
@@ -144,16 +144,15 @@
     <p xml:lang="zh-CN">它可以用来整理记事贴，跟踪待办事项的完成情况以及更多用途。</p>
     <p xml:lang="zh-TW">它讓您排列筆記、追蹤待辦事項等等。</p>
   </description>
-  <url type="homepage">https://invent.kde.org/utilities/basket</url>
-  <url type="bugtracker">https://bugs.kde.org/enter_bug.cgi?format=guided&amp;product=basket</url>
-  <url type="help">https://docs.kde.org/?application=basket</url>
-  <url type="donation">https://www.kde.org/community/donations/?app=basket</url>
+  <url type="homepage">https://github.com/ThorinFutDeChene/Mathom</url>
+  <url type="bugtracker">https://github.com/ThorinFutDeChene/Mathom/issues</url>
+  <url type="help">https://github.com/ThorinFutDeChene/Mathom</url>
   <categories>
     <category>Office</category>
   </categories>
-  <project_group>KDE</project_group>
+  <project_group>Thorinux Systems</project_group>
   <provides>
-    <binary>basket</binary>
+    <binary>mathom</binary>
   </provides>
   <content_rating type="oars-1.1"/>
 </component>

@@ -747,8 +747,14 @@ void BasketScene::setAppearance(const QString &icon,
         KIconLoader::global()->loadIcon(icon, KIconLoader::NoGroup, 16, KIconLoader::DefaultState, QStringList(), nullptr, /*canReturnNull=*/true);
     const bool isBundledMathomIcon = icon == QStringLiteral("mathom-house")
         || icon == QStringLiteral("mathom-shelf");
-    if (isBundledMathomIcon || !iconTest.isNull())
-        m_icon = icon;
+    const bool isCustomIconFile = QFileInfo::exists(icon);
+    const QString migratedCustomIcon =
+        Global::savesFolder() + QStringLiteral("basket-icons/") + QFileInfo(icon).fileName();
+    const bool hasMigratedCustomIcon =
+        !QFileInfo(icon).fileName().isEmpty() && QFileInfo::exists(migratedCustomIcon);
+
+    if (isBundledMathomIcon || isCustomIconFile || hasMigratedCustomIcon || !iconTest.isNull())
+        m_icon = hasMigratedCustomIcon && !isCustomIconFile ? migratedCustomIcon : icon;
 
     // We don't request the background images if it's not loaded yet (to make the application startup fast).
     // When the basket is loading (because requested by the user: he/she want to access it)

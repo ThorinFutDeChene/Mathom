@@ -96,6 +96,37 @@ QFont State::font(QFont base)
     return base;
 }
 
+QIcon State::icon() const
+{
+    if (m_emblem.isEmpty())
+        return {};
+
+    // First honour the active desktop icon theme. Standard icons such as
+    // dialog-information and ktip are provided there.
+    QIcon result = QIcon::fromTheme(m_emblem);
+    if (!result.isNull())
+        return result;
+
+    // Mathom/BasKet also ships its own tag emblems. When running from the
+    // bundled/Flatpak build they are not always discoverable through the host
+    // icon theme, so fall back to the resources embedded in the executable.
+    QString resource;
+    if (m_emblem == QStringLiteral("tag_checkbox")
+        || m_emblem == QStringLiteral("tag_checkbox_checked")) {
+        resource = QStringLiteral(":/tags/16-actions-") + m_emblem + QStringLiteral(".png");
+    } else if (m_emblem.startsWith(QStringLiteral("tag_"))) {
+        resource = QStringLiteral(":/tags/sc-actions-") + m_emblem + QStringLiteral(".svgz");
+    }
+
+    if (!resource.isEmpty()) {
+        QIcon bundled(resource);
+        if (!bundled.isNull())
+            return bundled;
+    }
+
+    return result;
+}
+
 QString State::toCSS(const QString &gradientFolderPath, const QString &gradientFolderName, const QFont &baseFont)
 {
     QString css;
@@ -787,7 +818,7 @@ StateAction::StateAction(State *state, const QKeySequence &shortcut, QWidget *pa
     if (withTagName && m_state->parentTag())
         setText(m_state->parentTag()->name());
 
-    setIcon(QIcon::fromTheme(m_state->emblem()));
+    setIcon(m_state->icon());
 
     setShortcut(shortcut);
 }

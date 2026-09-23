@@ -13,6 +13,7 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QFocusEvent>
+#include <QFileInfo>
 #include <QIcon>
 #include <QMimeData>
 #include <QPainter>
@@ -107,14 +108,26 @@ void BasketListViewItem::setup()
         icon = QIcon(QStringLiteral(":/images/128-actions-mathom-house.png")).pixmap(16, 16);
     } else if (iconName == QStringLiteral("mathom-shelf")) {
         icon = QIcon(QStringLiteral(":/images/128-actions-mathom-shelf.png")).pixmap(16, 16);
+    } else if (QFileInfo::exists(iconName)) {
+        // Custom Mathom/BasKet icons can be stored as absolute file paths.
+        // Do not send those paths through KIconLoader: load the file directly.
+        icon = QIcon(iconName).pixmap(16, 16);
     } else {
-        icon = KIconLoader::global()->loadIcon(iconName,
+        // Older profiles can point to the former BasKet basket-icons folder.
+        // If the basename has already been migrated to Mathom, use it.
+        const QString migratedIcon =
+            Global::savesFolder() + QStringLiteral("basket-icons/") + QFileInfo(iconName).fileName();
+        if (!QFileInfo(iconName).fileName().isEmpty() && QFileInfo::exists(migratedIcon)) {
+            icon = QIcon(migratedIcon).pixmap(16, 16);
+        } else {
+            icon = KIconLoader::global()->loadIcon(iconName,
                                                KIconLoader::NoGroup,
                                                16,
                                                KIconLoader::DefaultState,
                                                QStringList(),
-                                               nullptr,
-                                               /*canReturnNull=*/false);
+                                                   nullptr,
+                                                   /*canReturnNull=*/false);
+        }
     }
 
     setIcon(/*column=*/0, icon);

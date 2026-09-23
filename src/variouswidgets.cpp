@@ -6,6 +6,7 @@
 
 #include "variouswidgets.h"
 #include "debugwindow.h"
+#include "mathomicons.h"
 
 #include <QDialogButtonBox>
 #include <QDrag>
@@ -147,10 +148,10 @@ void ServiceLaunchRequester::setServiceLauncher(const QString &serviceLauncher)
                 buttonIcon = QIcon(iconPath);
             } else {
                 // Name only, so assume it is in the icon theme
-                buttonIcon = QIcon::fromTheme(serviceIcon);
+                buttonIcon = MathomIcons::icon(serviceIcon);
             }
         } else {
-            buttonIcon = QIcon::fromTheme(QStringLiteral("kde-symbolic"));
+            buttonIcon = MathomIcons::icon(QStringLiteral("kde-symbolic"));
         }
 
         const QString name = service->name();
@@ -161,7 +162,7 @@ void ServiceLaunchRequester::setServiceLauncher(const QString &serviceLauncher)
             displayName = name;
         comment = service->comment();
     } else {
-        buttonIcon = QIcon::fromTheme(QStringLiteral("kde-symbolic"));
+        buttonIcon = MathomIcons::icon(QStringLiteral("kde-symbolic"));
         displayName = i18n("Choose an Application Launcher ...");
         comment = i18n("Use KDE Plasma Application Launchers to open Mathom content");
     }
@@ -310,7 +311,7 @@ IconSizeDialog::IconSizeDialog(const QString &caption, const QString &message, c
     iconView->setWrapping(false);
     iconView->setDragEnabled(false);
 
-    QIcon desktopIcon = QIcon::fromTheme(icon);
+    QIcon desktopIcon = MathomIcons::icon(icon);
     m_size16 = new QListWidgetItem(desktopIcon.pixmap(KIconLoader::SizeSmall), i18n("%1 by %1 pixels", KIconLoader::SizeSmall), iconView);
     m_size22 = new QListWidgetItem(desktopIcon.pixmap(KIconLoader::SizeSmallMedium), i18n("%1 by %1 pixels", KIconLoader::SizeSmallMedium), iconView);
     m_size32 = new QListWidgetItem(desktopIcon.pixmap(KIconLoader::SizeMedium), i18n("%1 by %1 pixels", KIconLoader::SizeMedium), iconView);

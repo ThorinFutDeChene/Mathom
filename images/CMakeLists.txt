@@ -1,7 +1,7 @@
 ecm_install_icons(ICONS
-    128-apps-fr.thorinux.mathom.png
-    128-actions-mathom-house.png
-    128-actions-mathom-shelf.png
+    sc-apps-fr.thorinux.mathom.svg
+    sc-actions-mathom-house.svg
+    sc-actions-mathom-shelf.svg
     DESTINATION ${KDE_INSTALL_ICONDIR}
     THEME hicolor
 )

@@ -1,42 +1,73 @@
-# BasKet Note Pads
+# Mathom
 
-## Purpose
+Mathom est un gestionnaire de notes et de connaissances développé par **Thorinux Systems** à partir de **BasKet Note Pads**.
 
-This application provides as many baskets as you wish, and you can drag and drop
-various objects (text, URLs, images, sounds...)  into its.
+L'application organise les informations selon trois niveaux :
 
-Objects can be edited, copied, dragged... So, you can arrange them as you want !
+- **Mathom-House** : espace principal ;
+- **Étagère / sous-étagère** : classement hiérarchique ;
+- **Mathom** : note ou contenu.
 
-It allows to arrange notes, track to-dos and much more.
+## Version
 
-## Developers
+Version publiée : **0.1.1**
 
-Basket is build with the Qt6 and KDE Frameworks 6.
+## Nouveautés de la 0.1.1
 
-## Contact
+- nouvelle identité graphique Mathom ;
+- nouveau logo de l'application ;
+- icône coffre pour les Mathom-Houses ;
+- icône parchemin + plume pour les étagères et sous-étagères ;
+- conservation des icônes personnalisées ;
+- restauration des icônes historiques des marques BasKet ;
+- interface française ;
+- paquet Debian autonome pour Ubuntu 24.04 LTS amd64.
 
-If you have any questions, or would like to contribute (always welcome!) please
-send me an email to the general KDE development mailing list at
-kde-devel@kde.org.
+## Installation Ubuntu / Debian
 
-## Building/Installation
+Télécharger le paquet `.deb` depuis la page des Releases GitHub, puis :
 
-To build and install BasKet, follow these steps (this assumes you have the relevant
-kf6 and qt6 development libraries and CMake):
-
+```bash
+sudo apt install ./mathom_0.1.1-1_amd64.deb
 ```
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=~/.local/kde -DKDE_INSTALL_PLUGINDIR=~/.local/kde/lib64/qt6/plugins
-make -j8
-make -j8 install
+
+Le paquet installe Mathom dans `/opt/mathom` avec les bibliothèques Qt/KF6 nécessaires à son exécution.
+
+## Construction du paquet Debian
+
+Le script de construction officiel est :
+
+```bash
+./scripts/build-mathom-deb.sh
 ```
 
-## Flatpak
+La compilation utilise le SDK KDE 6.9 via Flatpak, puis construit un paquet Debian autonome.
 
-This application has a flatpak manifest.
+Prérequis principaux :
 
+- `flatpak-builder` ;
+- `org.kde.Sdk//6.9` ;
+- `org.kde.Platform//6.9` ;
+- les outils `linuxdeploy` présents dans `packaging/tools`.
+
+Le paquet produit est :
+
+```text
+packaging/mathom_0.1.1-1_amd64.deb
 ```
-flatpak-builder build-dir .flatpak-manifest.yaml
-flatpak-builder --run build-dir .flatpak-manifest.yaml basket
+
+## Développement
+
+Le binaire est `mathom` et l'identifiant d'application est :
+
+```text
+fr.thorinux.mathom
 ```
+
+Mathom utilise Qt 6 et KDE Frameworks 6.
+
+## Origine et licence
+
+Mathom est un fork de **BasKet Note Pads** et conserve l'historique, les auteurs et les licences du projet d'origine.
+
+Licence : **GPL-2.0-or-later**.

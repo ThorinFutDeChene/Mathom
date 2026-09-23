@@ -60,6 +60,7 @@
 #include "formatimporter.h"
 #include "gitwrapper.h"
 #include "global.h"
+#include "mathomicons.h"
 #include "history.h"
 #include "htmlexporter.h"
 #include "newbasketdialog.h"
@@ -359,25 +360,25 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("basket_export_basket_archive"), this, &BNPView::saveAsArchive);
     a->setText(i18n("&Mathom-House Archive..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("baskets")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("baskets")));
     a->setShortcut(0);
     m_actSaveAsArchive = a;
 
     a = ac->addAction(QStringLiteral("basket_import_basket_archive"), this, &BNPView::openArchive);
     a->setText(i18n("&Mathom-House Archive..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("baskets")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("baskets")));
     a->setShortcut(0);
     m_actOpenArchive = a;
 
     a = ac->addAction(QStringLiteral("basket_export_html"), this, &BNPView::exportToHTML);
     a->setText(i18n("&HTML Web Page..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("text-html")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("text-html")));
     a->setShortcut(0);
     m_actExportToHtml = a;
 
     a = ac->addAction(QStringLiteral("basket_import_text_file"), this, &BNPView::importTextFile);
     a->setText(i18n("Text &File..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("text-plain")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("text-plain")));
     a->setShortcut(0);
 
     a = ac->addAction(QStringLiteral("basket_backup_restore"), this, &BNPView::backupRestore);
@@ -393,7 +394,7 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("edit_delete"), this, &BNPView::delNote);
     a->setText(i18n("D&elete"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("edit-delete")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("edit-delete")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::Key_Delete));
     m_actDelNote = a;
 
@@ -417,16 +418,16 @@ void BNPView::setupActions()
 
     m_actClearFormatting = ac->addAction(QStringLiteral("note_clear"), this, &BNPView::clearFormattingNote);
     m_actClearFormatting->setText(i18n("&Clear Formatting"));
-    m_actClearFormatting->setIcon(QIcon::fromTheme(QStringLiteral("text-plain")));
+    m_actClearFormatting->setIcon(MathomIcons::icon(QStringLiteral("text-plain")));
 
     a = ac->addAction(QStringLiteral("note_edit"), this, &BNPView::editNote);
     a->setText(i18nc("Verb; not Menu", "&Edit..."));
-    // a->setIcon(QIcon::fromTheme("edit"));
+    // a->setIcon(MathomIcons::icon("edit"));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::Key_Return));
     m_actEditNote = a;
 
     m_actOpenNote = ac->addAction(KStandardAction::Open, QStringLiteral("note_open"), this, &BNPView::openNote);
-    m_actOpenNote->setIcon(QIcon::fromTheme(QStringLiteral("window-new")));
+    m_actOpenNote->setIcon(MathomIcons::icon(QStringLiteral("window-new")));
     m_actOpenNote->setText(i18n("&Open"));
     m_actionCollection->setDefaultShortcut(m_actOpenNote, QKeySequence(Qt::Key_F9));
 
@@ -441,37 +442,37 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("note_group"), this, &BNPView::noteGroup);
     a->setText(i18n("&Group"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("object-group")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("object-group")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::Key_G));
     m_actGroup = a;
 
     a = ac->addAction(QStringLiteral("note_ungroup"), this, &BNPView::noteUngroup);
     a->setText(i18n("U&ngroup"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("object-ungroup")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("object-ungroup")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_G));
     m_actUngroup = a;
 
     a = ac->addAction(QStringLiteral("note_move_top"), this, &BNPView::moveOnTop);
     a->setText(i18n("Move on &Top"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("arrow-up-double")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("arrow-up-double")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Home));
     m_actMoveOnTop = a;
 
     a = ac->addAction(QStringLiteral("note_move_up"), this, &BNPView::moveNoteUp);
     a->setText(i18n("Move &Up"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("arrow-up")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("arrow-up")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Up));
     m_actMoveNoteUp = a;
 
     a = ac->addAction(QStringLiteral("note_move_down"), this, &BNPView::moveNoteDown);
     a->setText(i18n("Move &Down"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("arrow-down")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("arrow-down")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Down));
     m_actMoveNoteDown = a;
 
     a = ac->addAction(QStringLiteral("note_move_bottom"), this, &BNPView::moveOnBottom);
     a->setText(i18n("Move on &Bottom"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("arrow-down-double")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("arrow-down-double")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_End));
     m_actMoveOnBottom = a;
 
@@ -482,56 +483,56 @@ void BNPView::setupActions()
 #if 0
     a = ac->addAction("insert_text");
     a->setText(i18n("Plai&n Text"));
-    a->setIcon(QIcon::fromTheme("text"));
+    a->setIcon(MathomIcons::icon("text"));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::Key_T));
     m_actInsertText = a;
 #endif
 
     a = ac->addAction(QStringLiteral("insert_html"));
     a->setText(i18n("&Text"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("text-html")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("text-html")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::Key_Insert));
     m_actInsertHtml = a;
 
     a = ac->addAction(QStringLiteral("insert_link"));
     a->setText(i18n("&Link"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("insert-link")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("insert-link")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::Key_Y));
     m_actInsertLink = a;
 
     a = ac->addAction(QStringLiteral("insert_cross_reference"));
     a->setText(i18n("Cross &Reference"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("insert-link")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("insert-link")));
     m_actInsertCrossReference = a;
 
     a = ac->addAction(QStringLiteral("insert_image"));
     a->setText(i18n("&Image"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("insert-image")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("insert-image")));
     m_actInsertImage = a;
 
     a = ac->addAction(QStringLiteral("insert_color"));
     a->setText(i18n("&Color"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("fill-color")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("fill-color")));
     m_actInsertColor = a;
 
     a = ac->addAction(QStringLiteral("insert_launcher"));
     a->setText(i18n("L&auncher"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("system-run")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("system-run")));
     m_actInsertLauncher = a;
 
     a = ac->addAction(QStringLiteral("insert_kmenu"));
     a->setText(i18n("Import Launcher for &desktop application..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("kde")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("kde")));
     m_actImportKMenu = a;
 
     a = ac->addAction(QStringLiteral("insert_icon"));
     a->setText(i18n("Im&port Icon..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("preferences-desktop-icons")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("preferences-desktop-icons")));
     m_actImportIcon = a;
 
     a = ac->addAction(QStringLiteral("insert_from_file"));
     a->setText(i18n("Load From &File..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("document-import")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("document-import")));
     m_actLoadFile = a;
 
     //  connect( m_actInsertText, QAction::triggered, this, [this] () { insertEmpty(NoteType::Text); });
@@ -567,12 +568,12 @@ void BNPView::setupActions()
 #ifndef _WIN32
     a = ac->addAction(QStringLiteral("insert_screen_color"), this, &BNPView::slotColorFromScreen);
     a->setText(i18n("C&olor from Screen"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("color-picker")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("color-picker")));
     m_actColorPicker = a;
 
     a = ac->addAction(QStringLiteral("insert_screen_capture"), this, &BNPView::grabScreenshot);
     a->setText(i18n("Grab Screen &Zone"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("ksnapshot")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("ksnapshot")));
     m_actGrabScreenshot = a;
 #endif
 
@@ -593,13 +594,13 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("basket_new"), this, qOverload<>(&BNPView::askNewBasket));
     a->setText(i18n("&New Mathom-House..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("mathom-house")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("mathom-house")));
     m_actionCollection->setDefaultShortcuts(a, KStandardShortcut::shortcut(KStandardShortcut::New));
     actNewBasket = a;
 
     a = ac->addAction(QStringLiteral("basket_new_sub"), this, &BNPView::askNewSubBasket);
     a->setText(i18n("New &Shelf..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("mathom-shelf")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("mathom-shelf")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_N));
     actNewSubBasket = a;
 
@@ -608,7 +609,7 @@ void BNPView::setupActions()
     actNewSiblingBasket = a;
 
     auto *newBasketMenu = new KActionMenu(i18n("&New"), ac);
-    newBasketMenu->setIcon(QIcon::fromTheme(QStringLiteral("document-new")));
+    newBasketMenu->setIcon(MathomIcons::icon(QStringLiteral("document-new")));
     ac->addAction(QStringLiteral("basket_new_menu"), newBasketMenu);
 
     newBasketMenu->addAction(actNewBasket);
@@ -618,33 +619,33 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("basket_properties"), this, &BNPView::propBasket);
     a->setText(i18n("&Properties..."));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("document-properties")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("document-properties")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::Key_F2));
     m_actPropBasket = a;
 
     a = ac->addAction(QStringLiteral("basket_sort_children_asc"), this, &BNPView::sortChildrenAsc);
     a->setText(i18n("Sort Children Ascending"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("view-sort-ascending")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("view-sort-ascending")));
     m_actSortChildrenAsc = a;
 
     a = ac->addAction(QStringLiteral("basket_sort_children_desc"), this, &BNPView::sortChildrenDesc);
     a->setText(i18n("Sort Children Descending"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("view-sort-descending")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("view-sort-descending")));
     m_actSortChildrenDesc = a;
 
     a = ac->addAction(QStringLiteral("basket_sort_siblings_asc"), this, &BNPView::sortSiblingsAsc);
     a->setText(i18n("Sort Siblings Ascending"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("view-sort-ascending")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("view-sort-ascending")));
     m_actSortSiblingsAsc = a;
 
     a = ac->addAction(QStringLiteral("basket_sort_siblings_desc"), this, &BNPView::sortSiblingsDesc);
     a->setText(i18n("Sort Siblings Descending"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("view-sort-descending")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("view-sort-descending")));
     m_actSortSiblingsDesc = a;
 
     a = ac->addAction(QStringLiteral("basket_remove"), this, &BNPView::delBasket);
     a->setText(i18n("&Remove Mathom-House"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("edit-delete")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("edit-delete")));
     a->setShortcut(0);
     m_actDelBasket = a;
 
@@ -656,7 +657,7 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("basket_lock"), this, &BNPView::lockBasket);
     a->setText(i18nc("Lock Location", "&Lock"));
-    newBasketMenu->setIcon(QIcon::fromTheme(QStringLiteral("document-new")));
+    newBasketMenu->setIcon(MathomIcons::icon(QStringLiteral("document-new")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::Key_L));
     m_actLockBasket = a;
 #endif
@@ -671,7 +672,7 @@ void BNPView::setupActions()
     KToggleAction *toggleAct = nullptr;
     toggleAct = new KToggleAction(i18n("&Filter"), ac);
     ac->addAction(QStringLiteral("edit_filter"), toggleAct);
-    toggleAct->setIcon(QIcon::fromTheme(QStringLiteral("view-filter")));
+    toggleAct->setIcon(MathomIcons::icon(QStringLiteral("view-filter")));
     m_actionCollection->setDefaultShortcuts(toggleAct, KStandardShortcut::shortcut(KStandardShortcut::Find));
     m_actShowFilter = toggleAct;
 
@@ -682,7 +683,7 @@ void BNPView::setupActions()
     toggleAct = new KToggleAction(ac);
     ac->addAction(QStringLiteral("edit_filter_all_baskets"), toggleAct);
     toggleAct->setText(i18n("&Search All"));
-    toggleAct->setIcon(QIcon::fromTheme(QStringLiteral("edit-find")));
+    toggleAct->setIcon(MathomIcons::icon(QStringLiteral("edit-find")));
     m_actionCollection->setDefaultShortcut(toggleAct, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F));
     m_actFilterAllBaskets = toggleAct;
 
@@ -690,7 +691,7 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("edit_filter_reset"), this, &BNPView::slotResetFilter);
     a->setText(i18n("&Reset Filter"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("edit-clear-locationbar-rtl")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("edit-clear-locationbar-rtl")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::CTRL | Qt::Key_R));
     m_actResetFilter = a;
 
@@ -698,25 +699,25 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("go_basket_previous"), this, &BNPView::goToPreviousBasket);
     a->setText(i18n("&Previous"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("go-previous")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("go-previous")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::ALT | Qt::Key_Left));
     m_actPreviousBasket = a;
 
     a = ac->addAction(QStringLiteral("go_basket_next"), this, &BNPView::goToNextBasket);
     a->setText(i18n("&Next"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("go-next")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("go-next")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::ALT | Qt::Key_Right));
     m_actNextBasket = a;
 
     a = ac->addAction(QStringLiteral("go_basket_fold"), this, &BNPView::foldBasket);
     a->setText(i18n("&Fold Mathom-House"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("go-up")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("go-up")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::ALT | Qt::Key_Up));
     m_actFoldBasket = a;
 
     a = ac->addAction(QStringLiteral("go_basket_expand"), this, &BNPView::expandBasket);
     a->setText(i18n("&Expand Mathom-House"));
-    a->setIcon(QIcon::fromTheme(QStringLiteral("go-down")));
+    a->setIcon(MathomIcons::icon(QStringLiteral("go-down")));
     m_actionCollection->setDefaultShortcut(a, QKeySequence(Qt::ALT | Qt::Key_Down));
     m_actExpandBasket = a;
 
@@ -724,7 +725,7 @@ void BNPView::setupActions()
     // FOR_BETA_PURPOSE:
     a = ac->addAction("beta_convert_texts", this, &BNPView::convertTexts);
     a->setText(i18n("Convert text mathoms to rich text mathoms"));
-    a->setIcon(QIcon::fromTheme("run-build-file"));
+    a->setIcon(MathomIcons::icon("run-build-file"));
     m_convertTexts = a;
 #endif
 
@@ -1675,7 +1676,7 @@ void BNPView::updateNotesActions()
     }
     } else if (m_type != Color) {
         popupMenu->insertSeparator();
-        popupMenu->insertItem(QIcon::fromTheme("document-save-as"), i18n("&Save a copy as..."), this, &BNPView::slotSaveAs, 0, 10);
+        popupMenu->insertItem(MathomIcons::icon("document-save-as"), i18n("&Save a copy as..."), this, &BNPView::slotSaveAs, 0, 10);
     }*/
 }
 
@@ -2441,13 +2442,13 @@ void BNPView::populateTagsMenu(QMenu &menu, Note *referenceNote)
     act->setEnabled(enable);
     menu.addAction(act);
 
-    act = new QAction(QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("&Remove All"), &menu);
+    act = new QAction(MathomIcons::icon(QStringLiteral("edit-delete")), i18n("&Remove All"), &menu);
     act->setData(2);
     if (!currentBasket()->selectedNotesHaveTags())
         act->setEnabled(false);
     menu.addAction(act);
 
-    act = new QAction(QIcon::fromTheme(QStringLiteral("configure")), i18n("&Customize..."), &menu);
+    act = new QAction(MathomIcons::icon(QStringLiteral("configure")), i18n("&Customize..."), &menu);
     act->setData(3);
     menu.addAction(act);
 

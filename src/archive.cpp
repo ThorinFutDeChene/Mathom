@@ -7,6 +7,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QFileInfo>
 #include <QGuiApplication>
 #include <QList>
 #include <QMap>
@@ -723,13 +724,21 @@ void Archive::importBasketIcon(QDomElement properties, const QString &extraction
             QDir dir;
             dir.mkdir(Global::savesFolder() + QStringLiteral("basket-icons/"));
             FormatImporter copier; // Only used to copy files synchronously
-            // Of the icon path was eg. "/home/seb/icon.png", it was exported as "basket-icons/_home_seb_icon.png".
-            // So we need to copy that image to "~/.local/share/basket/basket-icons/icon.png":
-            int slashIndex = iconName.lastIndexOf(QLatin1Char('/'));
-            QString iconFileName = (slashIndex < 0 ? iconName : iconName.right(slashIndex - 2));
-            QString source = extractionFolder + QStringLiteral("basket-icons/") + iconName.replace(QLatin1Char('/'), QLatin1Char('/'));
-            QString destination = Global::savesFolder() + QStringLiteral("basket-icons/") + iconFileName;
-            if (!dir.exists(destination))
+            // Archive::saveBasketToArchive() flattens '/' to '_' in the
+            // archived file name. Rebuild that exact name here, then restore
+            // the original basename in Mathom's private basket-icons folder.
+            const QString iconFileName = QFileInfo(iconName).fileName().isEmpty()
+                ? iconName
+                : QFileInfo(iconName).fileName();
+            QString archivedIconName = iconName;
+            archivedIconName.replace(QLatin1Char('/'), QLatin1Char('_'));
+
+            const QString source =
+                extractionFolder + QStringLiteral("basket-icons/") + archivedIconName;
+            const QString destination =
+                Global::savesFolder() + QStringLiteral("basket-icons/") + iconFileName;
+
+            if (QFileInfo::exists(source) && !QFileInfo::exists(destination))
                 copier.copyFolder(source, destination);
             // Replace the emblem path in the tags.xml copy:
             QDomElement iconElement = XMLWork::getElement(properties, QStringLiteral("icon"));

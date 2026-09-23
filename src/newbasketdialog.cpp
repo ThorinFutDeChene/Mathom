@@ -35,6 +35,7 @@
 #include "bnpview.h"
 #include "global.h"
 #include "kcolorcombo2.h"
+#include "mathomicons.h"
 #include "tools.h"
 #include "variouswidgets.h" //For HelpLabel
 
@@ -305,13 +306,7 @@ int NewBasketDialog::populateBasketsList(QTreeWidgetItem *item, int indent, int 
     static const int ICON_SIZE = 16;
     // Get the basket data:
     BasketScene *basket = ((BasketListViewItem *)item)->basket();
-    QPixmap icon = KIconLoader::global()->loadIcon(basket->icon(),
-                                                   KIconLoader::NoGroup,
-                                                   ICON_SIZE,
-                                                   KIconLoader::DefaultState,
-                                                   QStringList(),
-                                                   nullptr,
-                                                   /*canReturnNull=*/false);
+    QPixmap icon = MathomIcons::hierarchy(basket->icon(), item->parent() == nullptr).pixmap(ICON_SIZE, ICON_SIZE);
     icon = Tools::indentPixmap(icon, indent, 2 * ICON_SIZE / 3);
     m_createIn->addItem(icon, basket->basketName());
     m_basketsMap.insert(index, basket);

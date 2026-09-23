@@ -17,6 +17,7 @@
 #include <KParts/StatusBarExtension>
 
 #include "basketscene.h"
+#include "mathomicons.h"
 #include "bnpview.h"
 #include "global.h"
 #include "tools.h"
@@ -94,7 +95,7 @@ void BasketStatusBar::setupStatusBar()
     //  addWidget( m_lockStatus, 0, true );
     m_lockStatus->installEventFilter(this);
 
-    m_savedStatusPixmap = QIcon::fromTheme(QStringLiteral("document-save")).pixmap(KIconLoader::SizeSmall);
+    m_savedStatusPixmap = MathomIcons::icon(QStringLiteral("document-save")).pixmap(KIconLoader::SizeSmall);
     m_savedStatus = new QLabel(parent);
     m_savedStatus->setPixmap(m_savedStatusPixmap);
     m_savedStatus->setFixedSize(m_savedStatus->sizeHint());
@@ -154,7 +155,7 @@ void BasketStatusBar::setLockStatus(bool isLocked)
     }
 
     if (isLocked) {
-        QPixmap encryptedIcon = QIcon::fromTheme(QStringLiteral("encrypted.png")).pixmap(KIconLoader::SizeSmall);
+        QPixmap encryptedIcon = MathomIcons::icon(QStringLiteral("encrypted.png")).pixmap(KIconLoader::SizeSmall);
         m_lockStatus->setPixmap(encryptedIcon);
         m_lockStatus->setToolTip(i18n("<p>This location is <b>locked</b>.<br>Click to unlock it.</p>").replace(QLatin1Char(' '), QStringLiteral("&nbsp;")));
     } else {

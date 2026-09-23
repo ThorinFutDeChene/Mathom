@@ -243,14 +243,18 @@ test "$(dpkg-deb -f "$OUTPUT" Package)" = "mathom"
 test "$(dpkg-deb -f "$OUTPUT" Version)" = "${VERSION}-${REVISION}"
 test "$(dpkg-deb -f "$OUTPUT" Architecture)" = "$ARCH"
 
-dpkg-deb -c "$OUTPUT" | grep -q './opt/mathom/usr/share/icons/breeze/index.theme'
-dpkg-deb -c "$OUTPUT" | grep -q './usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg'
+CONTENTS_LIST="$PACKAGING/mathom-deb-contents.txt"
+dpkg-deb -c "$OUTPUT" > "$CONTENTS_LIST"
 
-if dpkg-deb -c "$OUTPUT" |
-    grep -Eq '/opt/basket(/|$)|org\.kde\.basket\.desktop|Mathom \(Nightly\)'; then
+grep -q './opt/mathom/usr/share/icons/breeze/index.theme' "$CONTENTS_LIST"
+grep -q './usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg' "$CONTENTS_LIST"
+
+if grep -Eq '/opt/basket(/|$)|org\.kde\.basket\.desktop|Mathom \(Nightly\)' "$CONTENTS_LIST"; then
     echo "Erreur : ancienne identité BasKet/Nightly trouvée dans le paquet."
     exit 1
 fi
+
+rm -f "$CONTENTS_LIST"
 
 echo
 echo "Paquet créé avec succès :"

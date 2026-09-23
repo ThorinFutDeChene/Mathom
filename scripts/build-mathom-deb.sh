@@ -54,11 +54,11 @@ if [ ! -x "$APPDIR/usr/bin/mathom" ]; then
     exit 1
 fi
 
-ICON="$APPDIR/usr/share/icons/hicolor/128x128/apps/fr.thorinux.mathom.png"
+ICON="$APPDIR/usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg"
 
-if ! file "$ICON" | grep -q '128 x 128'; then
-    echo "Erreur : l'icône principale n'est pas réellement en 128x128."
-    file "$ICON"
+if [ ! -s "$ICON" ]; then
+    echo "Erreur : l'icône principale Mathom est absente :"
+    echo "$ICON"
     exit 1
 fi
 
@@ -155,9 +155,9 @@ cp "$APPDIR/usr/share/applications/fr.thorinux.mathom.desktop" \
 cp "$APPDIR/usr/share/metainfo/fr.thorinux.mathom.metainfo.xml" \
     "$DEBROOT/usr/share/metainfo/"
 
-# Installer toutes les tailles de l'icône Mathom disponibles.
+# Installer les icônes Mathom disponibles (PNG et SVG).
 find "$APPDIR/usr/share/icons/hicolor" \
-    -type f -name 'fr.thorinux.mathom.png' |
+    -type f \( -name 'fr.thorinux.mathom.png' -o -name 'fr.thorinux.mathom.svg' \) |
 while IFS= read -r icon; do
     relative="${icon#"$APPDIR/usr/share/"}"
     destination="$DEBROOT/usr/share/$(dirname "$relative")"

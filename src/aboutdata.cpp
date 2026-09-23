@@ -4,6 +4,7 @@
  */
 
 #include "aboutdata.h"
+#include "mathomicons.h"
 #include <basket_version.h>
 
 #include <KLocalizedString>
@@ -26,7 +27,7 @@ AboutData::AboutData()
     setHomepage(QString());
     setOrganizationDomain(QByteArrayLiteral("thorinux.fr"));
     setDesktopFileName(QStringLiteral("fr.thorinux.mathom"));
-    setProgramLogo(QIcon(QStringLiteral(":/images/128-apps-fr.thorinux.mathom.png")));
+    setProgramLogo(MathomIcons::application());
 
     addAuthor(QStringLiteral("Thorinux Systems"), i18n("Mathom fork maintainer"));
 

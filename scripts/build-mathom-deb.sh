@@ -54,11 +54,11 @@ if [ ! -x "$APPDIR/usr/bin/mathom" ]; then
     exit 1
 fi
 
-ICON="$APPDIR/usr/share/icons/hicolor/128x128/apps/fr.thorinux.mathom.png"
+ICON="$APPDIR/usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg"
 
-if ! file "$ICON" | grep -q '128 x 128'; then
-    echo "Erreur : l'icône principale Mathom n'est pas un vrai PNG 128x128 :"
-    file "$ICON"
+if [ ! -s "$ICON" ]; then
+    echo "Erreur : l'icône principale Mathom est absente :"
+    echo "$ICON"
     exit 1
 fi
 
@@ -192,6 +192,41 @@ Description: Mathom - notes and information organizer
  BasKet Note Pads.
 CONTROL
 
+cat > "$DEBROOT/DEBIAN/postinst" <<'POSTINST'
+#!/bin/sh
+set -e
+
+# MATE/GNOME can keep the old launcher icon in cache after an upgrade.
+# Refresh the caches when the tools are available, without making them
+# mandatory dependencies of Mathom.
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -f -q /usr/share/icons/hicolor || true
+fi
+
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database -q /usr/share/applications || true
+fi
+
+exit 0
+POSTINST
+
+cat > "$DEBROOT/DEBIAN/postrm" <<'POSTRM'
+#!/bin/sh
+set -e
+
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -f -q /usr/share/icons/hicolor || true
+fi
+
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database -q /usr/share/applications || true
+fi
+
+exit 0
+POSTRM
+
+chmod 755 "$DEBROOT/DEBIAN/postinst" "$DEBROOT/DEBIAN/postrm"
+
 echo
 echo "=== 6/7 Construction du paquet ==="
 
@@ -209,7 +244,7 @@ test "$(dpkg-deb -f "$OUTPUT" Version)" = "${VERSION}-${REVISION}"
 test "$(dpkg-deb -f "$OUTPUT" Architecture)" = "$ARCH"
 
 dpkg-deb -c "$OUTPUT" | grep -q './opt/mathom/usr/share/icons/breeze/index.theme'
-dpkg-deb -c "$OUTPUT" | grep -q './usr/share/icons/hicolor/128x128/apps/fr.thorinux.mathom.png'
+dpkg-deb -c "$OUTPUT" | grep -q './usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg'
 
 if dpkg-deb -c "$OUTPUT" |
     grep -Eq '/opt/basket(/|$)|org\.kde\.basket\.desktop|Mathom \(Nightly\)'; then

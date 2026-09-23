@@ -28,7 +28,7 @@ Version publiée : **0.1.1**
 Télécharger le paquet `.deb` depuis la page des Releases GitHub, puis :
 
 ```bash
-sudo apt install ./mathom_0.1.1-1_amd64.deb
+sudo apt install ./mathom_0.1.1-2_amd64.deb
 ```
 
 Le paquet installe Mathom dans `/opt/mathom` avec les bibliothèques Qt/KF6 nécessaires à son exécution.
@@ -53,7 +53,7 @@ Prérequis principaux :
 Le paquet produit est :
 
 ```text
-packaging/mathom_0.1.1-1_amd64.deb
+packaging/mathom_0.1.1-2_amd64.deb
 ```
 
 ## Développement

@@ -22,6 +22,7 @@
 #include "debugwindow.h"
 #include "gitwrapper.h"
 #include "global.h"
+#include "mathomicons.h"
 #include "tools.h"
 #include "xmlwork.h"
 
@@ -98,33 +99,7 @@ QFont State::font(QFont base)
 
 QIcon State::icon() const
 {
-    if (m_emblem.isEmpty())
-        return {};
-
-    // First honour the active desktop icon theme. Standard icons such as
-    // dialog-information and ktip are provided there.
-    QIcon result = QIcon::fromTheme(m_emblem);
-    if (!result.isNull())
-        return result;
-
-    // Mathom/BasKet also ships its own tag emblems. When running from the
-    // bundled/Flatpak build they are not always discoverable through the host
-    // icon theme, so fall back to the resources embedded in the executable.
-    QString resource;
-    if (m_emblem == QStringLiteral("tag_checkbox")
-        || m_emblem == QStringLiteral("tag_checkbox_checked")) {
-        resource = QStringLiteral(":/tags/16-actions-") + m_emblem + QStringLiteral(".png");
-    } else if (m_emblem.startsWith(QStringLiteral("tag_"))) {
-        resource = QStringLiteral(":/tags/sc-actions-") + m_emblem + QStringLiteral(".svgz");
-    }
-
-    if (!resource.isEmpty()) {
-        QIcon bundled(resource);
-        if (!bundled.isNull())
-            return bundled;
-    }
-
-    return result;
+    return MathomIcons::icon(m_emblem);
 }
 
 QString State::toCSS(const QString &gradientFolderPath, const QString &gradientFolderName, const QFont &baseFont)

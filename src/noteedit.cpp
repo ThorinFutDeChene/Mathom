@@ -45,6 +45,7 @@
 #include "bnpview.h"
 #include "focusedwidgets.h"
 #include "global.h"
+#include "mathomicons.h"
 #include "note.h"
 #include "notecontent.h"
 #include "notefactory.h"
@@ -1095,21 +1096,21 @@ void InlineEditors::initToolBars(KActionCollection *ac)
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_bold"), ta);
     ta->setText(i18n("Bold"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-text-bold")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-text-bold")));
     ac->setDefaultShortcut(ta, QKeySequence(Qt::CTRL | Qt::Key_B));
     richTextBold = ta;
 
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_italic"), ta);
     ta->setText(i18n("Italic"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-text-italic")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-text-italic")));
     ac->setDefaultShortcut(ta, QKeySequence(Qt::CTRL | Qt::Key_I));
     richTextItalic = ta;
 
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_underline"), ta);
     ta->setText(i18n("Underline"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-text-underline")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-text-underline")));
     ac->setDefaultShortcut(ta, QKeySequence(Qt::CTRL | Qt::Key_U));
     richTextUnderline = ta;
 
@@ -1117,38 +1118,38 @@ void InlineEditors::initToolBars(KActionCollection *ac)
     ta = new KToggleAction(ac);
     ac->addAction("richtext_super", ta);
     ta->setText(i18n("Superscript"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-text-superscript")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-text-superscript")));
     richTextSuper = ta;
 
     ta = new KToggleAction(ac);
     ac->addAction("richtext_sub", ta);
     ta->setText(i18n("Subscript"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-text-subscript")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-text-subscript")));
     richTextSub = ta;
 #endif
 
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_left"), ta);
     ta->setText(i18n("Align Left"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-justify-left")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-justify-left")));
     richTextLeft = ta;
 
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_center"), ta);
     ta->setText(i18n("Centered"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-justify-center")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-justify-center")));
     richTextCenter = ta;
 
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_right"), ta);
     ta->setText(i18n("Align Right"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-justify-right")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-justify-right")));
     richTextRight = ta;
 
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_block"), ta);
     ta->setText(i18n("Justified"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("format-justify-fill")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("format-justify-fill")));
     richTextJustified = ta;
 
     auto *alignmentGroup = new QActionGroup(ac);
@@ -1160,13 +1161,13 @@ void InlineEditors::initToolBars(KActionCollection *ac)
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_undo"), ta);
     ta->setText(i18n("Undo"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("edit-undo")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("edit-undo")));
     richTextUndo = ta;
 
     ta = new KToggleAction(ac);
     ac->addAction(QStringLiteral("richtext_redo"), ta);
     ta->setText(i18n("Redo"));
-    ta->setIcon(QIcon::fromTheme(QStringLiteral("edit-redo")));
+    ta->setIcon(MathomIcons::icon(QStringLiteral("edit-redo")));
     richTextRedo = ta;
 
     disableRichTextToolBar();

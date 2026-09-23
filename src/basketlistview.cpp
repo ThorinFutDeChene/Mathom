@@ -93,7 +93,10 @@ void BasketListViewItem::setup()
     setText(/*column=*/0, escapedName(m_basket->basketName()));
 
     QString iconName = m_basket->icon();
-    if (iconName.isEmpty() || iconName == QStringLiteral("fr.thorinux.mathom")) {
+    if (iconName.isEmpty()
+        || iconName == QStringLiteral("fr.thorinux.mathom")
+        || iconName == QStringLiteral("org.kde.basket")
+        || iconName == QStringLiteral("basket")) {
         iconName = parent()
             ? QStringLiteral("mathom-shelf")
             : QStringLiteral("mathom-house");

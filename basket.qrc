@@ -1,5 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+	<file alias="mathom/icons/app.png">resources/icons/app/mathom.png</file>
+	<file alias="mathom/icons/house.png">resources/icons/hierarchy/mathom-house.png</file>
+	<file alias="mathom/icons/shelf.png">resources/icons/hierarchy/mathom-shelf.png</file>
 	<file>images/tag_export_help.png</file>
 	<file>images/tag_export_on_every_lines_help.png</file>
 	<file>images/insertion_help.png</file>

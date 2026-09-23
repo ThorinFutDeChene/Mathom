@@ -3060,7 +3060,7 @@ void BasketScene::drawForeground(QPainter *painter, const QRectF &rect)
             label->setAlignment(Qt::AlignTop);
             layout->addWidget(label, 0, 1, 1, 2);
             auto *pixmap = new QLabel(m_decryptBox);
-            pixmap->setPixmap(KIconLoader::global()->loadIcon(QStringLiteral("encrypted"), KIconLoader::NoGroup, KIconLoader::SizeHuge));
+            pixmap->setPixmap(MathomIcons::icon(QStringLiteral("encrypted")).pixmap(KIconLoader::SizeHuge));
             layout->addWidget(pixmap, 0, 0, 2, 1);
 
             auto *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -3262,16 +3262,16 @@ void BasketScene::popupEmblemMenu(Note *note, int emblemNumber)
     if (tag->countStates() == 1) {
         menu.addSection(/*SmallIcon(state->icon()), */ tag->name());
         QAction *act;
-        act = new QAction(QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("&Remove"), &menu);
+        act = new QAction(MathomIcons::icon(QStringLiteral("edit-delete")), i18n("&Remove"), &menu);
         act->setData(1);
         menu.addAction(act);
-        act = new QAction(QIcon::fromTheme(QStringLiteral("configure")), i18n("&Customize..."), &menu);
+        act = new QAction(MathomIcons::icon(QStringLiteral("configure")), i18n("&Customize..."), &menu);
         act->setData(2);
         menu.addAction(act);
 
         menu.addSeparator();
 
-        act = new QAction(QIcon::fromTheme(QStringLiteral("search-filter")), i18n("&Filter by this Tag"), &menu);
+        act = new QAction(MathomIcons::icon(QStringLiteral("search-filter")), i18n("&Filter by this Tag"), &menu);
         act->setData(3);
         menu.addAction(act);
     } else {
@@ -3303,21 +3303,21 @@ void BasketScene::popupEmblemMenu(Note *note, int emblemNumber)
         menu.addSeparator();
 
         auto *act = new QAction(&menu);
-        act->setIcon(QIcon::fromTheme(QStringLiteral("edit-delete")));
+        act->setIcon(MathomIcons::icon(QStringLiteral("edit-delete")));
         act->setText(i18n("&Remove"));
         act->setShortcut(sequenceOnDelete ? sequence : QKeySequence());
         act->setData(1);
         menu.addAction(act);
-        act = new QAction(QIcon::fromTheme(QStringLiteral("configure")), i18n("&Customize..."), &menu);
+        act = new QAction(MathomIcons::icon(QStringLiteral("configure")), i18n("&Customize..."), &menu);
         act->setData(2);
         menu.addAction(act);
 
         menu.addSeparator();
 
-        act = new QAction(QIcon::fromTheme(QStringLiteral("search-filter")), i18n("&Filter by this Tag"), &menu);
+        act = new QAction(MathomIcons::icon(QStringLiteral("search-filter")), i18n("&Filter by this Tag"), &menu);
         act->setData(3);
         menu.addAction(act);
-        act = new QAction(QIcon::fromTheme(QStringLiteral("search-filter")), i18n("Filter by this &State"), &menu);
+        act = new QAction(MathomIcons::icon(QStringLiteral("search-filter")), i18n("Filter by this &State"), &menu);
         act->setData(4);
         menu.addAction(act);
     }

@@ -20,6 +20,7 @@
 #include "config.h"
 #include "global.h"
 #include "mainwindow.h"
+#include "mathomicons.h"
 
 #if HAVE_LIBGIT2
 extern "C" {
@@ -36,7 +37,7 @@ Application::Application(int &argc, char **argv)
     KLocalizedString::setApplicationDomain("basket");
     // Use the bundled Mathom logo directly. This avoids picking up an
     // older system-installed Basket/Mathom icon from the host icon theme.
-    setWindowIcon(QIcon(QStringLiteral(":/images/128-apps-fr.thorinux.mathom.png")));
+    setWindowIcon(MathomIcons::application());
 
     KAboutData::setApplicationData(AboutData());
     // BasketPart::createAboutData();

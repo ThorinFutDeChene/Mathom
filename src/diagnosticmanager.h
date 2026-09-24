@@ -51,13 +51,19 @@ private:
     void prepareEmail(const QString &reportPath);
     QVariantMap baseRecord(const QString &event) const;
     void writeRecord(const QVariantMap &record);
+    void flushTextInput();
+    qint64 currentMemoryRssKiB() const;
 
     QFile *m_sessionFile = nullptr;
     QTimer *m_heartbeatTimer = nullptr;
+    QTimer *m_textInputFlushTimer = nullptr;
     QString m_sessionId;
     QString m_sessionPath;
     QStringList m_pendingReports;
+    QString m_pendingTextTarget;
     qint64 m_startedAtMs = 0;
+    qint64 m_pendingTextStartedAtMs = 0;
+    int m_pendingTextCharacters = 0;
     bool m_started = false;
     bool m_closed = false;
 };

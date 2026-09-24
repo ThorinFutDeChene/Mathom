@@ -175,16 +175,13 @@ QString operationBase(const QString &event)
 
 bool isUserActionEvent(const QString &event)
 {
+    // Keep "user action" strictly limited to direct input events.
+    // Business events (edit started, shelf switch, new Mathom, etc.) may be
+    // triggered automatically by Mathom and must not be presented as a
+    // deliberate user action in the report summary.
     return event == QStringLiteral("MOUSE_PRESS")
         || event == QStringLiteral("KEY_PRESS")
-        || event == QStringLiteral("TEXT_INPUT")
-        || event == QStringLiteral("SHELF_SWITCH_BEGIN")
-        || event == QStringLiteral("NEW_SHELF_DIALOG_BEGIN")
-        || event == QStringLiteral("DELETE_SHELF_REQUEST")
-        || event == QStringLiteral("FOCUS_MODE_TOGGLE_BEGIN")
-        || event == QStringLiteral("NEW_MATHOM_BEGIN")
-        || event == QStringLiteral("MATHOM_EDIT_BEGIN")
-        || event == QStringLiteral("PASTE_BEGIN");
+        || event == QStringLiteral("TEXT_INPUT");
 }
 
 QString detailsSummary(const QVariantMap &details)
@@ -707,7 +704,7 @@ QString DiagnosticManager::createReportForSession(const QString &sessionPath)
         writeLine(QStringLiteral("Pic memoire RSS retenu : %1 Mio").arg(retainedPeakMemoryKiB / 1024.0, 0, 'f', 1));
 
     writeLine();
-    writeLine(QStringLiteral("Derniere action utilisateur :"));
+    writeLine(QStringLiteral("Derniere action utilisateur directe :"));
     writeLine(summary.lastUserAction.isEmpty()
                   ? QStringLiteral("  aucune action utilisateur identifiee")
                   : QStringLiteral("  %1").arg(summary.lastUserAction));

@@ -1447,6 +1447,9 @@ void BNPView::setCurrentBasket(BasketScene *basket)
         }
 
         m_tree->viewport()->update();
+        DiagnosticManager::instance().logEvent(
+            QStringLiteral("SHELF_SWITCH_OK"),
+            {{QStringLiteral("folder"), basket ? basket->folderName() : QStringLiteral("<none>")}});
         Q_EMIT basketChanged();
         return;
     }

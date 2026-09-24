@@ -1425,17 +1425,28 @@ void BNPView::setCurrentBasketInHistory(BasketScene *basket)
 
 void BNPView::setCurrentBasket(BasketScene *basket)
 {
-    if (m_tree->currentItem() != nullptr && currentBasket() == basket)
+    // A location can already be the current widget while its notes are still
+    // lazily unloaded (notably the location restored as "last opened").
+    // Always perform the load BEFORE the early-return check.
+    if (basket && !basket->isLoaded())
+        basket->load();
+
+    if (m_tree->currentItem() != nullptr && currentBasket() == basket) {
+        if (basket) {
+            basket->aboutToBeActivated();
+            basket->relayoutNotes();
+            basket->openBasket();
+            countsChanged(basket);
+            updateStatusBarHint();
+        }
+
+        m_tree->viewport()->update();
+        Q_EMIT basketChanged();
         return;
+    }
 
     if (currentBasket())
         currentBasket()->closeBasket();
-
-    // A location is loaded lazily. Switching to an unloaded shelf must
-    // actually load its .basket data before activating it. Without this,
-    // imported/welcome shelves can remain indefinitely on "Loading...".
-    if (basket && !basket->isLoaded())
-        basket->load();
 
     if (basket)
         basket->aboutToBeActivated();
@@ -1521,10 +1532,21 @@ void BNPView::toggleTreeVisibility()
         // Remember the user's current width before entering focus mode.
         m_treeLastWidth = treeWidth;
 
+        // Some native desktop styles keep a minimum effective width even
+        // when QSplitter::setSizes() asks for zero. Force the tree geometry
+        // to zero while keeping the splitter handle and its restore button.
+        m_tree->setMinimumWidth(0);
+        m_tree->setMaximumWidth(0);
+
         currentSizes[treeIndex] = 0;
         currentSizes[contentIndex] =
             qMax(1, totalWidth);
     } else {
+        // Restore normal sizing before asking the splitter for the previous
+        // user width.
+        m_tree->setMinimumWidth(0);
+        m_tree->setMaximumWidth(QWIDGETSIZE_MAX);
+
         int restoredWidth = m_treeLastWidth;
 
         if (restoredWidth <= 0)

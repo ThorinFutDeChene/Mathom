@@ -10,11 +10,13 @@
 #include <QStringList>
 #include <QVariantMap>
 
+#include "basket_export.h"
+
 class QFile;
 class QTimer;
 class QWidget;
 
-class DiagnosticManager : public QObject
+class BASKET_EXPORT DiagnosticManager : public QObject
 {
     Q_OBJECT
 

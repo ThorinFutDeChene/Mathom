@@ -4600,3 +4600,905 @@ msgstr "Редагувати цю електронну таблицю"
 msgid "Mathom Spreadsheet (*.mcalc)"
 msgstr "Електронна таблиця Mathom (*.mcalc)"
 
+
+
+# -----------------------------------------------------------------------------
+# Mathom strings synchronized from the current source catalogue.
+# Untranslated entries are intentionally left empty for community translators.
+# -----------------------------------------------------------------------------
+
+#: src/tagsedit.cpp:330
+msgid "This option will enable you to type a cross reference link directly into a text mathom. Cross Reference links can have the following syntax:"
+msgstr ""
+
+#: src/tagsedit.cpp:332
+msgid "Relative to the current location:"
+msgstr ""
+
+#: src/tagsedit.cpp:335
+msgid "Location matching is cAse inSEnsItive."
+msgstr ""
+
+#: src/tagsedit.cpp:372
+msgid "When you copy and paste or drag and drop mathoms to a text editor, this text will be inserted as a textual equivalent of the tag."
+msgstr ""
+
+#. i18n("If filled, this property lets you paste this tag or this state as textual equivalent.") + "<br>" +
+#: src/tagsedit.cpp:375 src/settings.cpp:551
+msgid "For instance, a list of mathoms with the <b>To Do</b> and <b>Done</b> tags are exported as lines preceded by <b>[ ]</b> or <b>[x]</b>, representing an empty checkbox and a checked box."
+msgstr ""
+
+#: src/tagsedit.cpp:381
+msgid "When a mathom has several lines, you can choose to export the tag or the state on the first line or on every line of the mathom."
+msgstr ""
+
+#: src/tagsedit.cpp:383
+msgid "In the example above, the tag of the top mathom is only exported on the first line, while the tag of the bottom mathom is exported on every line of the mathom."
+msgstr ""
+
+#: src/tagsedit.cpp:770
+msgid "Deleting the tag will remove it from every mathom it is currently assigned to."
+msgstr ""
+
+#: src/tagsedit.cpp:775
+msgid "Deleting the state will remove the tag from every mathom the state is currently assigned to."
+msgstr ""
+
+#: src/history.cpp:18
+msgid "Set current location to %1"
+msgstr ""
+
+#: src/linklabel.cpp:659
+msgid "<p>This is normal because there are several types of mathoms.<br>This setting only applies to file and local link mathoms.<br>The images you see are image mathoms, not file mathoms.<br>File mathoms are generic documents, whereas image mathoms are pictures you can draw in.</p><p>When dropping files to locations, %1 detects their type and shows you the content of the files.<br>For instance, when dropping image or text files, image and text mathoms are created for them.<br>For type of files %2 does not understand, they are shown as generic file mathoms with just an icon or file preview and a filename.</p><p>If you do not want the application to create mathoms depending on the content of the files you drop, go to the \"General\" page and uncheck \"Image or animation\" in the \"View Content of Added Files for the Following Types\" group.</p>"
+msgstr ""
+
+#: src/notefactory.cpp:423
+msgid "<p>%1 doesn't support the data you've dropped.<br>It however created a generic mathom, allowing you to drag or copy it to an application that understands it.</p><p>If you want support for this data, please contact the developer.</p>"
+msgstr ""
+
+#: src/notefactory.cpp:1005
+msgid "Load File Content into a Mathom"
+msgstr ""
+
+#: src/archive.cpp:53 src/bnpview.cpp:1991
+msgid "Save as Mathom-House Archive"
+msgstr ""
+
+#: src/archive.cpp:54
+msgid "Saving as Mathom-House archive. Please wait..."
+msgstr ""
+
+#: src/archive.cpp:267 src/archive.cpp:270 src/archive.cpp:273
+#: src/archive.cpp:276 src/archive.cpp:283 src/archive.cpp:292
+msgid "Mathom-House Archive Error"
+msgstr ""
+
+#: src/archive.cpp:270
+msgid "This file is not a Mathom-House archive."
+msgstr ""
+
+#: src/archive.cpp:287
+msgid "This file was created with a recent version of %1. It can be opened but not every information will be available to you. For instance, some mathoms may be missing because they are of a type only available in new versions. When saving the file back, consider to save it to another file, to preserve the original one."
+msgstr ""
+
+#: src/bnpview.cpp:217
+msgid "Paste clipboard contents in current location"
+msgstr ""
+
+#: src/bnpview.cpp:219
+msgid "Allows you to paste clipboard contents in the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:224
+msgid "Paste selection in current location"
+msgstr ""
+
+#: src/bnpview.cpp:226
+msgid "Allows you to paste clipboard selection in the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:231
+msgid "Create a new Mathom-House"
+msgstr ""
+
+#: src/bnpview.cpp:233
+msgid "Allows you to create a new Mathom-House without having to open the main window (you then can use the other global shortcuts to add a mathom, paste clipboard or paste selection in this new Mathom-House)."
+msgstr ""
+
+#: src/bnpview.cpp:238
+msgid "Go to previous location"
+msgstr ""
+
+#: src/bnpview.cpp:240
+msgid "Allows you to go to the previous location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:244
+msgid "Go to next location"
+msgstr ""
+
+#: src/bnpview.cpp:246
+msgid "Allows you to go to the next location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:250
+msgid "Insert text mathom"
+msgstr ""
+
+#: src/bnpview.cpp:252
+msgid "Add a text mathom to the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:257 src/settings.cpp:587
+msgid "Insert image mathom"
+msgstr ""
+
+#: src/bnpview.cpp:259
+msgid "Add an image mathom to the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:263 src/settings.cpp:588
+msgid "Insert link mathom"
+msgstr ""
+
+#: src/bnpview.cpp:265
+msgid "Add a link mathom to the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:269 src/settings.cpp:591
+msgid "Insert color mathom"
+msgstr ""
+
+#: src/bnpview.cpp:271
+msgid "Add a color mathom to the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:277
+msgid "Add a color mathom picked from one pixel on screen to the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:284
+msgid "Grab a screen zone as an image mathom in the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:290
+msgid "Insert plain text mathom"
+msgstr ""
+
+#: src/bnpview.cpp:292
+msgid "Add a plain text mathom to the current location without having to open the main window."
+msgstr ""
+
+#: src/bnpview.cpp:301
+msgid "Mathom-Houses"
+msgstr ""
+
+#: src/bnpview.cpp:346
+msgid "<h2>Organization Tree</h2>Here is the list of your Mathom-Houses and shelves. You can organize your mathoms by placing them in different locations. You can create shelves inside Mathom-Houses and other shelves to form a hierarchy. You can browse between locations by clicking them, or reorganize them using drag and drop."
+msgstr ""
+
+#: src/bnpview.cpp:361 src/bnpview.cpp:367
+msgid "&Mathom-House Archive..."
+msgstr ""
+
+#: src/bnpview.cpp:404
+msgid "Selects all mathoms"
+msgstr ""
+
+#: src/bnpview.cpp:409
+msgid "Unselects all selected mathoms"
+msgstr ""
+
+#: src/bnpview.cpp:416
+msgid "Inverts the current selection of mathoms"
+msgstr ""
+
+#: src/bnpview.cpp:595
+msgid "&New Mathom-House..."
+msgstr ""
+
+#: src/bnpview.cpp:601
+msgid "New &Shelf..."
+msgstr ""
+
+#: src/bnpview.cpp:606
+msgid "New at the Same &Level..."
+msgstr ""
+
+#: src/bnpview.cpp:645 src/bnpview.cpp:1903 src/bnpview.cpp:2054
+msgid "&Remove Mathom-House"
+msgstr ""
+
+#: src/bnpview.cpp:657
+msgctxt "Lock Location"
+msgid "&Lock"
+msgstr ""
+
+#: src/bnpview.cpp:699
+msgid "&Previous"
+msgstr ""
+
+#: src/bnpview.cpp:705
+msgid "&Next"
+msgstr ""
+
+#: src/bnpview.cpp:711 src/bnpview.cpp:2058
+msgid "&Fold Mathom-House"
+msgstr ""
+
+#: src/bnpview.cpp:717 src/bnpview.cpp:2062
+msgid "&Expand Mathom-House"
+msgstr ""
+
+#: src/bnpview.cpp:725
+msgid "Convert text mathoms to rich text mathoms"
+msgstr ""
+
+#: src/bnpview.cpp:734
+msgid "&Welcome Mathom-Houses"
+msgstr ""
+
+#: src/bnpview.cpp:999
+msgid "Plain Text Mathoms Conversion"
+msgstr ""
+
+#: src/bnpview.cpp:1000
+msgid "Converting plain text mathoms to rich text ones..."
+msgstr ""
+
+#: src/bnpview.cpp:1578
+msgid "No mathoms"
+msgstr ""
+
+#: src/bnpview.cpp:1580
+msgid "%1 mathom"
+msgid_plural "%1 mathoms"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/bnpview.cpp:1585
+msgctxt "e.g. '18 mathoms, 10 matches, 5 selected'"
+msgid "%1, %2, %3"
+msgstr ""
+
+#: src/bnpview.cpp:1718
+msgid "The plain text mathoms have been converted to rich text."
+msgstr ""
+
+#: src/bnpview.cpp:1720
+msgid "There are no plain text mathoms to convert."
+msgstr ""
+
+#: src/bnpview.cpp:1780
+msgid "Cannot add mathom."
+msgstr ""
+
+#: src/bnpview.cpp:1898
+msgid "<qt>Do you really want to remove the shelf <b>%1</b> and its contents?</qt>"
+msgstr ""
+
+#: src/bnpview.cpp:1900
+msgid "<qt>Do you really want to remove the Mathom-House <b>%1</b> and its contents?</qt>"
+msgstr ""
+
+#: src/bnpview.cpp:1902
+msgid "Remove Shelf"
+msgstr ""
+
+#: src/bnpview.cpp:1902
+msgid "Remove Mathom-House"
+msgstr ""
+
+#: src/bnpview.cpp:1903 src/bnpview.cpp:2053
+msgid "&Remove Shelf"
+msgstr ""
+
+#: src/bnpview.cpp:1914
+msgid "<qt><b>%1</b> contains the following shelves.<br>Do you want to remove them too?</qt>"
+msgstr ""
+
+#: src/bnpview.cpp:1917
+msgid "Remove Shelves"
+msgstr ""
+
+#: src/bnpview.cpp:1918
+msgid "&Remove Shelves"
+msgstr ""
+
+#: src/bnpview.cpp:1988 src/bnpview.cpp:2035
+msgid "Mathom-House Archives"
+msgstr ""
+
+#: src/bnpview.cpp:2036
+msgid "Open Mathom-House Archive"
+msgstr ""
+
+#: src/bnpview.cpp:2057
+msgid "&Fold Shelf"
+msgstr ""
+
+#: src/bnpview.cpp:2061
+msgid "&Expand Shelf"
+msgstr ""
+
+#: src/backup.cpp:76
+msgid "Your Mathom data is currently stored in this folder:<br><b>%1</b>"
+msgstr ""
+
+#: src/backup.cpp:87
+msgid "<p>You can move the folder where %1 stores its Mathom data to:</p><ul><li>Store your Mathom data in a visible place in your home folder, such as ~/Mathom, so you can back it up manually whenever you want.</li><li>Store your Mathom data on a server to share it between two computers.<br>In this case, mount the shared-folder to the local file system and ask %1 to use that mount point.<br>Warning: you should not run %1 at the same time on both computers, or you risk to loss data while the two applications are desynced.</li></ul><p>Please remember that you should not change the content of that folder manually (eg. adding a file directly to the data folder will not add a mathom to Mathom).</p>"
+msgstr ""
+
+#: src/backup.cpp:148 src/backup.cpp:179
+msgid "Choose a Folder Where to Move Mathom Data"
+msgstr ""
+
+#: src/backup.cpp:172
+msgid "Your Mathom data has been successfully moved to <b>%1</b>. %2 is going to be restarted to take this change into account."
+msgstr ""
+
+#: src/backup.cpp:184
+msgid "Your Mathom data folder has been successfully changed to <b>%1</b>. %2 is going to be restarted to take this change into account."
+msgstr ""
+
+#: src/backup.cpp:196
+msgctxt "Backup filename (without extension), %1 is the date"
+msgid "Mathom_Backup_%1"
+msgstr ""
+
+#: src/backup.cpp:205 src/backup.cpp:213
+msgid "Back Up Mathom Data"
+msgstr ""
+
+#: src/backup.cpp:214
+msgid "Backing up Mathom data. Please wait..."
+msgstr ""
+
+#: src/backup.cpp:255
+msgid "Open Mathom Backup"
+msgstr ""
+
+#: src/backup.cpp:270
+msgid "This is a safety copy of your Mathom data as it was before you started to restore the backup %1."
+msgstr ""
+
+#: src/backup.cpp:274
+msgid "If something went wrong during the restoration process, you can re-use this folder as your Mathom data folder and nothing will be lost."
+msgstr ""
+
+#: src/backup.cpp:276
+msgid "Choose \"Backup & Restore...\" -> \"Use Another Existing Folder...\" and select that folder."
+msgstr ""
+
+#: src/backup.cpp:284
+msgid "Restore Mathom Data"
+msgstr ""
+
+#: src/backup.cpp:317
+msgid "This archive is either not a Mathom backup or is corrupted. It cannot be imported. Your previous Mathom data has been preserved instead."
+msgstr ""
+
+#: src/backup.cpp:382
+msgctxt "Safety folder name before restoring Mathom data"
+msgid "Mathom Before Restoration"
+msgstr ""
+
+#: src/backup.cpp:389
+msgctxt "Safety folder name before restoring Mathom data"
+msgid "Mathom Before Restoration (%1)"
+msgstr ""
+
+#: src/variouswidgets.cpp:43
+msgid "..."
+msgstr ""
+
+#: src/variouswidgets.cpp:166
+msgid "Use KDE Plasma Application Launchers to open Mathom content"
+msgstr ""
+
+#: src/newbasketdialog.cpp:89 src/newbasketdialog.cpp:226
+msgid "New Mathom-House"
+msgstr ""
+
+#: src/newbasketdialog.cpp:220
+msgid "(Mathom-Houses)"
+msgstr ""
+
+#: src/newbasketdialog.cpp:227
+msgid "New Shelf"
+msgstr ""
+
+#: src/newbasketdialog.cpp:233
+msgid "<p>Creating shelves inside Mathom-Houses and other shelves forms a hierarchy that helps you organize your mathoms:</p><ul><li>Grouping mathoms by themes or topics;</li><li>Creating shelves for different projects;</li><li>Creating nested shelves representing sections, chapters or pages;</li><li>Grouping related locations so they can be exported together.</li></ul>"
+msgstr ""
+
+#: src/basketstatusbar.cpp:159
+msgid "<p>This location is <b>locked</b>.<br>Click to unlock it.</p>"
+msgstr ""
+
+#: src/basketstatusbar.cpp:162
+msgid "<p>This location is <b>unlocked</b>.<br>Click to lock it.</p>"
+msgstr ""
+
+#: src/noteedit.cpp:542
+msgid "Images cannot be edited here at the moment.\nDo you want to open it with an application that understand it?"
+msgstr ""
+
+#: src/noteedit.cpp:544
+msgid "Edit Image Mathom"
+msgstr ""
+
+#: src/noteedit.cpp:571
+msgid "Edit Animation Mathom"
+msgstr ""
+
+#: src/noteedit.cpp:660
+msgid "Edit Color Mathom"
+msgstr ""
+
+#: src/noteedit.cpp:676
+msgid "The type of this mathom is unknown and cannot be edited here.\nYou however can drag or copy the mathom into an application that understands it."
+msgstr ""
+
+#: src/noteedit.cpp:678
+msgid "Edit Unknown Mathom"
+msgstr ""
+
+#: src/noteedit.cpp:690
+msgid "Edit Link Mathom"
+msgstr ""
+
+#: src/noteedit.cpp:957
+msgid "Edit Launcher Mathom"
+msgstr ""
+
+#: src/basketscene.cpp:311
+msgid "The new mathom does not match the filter and is hidden."
+msgstr ""
+
+#: src/basketscene.cpp:313
+msgid "A new mathom does not match the filter and is hidden."
+msgstr ""
+
+#: src/basketscene.cpp:315
+msgid "Some new mathoms do not match the filter and are hidden."
+msgstr ""
+
+#: src/basketscene.cpp:317
+msgid "The new mathoms do not match the filter and are hidden."
+msgstr ""
+
+#: src/basketscene.cpp:2779 src/basketscene.cpp:2832 src/basketscene.cpp:2841
+msgid "Insert mathom here\nRight click for more options"
+msgstr ""
+
+#: src/basketscene.cpp:2798
+msgid "Resize this mathom"
+msgstr ""
+
+#: src/basketscene.cpp:2801
+msgid "Select or move this mathom"
+msgstr ""
+
+#: src/basketscene.cpp:2807
+msgid "Assign or remove tags from this mathom"
+msgstr ""
+
+#: src/basketscene.cpp:2835
+msgid "Group mathom with the one below\nRight click for more options"
+msgstr ""
+
+#: src/basketscene.cpp:2838
+msgid "Group mathom with the one above\nRight click for more options"
+msgstr ""
+
+#: src/basketscene.cpp:3050
+msgid "Password-protected location."
+msgstr ""
+
+#: src/basketscene.cpp:3066
+msgid "To keep protected locations unlocked, change the automatic<br>locking duration in the application settings."
+msgstr ""
+
+#: src/basketscene.cpp:3996
+msgid "<qt>Do you really want to delete this mathom?</qt>"
+msgid_plural "<qt>Do you really want to delete these <b>%1</b> mathoms?</qt>"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/basketscene.cpp:3997
+msgid "Delete Mathom"
+msgid_plural "Delete Mathoms"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/basketscene.cpp:4096
+msgid "Copied mathom to clipboard."
+msgid_plural "Copied mathoms to clipboard."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/basketscene.cpp:4099
+msgid "Cut mathom to clipboard."
+msgid_plural "Cut mathoms to clipboard."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/basketscene.cpp:4102
+msgid "Copied mathom to selection."
+msgid_plural "Copied mathoms to selection."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/basketscene.cpp:4166 src/basketscene.cpp:4248
+msgid "Unable to open this mathom."
+msgstr ""
+
+#: src/basketfactory.cpp:53
+msgid "Sorry, but the folder creation for this new location has failed."
+msgstr ""
+
+#: src/basketfactory.cpp:53 src/basketfactory.cpp:86 src/basketfactory.cpp:107
+msgid "Location Creation Failed"
+msgstr ""
+
+#: src/basketfactory.cpp:86
+msgid "Sorry, but the template copying for this new location has failed."
+msgstr ""
+
+#: src/basketfactory.cpp:107
+msgid "Sorry, but the template customization for this new location has failed."
+msgstr ""
+
+#: src/aboutdata.cpp:20
+msgid "Copyright © 2026 Thorinux Systems; based on BasKet Note Pads. Original copyrights © 2003–2007 Sébastien Laoût and © 2013–2019 Gleb Baryshev"
+msgstr ""
+
+#: src/aboutdata.cpp:27
+msgid "Mathom fork maintainer"
+msgstr ""
+
+#: src/softwareimporters.cpp:57
+msgid "How to Import the Mathoms?"
+msgstr ""
+
+#: src/softwareimporters.cpp:61
+msgid "&Keep original hierarchy (all mathoms in separate Mathom-Houses)"
+msgstr ""
+
+#: src/softwareimporters.cpp:62
+msgid "&First-level mathoms in separate Mathom-Houses"
+msgstr ""
+
+#: src/softwareimporters.cpp:63
+msgid "&All mathoms in one Mathom-House"
+msgstr ""
+
+#: src/softwareimporters.cpp:116
+msgid "Mathoms separated by an &empty line"
+msgstr ""
+
+#: src/softwareimporters.cpp:117
+msgid "One &mathom per line"
+msgstr ""
+
+#: src/softwareimporters.cpp:118
+msgid "Mathoms begin with a &dash (-)"
+msgstr ""
+
+#: src/softwareimporters.cpp:119
+msgid "Mathoms begin with a &star (*)"
+msgstr ""
+
+#: src/softwareimporters.cpp:136
+msgid "&All in one mathom"
+msgstr ""
+
+#: src/main.cpp:38
+msgid "Custom folder to load and save Mathom data."
+msgstr ""
+
+#: src/main.cpp:43
+msgid "Open a Mathom-House archive or template."
+msgstr ""
+
+#: src/notecontent.cpp:2074
+msgid "Link has no location to open."
+msgstr ""
+
+#: src/notecontent.cpp:2078
+msgid "Opening location..."
+msgstr ""
+
+#: src/settings_versionsync.cpp:78
+msgid "Do you really want to remove old versions for all locations?"
+msgstr ""
+
+#: src/settings_versionsync.cpp:79
+msgid "Remove Old Versions"
+msgstr ""
+
+#: src/htmlexporter.cpp:125 src/htmlexporter.cpp:166
+msgctxt "HTML export folder (Mathom-Houses)"
+msgid "mathom-houses"
+msgstr ""
+
+#: src/htmlexporter.cpp:405
+msgid "Made with <a href=\"%1\">%2</a> %3, a tool to organize mathoms and keep information at hand."
+msgstr ""
+
+#: src/common.cpp:60
+msgid "Please enter the password for <b>%1</b>:"
+msgstr ""
+
+#: src/common.cpp:96
+msgid "Please assign a password to <b>%1</b>:"
+msgstr ""
+
+#: src/filter.cpp:54
+msgid "Filter All Locations"
+msgstr ""
+
+#: src/settings.cpp:456
+msgid "&Organization tree position:"
+msgstr ""
+
+#: src/settings.cpp:510
+msgid "&Show tooltips in Mathom-Houses and shelves"
+msgstr ""
+
+#: src/settings.cpp:514
+msgid "&Big mathoms"
+msgstr ""
+
+#: src/settings.cpp:529
+msgid "Ask confirmation before &deleting mathoms"
+msgstr ""
+
+#: src/settings.cpp:537
+msgid "Automatically detect tags from mathom's content"
+msgstr ""
+
+#: src/settings.cpp:549
+msgid "It does apply when you copy and paste, or drag and drop mathoms to a text editor."
+msgstr ""
+
+#: src/settings.cpp:563
+msgid "&Group a new mathom when clicking on the right of the insertion line"
+msgstr ""
+
+#: src/settings.cpp:565
+msgid "How to group a new mathom?"
+msgstr ""
+
+#: src/settings.cpp:566
+msgid "<p>When this option is enabled, the insertion-line not only allows you to insert mathoms at the cursor position, but also allows you to group a new mathom with the one under the cursor:</p>"
+msgstr ""
+
+#: src/settings.cpp:569
+msgid "<p>Place your mouse between mathoms, where you want to add a new one.<br>Click on the <b>left</b> of the insertion-line middle-mark to <b>insert</b> a mathom.<br>Click on the <b>right</b> to <b>group</b> a mathom, with the one <b>below or above</b>, depending on where your mouse is.</p>"
+msgstr ""
+
+#: src/settings.cpp:589
+msgid "Insert cross-reference mathom"
+msgstr ""
+
+#: src/settings.cpp:590
+msgid "Insert launcher mathom"
+msgstr ""
+
+#: src/settings.cpp:594
+msgid "Load mathom from file"
+msgstr ""
+
+#: src/settings.cpp:619
+msgid "A&utomatically lock protected locations when closed for"
+msgstr ""
+
+#: src/settings.cpp:634
+msgid "Use GnuPG agent for &private/public key protected locations"
+msgstr ""
+
+#: src/settings.cpp:716
+msgid "&Place of new mathoms:"
+msgstr ""
+
+#: src/settings.cpp:721
+msgid "At current mathom"
+msgstr ""
+
+#: src/settings.cpp:846
+msgid "Another location"
+msgstr ""
+
+#: src/settings.cpp:973
+msgid "Specific Mathom Associations"
+msgstr ""
+
+#: src/settings.cpp:975
+msgid "Open &text mathoms with a custom application:"
+msgstr ""
+
+#: src/settings.cpp:976
+msgid "Open text mathoms with:"
+msgstr ""
+
+#: src/settings.cpp:983
+msgid "Open &image mathoms with a custom application:"
+msgstr ""
+
+#: src/settings.cpp:984
+msgid "Open image mathoms with:"
+msgstr ""
+
+#: src/settings.cpp:991
+msgid "Open a&nimation mathoms with a custom application:"
+msgstr ""
+
+#: src/settings.cpp:992
+msgid "Open animation mathoms with:"
+msgstr ""
+
+#: src/settings.cpp:999
+msgid "Open so&und mathoms with a custom application:"
+msgstr ""
+
+#: src/settings.cpp:1000
+msgid "Open sound mathoms with:"
+msgstr ""
+
+#: src/settings.cpp:1007
+msgid "Open HTTP link mathoms with a custom application:"
+msgstr ""
+
+#: src/settings.cpp:1008
+msgid "Open HTTP link mathoms with:"
+msgstr ""
+
+#: src/settings.cpp:1016
+msgid "<p>If checked, the application defined below will be used when opening that type of mathom.</p><p>Otherwise, the application you've configured in Konqueror will be used.</p>"
+msgstr ""
+
+#: src/basketproperties.cpp:109
+msgid "<p><strong>Easily Remember your Shortcuts</strong>:<br>With the first option, giving the current location a shortcut of the form <strong>Alt+Letter</strong> will underline that letter in the organization tree.<br>For instance, if you assign the shortcut <i>Alt+T</i> to a location named <i>Tips</i>, it will be displayed as <i><u>T</u>ips</i> in the tree. It helps you visualize the shortcuts to remember them more quickly.</p><p><strong>Local vs Global</strong>:<br>The first option allows you to show the location while the main window is active. Global shortcuts are valid from anywhere, even if the window is hidden.</p><p><strong>Show vs Switch</strong>:<br>The last option makes this location the current one without opening the main window. It is useful in addition to the configurable global shortcuts, eg. to paste the clipboard or the selection into the current location from anywhere.</p>"
+msgstr ""
+
+#. i18n: file: src/basketui.rc:6
+#. i18n: ectx: Menu (basket)
+#: rc.cpp:105
+msgid "&Mathom-House"
+msgstr ""
+
+#. i18n: file: src/basketui.rc:62
+#. i18n: ectx: Menu (note)
+#: rc.cpp:123
+msgid "&Mathom"
+msgstr ""
+
+#: src/bnpview.cpp
+msgid "Check for &Updates..."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Mathom Update"
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Unable to determine the installed Mathom Debian package version."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Unable to contact the Mathom update server: %1"
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "The update server returned invalid data."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "No Mathom Debian package was found in the latest release."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Installed version: %1"
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Available version: %1"
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "A Mathom update is available."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Mathom is up to date."
+msgstr ""
+
+#: src/basketproperties.cpp
+msgid "Tab color:"
+msgstr ""
+
+#: src/basketproperties.cpp
+msgid "Automatic"
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "The update download address is invalid."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "The update has no valid SHA-256 integrity information."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Unable to create the temporary update directory."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Unable to create the temporary update file."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Downloading Mathom update..."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Cancel"
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Unable to download the Mathom update: %1"
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "The downloaded update failed the SHA-256 integrity check. It will not be installed."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "The downloaded file is not the expected Mathom Debian package. It will not be installed."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Installing Mathom %1..."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Mathom %1 could not be installed. The existing installation has not been replaced."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Mathom %1 has been installed successfully.\n\nRestart Mathom now?"
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Unable to start the privileged Mathom installer."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "No valid Mathom Debian package was found in the latest release."
+msgstr ""
+
+#: src/updatechecker.cpp
+msgid "Download and install it now?"
+msgstr ""
+
+#: src/bnpview.cpp
+msgid "Hide the organization tree"
+msgstr ""
+
+#: src/bnpview.cpp
+msgid "Show the organization tree"
+msgstr ""

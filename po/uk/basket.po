@@ -4573,3 +4573,30 @@ msgstr ""
 
 #~ msgid "Docking in System Tray"
 #~ msgstr "Швартування в системному лотку"
+
+
+# Mathom spreadsheet
+msgid "Spreadsheet"
+msgstr "Електронна таблиця"
+
+msgid "&Spreadsheet"
+msgstr "&Електронна таблиця"
+
+msgid "+ Row"
+msgstr "+ Рядок"
+
+msgid "- Row"
+msgstr "- Рядок"
+
+msgid "+ Column"
+msgstr "+ Стовпець"
+
+msgid "- Column"
+msgstr "- Стовпець"
+
+msgid "Edit this spreadsheet"
+msgstr "Редагувати цю електронну таблицю"
+
+msgid "Mathom Spreadsheet (*.mcalc)"
+msgstr "Електронна таблиця Mathom (*.mcalc)"
+

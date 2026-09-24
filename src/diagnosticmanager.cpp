@@ -17,6 +17,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QProcess>
 #include <QPushButton>
 #include <QStandardPaths>
 #include <QSysInfo>
@@ -318,21 +319,66 @@ void DiagnosticManager::openReport(const QString &reportPath)
 
 void DiagnosticManager::prepareEmail(const QString &reportPath)
 {
+    const QString subject =
+        QStringLiteral("[Mathom Bug] %1").arg(QFileInfo(reportPath).completeBaseName());
+
+    const QString body =
+        QStringLiteral("Bonjour,\n\n"
+                       "Mathom a genere un rapport de diagnostic apres un arret anormal.\n"
+                       "Le rapport de diagnostic est joint automatiquement a ce message.\n\n"
+                       "Merci.");
+
+    logEvent(
+        QStringLiteral("REPORT_EMAIL_PREPARE_BEGIN"),
+        {{QStringLiteral("report"), QFileInfo(reportPath).fileName()}});
+
+    // xdg-email supports attachments and uses the user's configured mail
+    // application. This is preferred over a plain mailto: URL, because
+    // mailto has no portable attachment mechanism.
+    const QString xdgEmail = QStandardPaths::findExecutable(QStringLiteral("xdg-email"));
+    if (!xdgEmail.isEmpty()) {
+        const QStringList arguments = {
+            QStringLiteral("--utf8"),
+            QStringLiteral("--subject"),
+            subject,
+            QStringLiteral("--body"),
+            body,
+            QStringLiteral("--attach"),
+            reportPath,
+            QStringLiteral("contact@thorinux.fr")
+        };
+
+        if (QProcess::startDetached(xdgEmail, arguments)) {
+            logEvent(
+                QStringLiteral("REPORT_EMAIL_PREPARED"),
+                {{QStringLiteral("method"), QStringLiteral("xdg-email")},
+                 {QStringLiteral("attachment"), QFileInfo(reportPath).fileName()}});
+            return;
+        }
+    }
+
+    // Fallback for desktops where xdg-email is unavailable. The report
+    // folder is opened as well so the user can attach the file manually.
     QUrl mail(QStringLiteral("mailto:contact@thorinux.fr"));
     QUrlQuery query;
-    query.addQueryItem(QStringLiteral("subject"),
-                       QStringLiteral("[Mathom Bug] %1").arg(QFileInfo(reportPath).completeBaseName()));
+    query.addQueryItem(QStringLiteral("subject"), subject);
     query.addQueryItem(
         QStringLiteral("body"),
         QStringLiteral("Bonjour,\n\n"
                        "Mathom a genere un rapport de diagnostic apres un arret anormal.\n"
-                       "Merci de joindre le fichier suivant a ce message :\n\n%1\n\n"
-                       "Le dossier contenant le rapport va egalement etre ouvert.")
-            .arg(reportPath));
+                       "L'ajout automatique de la piece jointe n'a pas fonctionne.\n"
+                       "Merci de joindre le rapport ouvert dans le dossier de diagnostic.\n\n"
+                       "Fichier : %1")
+            .arg(QFileInfo(reportPath).fileName()));
     mail.setQuery(query);
 
     QDesktopServices::openUrl(mail);
     QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(reportPath).absolutePath()));
+
+    logEvent(
+        QStringLiteral("REPORT_EMAIL_PREPARED"),
+        {{QStringLiteral("method"), QStringLiteral("mailto-fallback")},
+         {QStringLiteral("attachment"), QStringLiteral("manual")}});
 }
 
 void DiagnosticManager::showPendingReportDialog(QWidget *parent)
@@ -342,27 +388,37 @@ void DiagnosticManager::showPendingReportDialog(QWidget *parent)
 
     const QString reportPath = m_pendingReports.constLast();
 
-    QMessageBox box(parent);
-    box.setIcon(QMessageBox::Warning);
-    box.setWindowTitle(tr("Mathom - Rapport de diagnostic"));
-    box.setText(tr("Mathom ne s'est pas ferme normalement lors de la derniere utilisation."));
-    box.setInformativeText(
-        tr("Un rapport technique a ete cree. Il ne contient pas le texte de tes notes.\n\n"
-           "Tu peux le consulter, le garder pour le transmettre plus tard, "
-           "ou preparer un e-mail pour Thorinux."));
+    // Keep the diagnostic workflow available after "Voir le rapport".
+    // Opening the report must not make the email action disappear.
+    for (;;) {
+        QMessageBox box(parent);
+        box.setIcon(QMessageBox::Warning);
+        box.setWindowTitle(tr("Mathom - Rapport de diagnostic"));
+        box.setText(tr("Mathom ne s'est pas ferme normalement lors de la derniere utilisation."));
+        box.setInformativeText(
+            tr("Un rapport technique a ete cree. Il ne contient pas le texte de tes notes.\n\n"
+               "Tu peux d'abord le consulter puis revenir ici pour le transmettre a Thorinux."));
 
-    auto *viewButton =
-        box.addButton(tr("Voir le rapport"), QMessageBox::ActionRole);
-    auto *emailButton =
-        box.addButton(tr("Preparer un e-mail a Thorinux"), QMessageBox::ActionRole);
-    box.addButton(tr("Fermer"), QMessageBox::RejectRole);
+        auto *viewButton =
+            box.addButton(tr("Voir le rapport"), QMessageBox::ActionRole);
+        auto *emailButton =
+            box.addButton(tr("Preparer un e-mail a Thorinux"), QMessageBox::ActionRole);
+        box.addButton(tr("Fermer"), QMessageBox::RejectRole);
 
-    box.exec();
+        box.exec();
 
-    if (box.clickedButton() == viewButton) {
-        openReport(reportPath);
-    } else if (box.clickedButton() == emailButton) {
-        prepareEmail(reportPath);
+        if (box.clickedButton() == viewButton) {
+            logEvent(
+                QStringLiteral("REPORT_VIEW"),
+                {{QStringLiteral("report"), QFileInfo(reportPath).fileName()}});
+            openReport(reportPath);
+            continue;
+        }
+
+        if (box.clickedButton() == emailButton)
+            prepareEmail(reportPath);
+
+        break;
     }
 }
 

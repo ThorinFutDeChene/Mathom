@@ -570,6 +570,7 @@ private:
     // QWidget    *m_rightEditorBorder;
     bool m_redirectEditActions;
     bool m_editorTrackMouseEvent;
+    bool m_editorNativeMouseEvent;
     qreal m_editorWidth;
     qreal m_editorHeight;
     QTimer m_inactivityAutoSaveTimer;

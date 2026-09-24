@@ -1047,8 +1047,7 @@ void BasketScene::load()
     QDomElement properties = XMLWork::getElement(docElem, QStringLiteral("properties"));
 
     loadProperties(properties); // Since we are loading, this time the background image will also be loaded!
-    // Now that the background image is loaded and subscribed, we display it during the load process:
-    delete doc;
+    // Keep the DOM document alive while its elements are still being used.
 
     // BEGIN Compatibility with 0.6.0 Pre-Alpha versions:
     QDomElement notes = XMLWork::getElement(docElem, QStringLiteral("notes"));
@@ -1062,6 +1061,11 @@ void BasketScene::load()
     loadNotes(notes, nullptr);
     if (m_shouldConvertPlainTextNotes)
         convertTexts();
+
+    // The DOM elements are no longer needed.
+    delete doc;
+    doc = nullptr;
+
     m_watcher->startScan();
 
     signalCountsChanged();

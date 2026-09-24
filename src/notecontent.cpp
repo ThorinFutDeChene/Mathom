@@ -116,6 +116,8 @@ QString NoteType::typeToName(const NoteType::Id noteType)
         return i18n("Launcher");
     case NoteType::Color:
         return i18n("Color");
+    case NoteType::Spreadsheet:
+        return i18n("Spreadsheet");
     case NoteType::Unknown:
         return i18n("Unknown");
     }
@@ -147,6 +149,8 @@ QString NoteType::typeToLowerName(const NoteType::Id noteType)
         return QStringLiteral("launcher");
     case NoteType::Color:
         return QStringLiteral("color");
+    case NoteType::Spreadsheet:
+        return QStringLiteral("spreadsheet");
     case NoteType::Unknown:
         return QStringLiteral("unknown");
     }
@@ -177,6 +181,8 @@ NoteType::Id NoteType::typeFromLowerName(const QString &lowerTypeName)
         return NoteType::Launcher;
     } else if (lowerTypeName == QStringLiteral("color")) {
         return NoteType::Color;
+    } else if (lowerTypeName == QStringLiteral("spreadsheet")) {
+        return NoteType::Spreadsheet;
     } else if (lowerTypeName == QStringLiteral("unknown")) {
         return NoteType::Unknown;
     }

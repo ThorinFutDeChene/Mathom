@@ -1986,6 +1986,10 @@ void BasketScene::insertEmptyNote(int type)
         closeEditor();
     Note *note = NoteFactory::createEmptyNote((NoteType::Id)type, this);
     insertCreatedNote(note /*, / *edit=* /true*/);
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("NEW_MATHOM_OK"),
+        {{QStringLiteral("folder"), folderName()},
+         {QStringLiteral("type"), type}});
     noteEdit(note, /*justAdded=*/true);
 }
 
@@ -3965,10 +3969,6 @@ void BasketScene::showEditedNoteWhileFiltering()
 
 void BasketScene::noteEdit(Note *note, bool justAdded, const QPointF &clickedPoint) // TODO: Remove the first parameter!!!
 {
-    DiagnosticManager::instance().logEvent(
-        QStringLiteral("MATHOM_EDIT_BEGIN"),
-        {{QStringLiteral("folder"), folderName()},
-         {QStringLiteral("just_added"), justAdded}});
     if (!note)
         note = theSelectedNote(); // TODO: Or pick the focused note!
     if (!note)
@@ -3992,6 +3992,10 @@ void BasketScene::noteEdit(Note *note, bool justAdded, const QPointF &clickedPoi
 
     NoteEditor *editor = NoteEditor::editNoteContent(note->content(), m_view);
     if (editor->graphicsWidget()) {
+        DiagnosticManager::instance().logEvent(
+            QStringLiteral("MATHOM_EDIT_BEGIN"),
+            {{QStringLiteral("folder"), folderName()},
+             {QStringLiteral("just_added"), justAdded}});
         m_editor = editor;
 
         addItem(m_editor->graphicsWidget());

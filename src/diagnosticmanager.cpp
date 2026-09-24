@@ -17,6 +17,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QPushButton>
 #include <QStandardPaths>
 #include <QSysInfo>
 #include <QTimer>
@@ -122,7 +123,7 @@ void DiagnosticManager::startSession()
     details.insert(QStringLiteral("version"), QCoreApplication::applicationVersion());
     details.insert(QStringLiteral("qt_version"), QString::fromLatin1(qVersion()));
     details.insert(QStringLiteral("os"), QSysInfo::prettyProductName());
-    details.insert(QStringLiteral("kernel"), QSysInfo::kernelType() + QLatin1Char(' ') + QSysInfo::kernelVersion());
+    details.insert(QStringLiteral("kernel"), QStringLiteral("%1 %2").arg(QSysInfo::kernelType(), QSysInfo::kernelVersion()));
     details.insert(QStringLiteral("architecture"), QSysInfo::currentCpuArchitecture());
     details.insert(QStringLiteral("pid"), QCoreApplication::applicationPid());
     logEvent(QStringLiteral("SESSION_OPEN"), details);
@@ -350,9 +351,9 @@ void DiagnosticManager::showPendingReportDialog(QWidget *parent)
            "Tu peux le consulter, le garder pour le transmettre plus tard, "
            "ou preparer un e-mail pour Thorinux."));
 
-    QAbstractButton *viewButton =
+    auto *viewButton =
         box.addButton(tr("Voir le rapport"), QMessageBox::ActionRole);
-    QAbstractButton *emailButton =
+    auto *emailButton =
         box.addButton(tr("Preparer un e-mail a Thorinux"), QMessageBox::ActionRole);
     box.addButton(tr("Fermer"), QMessageBox::RejectRole);
 

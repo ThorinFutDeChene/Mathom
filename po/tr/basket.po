@@ -4038,9 +4038,6 @@ msgstr ""
 #~ "Dosya ve bağlantıları açmak için kullanılan uygulamalar nasıl "
 #~ "değiştirilir?"
 
-#~ msgid "..."
-#~ msgstr "..."
-
 #~ msgid "Choose an Existing Folder to Store Baskets"
 #~ msgstr "Sepetlerinizi Kaydetmek İçin Oluşturulmuş Bir Klasör Seçin"
 
@@ -4460,7 +4457,7 @@ msgstr ""
 
 #: src/variouswidgets.cpp:43
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: src/variouswidgets.cpp:166
 msgid "Use KDE Plasma Application Launchers to open Mathom content"

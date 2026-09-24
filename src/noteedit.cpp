@@ -10,6 +10,7 @@
 #include <QActionGroup>
 #include <QApplication>
 #include <QColorDialog>
+#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFontComboBox>
 #include <QFormLayout>
@@ -695,6 +696,9 @@ SpreadsheetEditor::SpreadsheetEditor(SpreadsheetContent *spreadsheetContent, QWi
     : NoteEditor(spreadsheetContent)
     , m_spreadsheetContent(spreadsheetContent)
     , m_table(new QTableWidget(spreadsheetContent->rowCount(), spreadsheetContent->columnCount()))
+    , m_cellAddress(new QLabel())
+    , m_formulaEdit(new QLineEdit())
+    , m_functionCombo(new QComboBox())
 {
     auto *container = new QWidget();
     auto *layout = new QVBoxLayout(container);
@@ -712,6 +716,27 @@ SpreadsheetEditor::SpreadsheetEditor(SpreadsheetContent *spreadsheetContent, QWi
     tools->addWidget(removeColumn);
     tools->addStretch();
     layout->addLayout(tools);
+
+    auto *formulaBar = new QHBoxLayout();
+    m_cellAddress->setMinimumWidth(48);
+    m_cellAddress->setAlignment(Qt::AlignCenter);
+    m_cellAddress->setText(QStringLiteral("A1"));
+
+    m_functionCombo->addItem(i18n("Function..."), QString());
+    m_functionCombo->addItem(i18n("Sum"), QStringLiteral("SUM"));
+    m_functionCombo->addItem(i18n("Average"), QStringLiteral("AVERAGE"));
+    m_functionCombo->addItem(i18n("Minimum"), QStringLiteral("MIN"));
+    m_functionCombo->addItem(i18n("Maximum"), QStringLiteral("MAX"));
+    m_functionCombo->addItem(i18n("Count"), QStringLiteral("COUNT"));
+
+    m_formulaEdit->setPlaceholderText(i18n("Value or formula, for example =A1+B1"));
+    auto *applyFormula = new QPushButton(i18n("Apply"), container);
+
+    formulaBar->addWidget(m_cellAddress);
+    formulaBar->addWidget(m_functionCombo);
+    formulaBar->addWidget(m_formulaEdit, 1);
+    formulaBar->addWidget(applyFormula);
+    layout->addLayout(formulaBar);
 
     m_table->setParent(container);
     m_table->setAlternatingRowColors(true);
@@ -737,16 +762,33 @@ SpreadsheetEditor::SpreadsheetEditor(SpreadsheetContent *spreadsheetContent, QWi
     BasketScene *scene = spreadsheetContent->note()->basket();
 
     connect(m_table, &QTableWidget::itemChanged, scene, &BasketScene::contentChangedInEditor);
+    connect(m_table, &QTableWidget::currentCellChanged, this, [this](int, int, int, int) {
+        updateFormulaBar();
+    });
+    connect(m_table, &QTableWidget::itemSelectionChanged, this, [this]() {
+        updateFormulaBar();
+    });
+
+    connect(m_formulaEdit, &QLineEdit::returnPressed, this, &SpreadsheetEditor::commitFormulaBar);
+    connect(applyFormula, &QPushButton::clicked, this, &SpreadsheetEditor::commitFormulaBar);
+    connect(m_functionCombo, &QComboBox::activated, this, [this](int index) {
+        const QString functionName = m_functionCombo->itemData(index).toString();
+        if (!functionName.isEmpty())
+            insertFunction(functionName);
+        m_functionCombo->setCurrentIndex(0);
+    });
 
     connect(addRow, &QPushButton::clicked, this, [this, scene]() {
         m_table->insertRow(m_table->rowCount());
         scene->contentChangedInEditor();
+        updateFormulaBar();
     });
     connect(removeRow, &QPushButton::clicked, this, [this, scene]() {
         if (m_table->rowCount() > 1) {
             const int row = m_table->currentRow() >= 0 ? m_table->currentRow() : m_table->rowCount() - 1;
             m_table->removeRow(row);
             scene->contentChangedInEditor();
+            updateFormulaBar();
         }
     });
     connect(addColumn, &QPushButton::clicked, this, [this, scene]() {
@@ -754,6 +796,7 @@ SpreadsheetEditor::SpreadsheetEditor(SpreadsheetContent *spreadsheetContent, QWi
         m_table->insertColumn(column);
         m_table->setHorizontalHeaderItem(column, new QTableWidgetItem(SpreadsheetContent::columnName(column)));
         scene->contentChangedInEditor();
+        updateFormulaBar();
     });
     connect(removeColumn, &QPushButton::clicked, this, [this, scene]() {
         if (m_table->columnCount() > 1) {
@@ -762,14 +805,93 @@ SpreadsheetEditor::SpreadsheetEditor(SpreadsheetContent *spreadsheetContent, QWi
             for (int index = 0; index < m_table->columnCount(); ++index)
                 m_table->setHorizontalHeaderItem(index, new QTableWidgetItem(SpreadsheetContent::columnName(index)));
             scene->contentChangedInEditor();
+            updateFormulaBar();
         }
     });
 
     m_table->setCurrentCell(0, 0);
+    updateFormulaBar();
     m_table->setFocus();
 }
 
 SpreadsheetEditor::~SpreadsheetEditor() = default;
+
+void SpreadsheetEditor::ensureCellExists(int row, int column)
+{
+    if (row < 0 || column < 0 || row >= m_table->rowCount() || column >= m_table->columnCount())
+        return;
+
+    if (!m_table->item(row, column))
+        m_table->setItem(row, column, new QTableWidgetItem());
+}
+
+void SpreadsheetEditor::updateFormulaBar()
+{
+    const int row = m_table->currentRow();
+    const int column = m_table->currentColumn();
+
+    if (row < 0 || column < 0) {
+        m_cellAddress->setText(QString());
+        m_formulaEdit->clear();
+        return;
+    }
+
+    m_cellAddress->setText(SpreadsheetContent::columnName(column) + QString::number(row + 1));
+    ensureCellExists(row, column);
+
+    if (QTableWidgetItem *item = m_table->item(row, column))
+        m_formulaEdit->setText(item->text());
+}
+
+void SpreadsheetEditor::commitFormulaBar()
+{
+    const int row = m_table->currentRow();
+    const int column = m_table->currentColumn();
+    if (row < 0 || column < 0)
+        return;
+
+    ensureCellExists(row, column);
+    m_table->item(row, column)->setText(m_formulaEdit->text());
+    m_table->setFocus();
+}
+
+void SpreadsheetEditor::insertFunction(const QString &functionName)
+{
+    const QList<QTableWidgetSelectionRange> ranges = m_table->selectedRanges();
+
+    int targetRow = m_table->currentRow();
+    int targetColumn = m_table->currentColumn();
+    QString argument;
+
+    if (!ranges.isEmpty()) {
+        const QTableWidgetSelectionRange range = ranges.first();
+        argument = SpreadsheetContent::columnName(range.leftColumn()) + QString::number(range.topRow() + 1)
+            + QLatin1Char(':')
+            + SpreadsheetContent::columnName(range.rightColumn()) + QString::number(range.bottomRow() + 1);
+
+        if (range.rowCount() > 1 && range.columnCount() == 1) {
+            targetRow = qMin(m_table->rowCount() - 1, range.bottomRow() + 1);
+            targetColumn = range.leftColumn();
+        } else if (range.columnCount() > 1 && range.rowCount() == 1) {
+            targetRow = range.topRow();
+            targetColumn = qMin(m_table->columnCount() - 1, range.rightColumn() + 1);
+        }
+    }
+
+    if (argument.isEmpty() && targetRow >= 0 && targetColumn >= 0)
+        argument = SpreadsheetContent::columnName(targetColumn) + QString::number(targetRow + 1);
+
+    if (targetRow < 0 || targetColumn < 0)
+        return;
+
+    ensureCellExists(targetRow, targetColumn);
+    const QString formula = QStringLiteral("=%1(%2)").arg(functionName, argument);
+    m_table->setCurrentCell(targetRow, targetColumn);
+    m_table->item(targetRow, targetColumn)->setText(formula);
+    updateFormulaBar();
+    m_table->setFocus();
+}
+
 
 void SpreadsheetEditor::syncContent(bool saveToFile)
 {

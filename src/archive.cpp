@@ -7,6 +7,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QList>
@@ -716,39 +717,44 @@ void Archive::renameMergedStatesAndBasketIcon(const QString &fullPath, QMap<QStr
 
 void Archive::importBasketIcon(QDomElement properties, const QString &extractionFolder)
 {
-    QString iconName = XMLWork::getElementText(properties, QStringLiteral("icon"));
-    if (!iconName.isEmpty() && iconName != QStringLiteral("basket")) {
-        QPixmap icon =
-            KIconLoader::global()->loadIcon(iconName, KIconLoader::NoGroup, 16, KIconLoader::DefaultState, QStringList(), nullptr, /*canReturnNull=*/true);
-        // The icon does not exists on that computer, import it:
-        if (icon.isNull()) {
-            QDir dir;
-            dir.mkpath(MathomIcons::customIconsFolder());
-            FormatImporter copier; // Only used to copy files synchronously
+    const QString iconName = XMLWork::getElementText(properties, QStringLiteral("icon"));
+    if (iconName.isEmpty() || iconName == QStringLiteral("basket"))
+        return;
 
-            // Archive::saveBasketToArchive() stores custom icon paths with '/'
-            // flattened to '_'. Restore the file into Mathom's single custom
-            // icon catalogue and rewrite the basket property to that path.
-            const QString iconFileName = QFileInfo(iconName).fileName().isEmpty()
-                ? iconName
-                : QFileInfo(iconName).fileName();
-            QString archivedIconName = iconName;
-            archivedIconName.replace(QLatin1Char('/'), QLatin1Char('_'));
+    // A .baskets archive is self-contained: when it contains a snapshot of
+    // the hierarchy icon, always restore that snapshot instead of deciding
+    // from the icon theme available on the current machine. This avoids the
+    // lab/native discrepancy where KIconLoader could resolve an icon in the
+    // Flatpak SDK while the installed Debian runtime could not render it.
+    QString archivedIconName = iconName;
+    archivedIconName.replace(QLatin1Char('/'), QLatin1Char('_'));
 
-            const QString source =
-                extractionFolder + QStringLiteral("basket-icons/") + archivedIconName;
-            const QString destination =
-                MathomIcons::customIconsFolder() + iconFileName;
+    const QString source =
+        extractionFolder + QStringLiteral("basket-icons/") + archivedIconName;
 
-            if (QFileInfo::exists(source) && !QFileInfo::exists(destination))
-                copier.copyFolder(source, destination);
-            // Replace the emblem path in the tags.xml copy:
-            QDomElement iconElement = XMLWork::getElement(properties, QStringLiteral("icon"));
-            properties.removeChild(iconElement);
-            QDomDocument document = properties.ownerDocument();
-            XMLWork::addElement(document, properties, QStringLiteral("icon"), destination);
-        }
+    if (!QFileInfo::exists(source))
+        return; // Keep the semantic/theme icon name as a normal fallback.
+
+    QDir().mkpath(MathomIcons::customIconsFolder());
+
+    QString destinationFileName = archivedIconName;
+    if (QFileInfo(destinationFileName).suffix().isEmpty())
+        destinationFileName += QStringLiteral(".png");
+
+    const QString destination =
+        MathomIcons::customIconsFolder() + destinationFileName;
+
+    if (!QFileInfo::exists(destination)) {
+        QFile::copy(source, destination);
     }
+
+    if (!QFileInfo::exists(destination))
+        return; // Copy failed: never destroy the original icon identifier.
+
+    QDomElement iconElement = XMLWork::getElement(properties, QStringLiteral("icon"));
+    properties.removeChild(iconElement);
+    QDomDocument document = properties.ownerDocument();
+    XMLWork::addElement(document, properties, QStringLiteral("icon"), destination);
 }
 
 void Archive::renameMergedStates(QDomNode notes, QMap<QString, QString> &mergedStates)

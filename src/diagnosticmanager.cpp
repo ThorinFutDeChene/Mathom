@@ -322,19 +322,35 @@ void DiagnosticManager::prepareEmail(const QString &reportPath)
     const QString subject =
         QStringLiteral("[Mathom Bug] %1").arg(QFileInfo(reportPath).completeBaseName());
 
+    QFile report(reportPath);
+    QString reportText;
+
+    if (report.open(QIODevice::ReadOnly | QIODevice::Text))
+        reportText = QString::fromUtf8(report.readAll());
+
+    if (reportText.isEmpty()) {
+        reportText =
+            QStringLiteral("Le rapport de diagnostic n'a pas pu etre relu par Mathom.\n"
+                           "Fichier local : %1")
+                .arg(QFileInfo(reportPath).fileName());
+    }
+
     const QString body =
         QStringLiteral("Bonjour,\n\n"
-                       "Mathom a genere un rapport de diagnostic apres un arret anormal.\n"
-                       "Le rapport de diagnostic est joint automatiquement a ce message.\n\n"
-                       "Merci.");
+                       "Mathom a detecte un arret anormal.\n"
+                       "Voici le rapport de diagnostic genere automatiquement.\n"
+                       "Le contenu des Mathoms n'est pas inclus dans ce rapport.\n\n"
+                       "---------------- RAPPORT MATHOM ----------------\n\n")
+        + reportText
+        + QStringLiteral("\n\n-------------- FIN DU RAPPORT --------------\n");
 
     logEvent(
         QStringLiteral("REPORT_EMAIL_PREPARE_BEGIN"),
         {{QStringLiteral("report"), QFileInfo(reportPath).fileName()}});
 
-    // xdg-email supports attachments and uses the user's configured mail
-    // application. This is preferred over a plain mailto: URL, because
-    // mailto has no portable attachment mechanism.
+    // Put the diagnostic report directly in the message body. Attachments
+    // are intentionally avoided because some mail clients/providers block
+    // or ignore attachment requests coming from xdg-email/mailto.
     const QString xdgEmail = QStandardPaths::findExecutable(QStringLiteral("xdg-email"));
     if (!xdgEmail.isEmpty()) {
         const QStringList arguments = {
@@ -343,42 +359,31 @@ void DiagnosticManager::prepareEmail(const QString &reportPath)
             subject,
             QStringLiteral("--body"),
             body,
-            QStringLiteral("--attach"),
-            reportPath,
             QStringLiteral("contact@thorinux.fr")
         };
 
         if (QProcess::startDetached(xdgEmail, arguments)) {
             logEvent(
                 QStringLiteral("REPORT_EMAIL_PREPARED"),
-                {{QStringLiteral("method"), QStringLiteral("xdg-email")},
-                 {QStringLiteral("attachment"), QFileInfo(reportPath).fileName()}});
+                {{QStringLiteral("method"), QStringLiteral("xdg-email-body")},
+                 {QStringLiteral("report_in_body"), true}});
             return;
         }
     }
 
-    // Fallback for desktops where xdg-email is unavailable. The report
-    // folder is opened as well so the user can attach the file manually.
+    // Fallback: use a standard mailto URI with the same full report body.
     QUrl mail(QStringLiteral("mailto:contact@thorinux.fr"));
     QUrlQuery query;
     query.addQueryItem(QStringLiteral("subject"), subject);
-    query.addQueryItem(
-        QStringLiteral("body"),
-        QStringLiteral("Bonjour,\n\n"
-                       "Mathom a genere un rapport de diagnostic apres un arret anormal.\n"
-                       "L'ajout automatique de la piece jointe n'a pas fonctionne.\n"
-                       "Merci de joindre le rapport ouvert dans le dossier de diagnostic.\n\n"
-                       "Fichier : %1")
-            .arg(QFileInfo(reportPath).fileName()));
+    query.addQueryItem(QStringLiteral("body"), body);
     mail.setQuery(query);
 
     QDesktopServices::openUrl(mail);
-    QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(reportPath).absolutePath()));
 
     logEvent(
         QStringLiteral("REPORT_EMAIL_PREPARED"),
-        {{QStringLiteral("method"), QStringLiteral("mailto-fallback")},
-         {QStringLiteral("attachment"), QStringLiteral("manual")}});
+        {{QStringLiteral("method"), QStringLiteral("mailto-body")},
+         {QStringLiteral("report_in_body"), true}});
 }
 
 void DiagnosticManager::showPendingReportDialog(QWidget *parent)

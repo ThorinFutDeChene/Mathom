@@ -107,6 +107,7 @@ private:
     bool m_isEmpty;
     bool m_canceled;
     QGraphicsProxyWidget *m_widget;
+    bool m_deferWidgetDeletion = false;
     KTextEdit *m_textEdit;
     QLineEdit *m_lineEdit;
     NoteContent *m_noteContent;
@@ -128,6 +129,10 @@ protected:
         m_canceled = true;
     }
     void setInlineEditor(QWidget *inlineEditor);
+    void deferInlineWidgetDeletion()
+    {
+        m_deferWidgetDeletion = true;
+    }
 
 public:
     virtual void validate()

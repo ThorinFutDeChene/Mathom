@@ -627,6 +627,11 @@ void BNPView::setupActions()
     a->setIcon(MathomIcons::icon(QStringLiteral("insert-image")));
     m_actInsertImage = a;
 
+    a = ac->addAction(QStringLiteral("insert_spreadsheet"));
+    a->setText(i18n("&Spreadsheet"));
+    a->setIcon(MathomIcons::icon(QStringLiteral("x-office-spreadsheet")));
+    m_actInsertSpreadsheet = a;
+
     a = ac->addAction(QStringLiteral("insert_color"));
     a->setText(i18n("&Color"));
     a->setIcon(MathomIcons::icon(QStringLiteral("fill-color")));
@@ -658,6 +663,9 @@ void BNPView::setupActions()
     });
     connect(m_actInsertImage, &QAction::triggered, this, [this]() {
         insertEmpty(NoteType::Image);
+    });
+    connect(m_actInsertSpreadsheet, &QAction::triggered, this, [this]() {
+        insertEmpty(NoteType::Spreadsheet);
     });
     connect(m_actInsertLink, &QAction::triggered, this, [this]() {
         insertEmpty(NoteType::Link);
@@ -699,6 +707,7 @@ void BNPView::setupActions()
     m_insertActions.append(m_actInsertLink);
     m_insertActions.append(m_actInsertCrossReference);
     m_insertActions.append(m_actInsertImage);
+    m_insertActions.append(m_actInsertSpreadsheet);
     m_insertActions.append(m_actInsertColor);
     m_insertActions.append(m_actImportKMenu);
     m_insertActions.append(m_actInsertLauncher);

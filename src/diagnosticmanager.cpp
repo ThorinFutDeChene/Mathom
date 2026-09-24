@@ -700,10 +700,11 @@ QString DiagnosticManager::createReportForSession(const QString &sessionPath)
 
     if (summary.lastMemoryKiB >= 0)
         writeLine(QStringLiteral("Memoire derniere mesure : %1 Mio").arg(summary.lastMemoryKiB / 1024.0, 0, 'f', 1));
-    if (summary.peakMemoryKiB >= 0)
-        writeLine(QStringLiteral("Memoire RSS maximum observee : %1 Mio").arg(summary.peakMemoryKiB / 1024.0, 0, 'f', 1));
-    if (summary.measuredPeakMemoryKiB >= 0)
-        writeLine(QStringLiteral("Pic memoire RSS signale par le systeme : %1 Mio").arg(summary.measuredPeakMemoryKiB / 1024.0, 0, 'f', 1));
+
+    const qint64 retainedPeakMemoryKiB =
+        qMax(summary.peakMemoryKiB, summary.measuredPeakMemoryKiB);
+    if (retainedPeakMemoryKiB >= 0)
+        writeLine(QStringLiteral("Pic memoire RSS retenu : %1 Mio").arg(retainedPeakMemoryKiB / 1024.0, 0, 'f', 1));
 
     writeLine();
     writeLine(QStringLiteral("Derniere action utilisateur :"));

@@ -42,6 +42,7 @@ Note *createNoteCrossReference(const QUrl &url, const QString &title, BasketScen
 Note *createNoteCrossReference(const QUrl &url, const QString &title, const QString &icon, BasketScene *parent);
 Note *createNoteImage(const QPixmap &image, BasketScene *parent);
 Note *createNoteColor(const QColor &color, BasketScene *parent);
+Note *createNoteSpreadsheet(BasketScene *parent);
 Note *createNoteFromText(const QString &content, BasketScene *parent); // Find automatically the type from the text meaning  // TODO: Return Note::List?
 Note *createNoteLauncher(const QUrl &url, BasketScene *parent);
 Note *createNoteLauncher(const QString &command, const QString &name, const QString &icon, BasketScene *parent);

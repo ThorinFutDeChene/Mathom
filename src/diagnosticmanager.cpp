@@ -22,10 +22,16 @@
 #include <QStandardPaths>
 #include <QSysInfo>
 #include <QTimer>
+#include <QTextStream>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QUuid>
 #include <QWidget>
+
+#ifdef Q_OS_LINUX
+#include <sys/resource.h>
+#include <unistd.h>
+#endif
 
 namespace
 {
@@ -54,6 +60,24 @@ QString safeObjectName(QObject *object)
     if (name.isEmpty())
         return QStringLiteral("<unnamed>");
     return name.left(120);
+}
+
+QString binaryBuildId()
+{
+    QFile executable(QCoreApplication::applicationFilePath());
+    if (!executable.open(QIODevice::ReadOnly))
+        return QStringLiteral("indisponible");
+
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    while (!executable.atEnd()) {
+        const QByteArray chunk = executable.read(1024 * 1024);
+        if (chunk.isEmpty() && executable.error() != QFileDevice::NoError)
+            return QStringLiteral("indisponible");
+        hash.addData(chunk);
+    }
+
+    return QStringLiteral("sha256:%1")
+        .arg(QString::fromLatin1(hash.result().toHex().left(16)));
 }
 
 QString formatDuration(qint64 milliseconds)
@@ -183,8 +207,14 @@ QString detailsSummary(const QVariantMap &details)
                      .arg(details.value(QStringLiteral("x")).toInt())
                      .arg(details.value(QStringLiteral("y")).toInt());
 
+    if (details.contains(QStringLiteral("target_class")))
+        parts << QStringLiteral("zone=%1").arg(details.value(QStringLiteral("target_class")).toString());
+
     if (details.contains(QStringLiteral("characters")))
         parts << QStringLiteral("caracteres=%1").arg(details.value(QStringLiteral("characters")).toInt());
+
+    if (details.contains(QStringLiteral("duration_ms")))
+        parts << QStringLiteral("duree=%1 ms").arg(details.value(QStringLiteral("duration_ms")).toLongLong());
 
     if (details.contains(QStringLiteral("selected_count")))
         parts << QStringLiteral("selection=%1").arg(details.value(QStringLiteral("selected_count")).toInt());
@@ -223,6 +253,7 @@ struct ParsedSession
     qint64 uptimeMs = -1;
     qint64 lastMemoryKiB = -1;
     qint64 peakMemoryKiB = -1;
+    qint64 measuredPeakMemoryKiB = -1;
     int eventCount = 0;
     QStringList activeOperations;
     QList<QByteArray> rawLines;
@@ -272,6 +303,12 @@ ParsedSession parseSession(QFile &input)
             summary.peakMemoryKiB = qMax(summary.peakMemoryKiB, rssKiB);
         }
 
+        const qint64 peakRssKiB =
+            details.value(QStringLiteral("peak_rss_kib"), -1).toLongLong();
+        if (peakRssKiB >= 0)
+            summary.measuredPeakMemoryKiB =
+                qMax(summary.measuredPeakMemoryKiB, peakRssKiB);
+
         if (isUserActionEvent(event))
             summary.lastUserAction = recordSummary(record);
 
@@ -301,7 +338,11 @@ ParsedSession parseSession(QFile &input)
                     summary.activeOperations.removeAt(index);
             }
 
-            if (event == QStringLiteral("MATHOM_EDIT_END")) {
+            // Editing starts as MATHOM_EDIT_BEGIN and is completed by
+            // MATHOM_EDIT_CLOSE_OK, so pair those two event families.
+            if (event == QStringLiteral("MATHOM_EDIT_CLOSE_OK")
+                || event == QStringLiteral("MATHOM_EDIT_CLOSE_FAILED")
+                || event == QStringLiteral("MATHOM_EDIT_END")) {
                 const int editIndex =
                     summary.activeOperations.lastIndexOf(QStringLiteral("MATHOM_EDIT"));
                 if (editIndex >= 0)
@@ -352,17 +393,27 @@ qint64 DiagnosticManager::currentMemoryRssKiB() const
 {
 #ifdef Q_OS_LINUX
     QFile status(QStringLiteral("/proc/self/status"));
-    if (!status.open(QIODevice::ReadOnly | QIODevice::Text))
-        return -1;
+    if (status.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        while (!status.atEnd()) {
+            const QByteArray line = status.readLine();
+            if (!line.startsWith("VmRSS:"))
+                continue;
 
-    while (!status.atEnd()) {
-        const QByteArray line = status.readLine();
-        if (!line.startsWith("VmRSS:"))
-            continue;
+            const QList<QByteArray> fields = line.simplified().split(' ');
+            if (fields.size() >= 2)
+                return fields.at(1).toLongLong();
+        }
+    }
 
-        const QList<QByteArray> fields = line.simplified().split(' ');
-        if (fields.size() >= 2)
-            return fields.at(1).toLongLong();
+    QFile statm(QStringLiteral("/proc/self/statm"));
+    if (statm.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        const QList<QByteArray> fields = statm.readAll().simplified().split(' ');
+        if (fields.size() >= 2) {
+            const qint64 residentPages = fields.at(1).toLongLong();
+            const long pageSize = sysconf(_SC_PAGESIZE);
+            if (residentPages >= 0 && pageSize > 0)
+                return residentPages * pageSize / 1024;
+        }
     }
 #endif
     return -1;
@@ -410,12 +461,17 @@ void DiagnosticManager::startSession()
     details.insert(QStringLiteral("kernel"), QStringLiteral("%1 %2").arg(QSysInfo::kernelType(), QSysInfo::kernelVersion()));
     details.insert(QStringLiteral("architecture"), QSysInfo::currentCpuArchitecture());
     details.insert(QStringLiteral("pid"), QCoreApplication::applicationPid());
-    details.insert(QStringLiteral("build_id"),
-                   QStringLiteral("%1 %2").arg(QStringLiteral(__DATE__), QStringLiteral(__TIME__)));
+    details.insert(QStringLiteral("build_id"), binaryBuildId());
 
     const qint64 rssKiB = currentMemoryRssKiB();
     if (rssKiB >= 0)
         details.insert(QStringLiteral("rss_kib"), rssKiB);
+
+#ifdef Q_OS_LINUX
+    struct rusage usage {};
+    if (getrusage(RUSAGE_SELF, &usage) == 0)
+        details.insert(QStringLiteral("peak_rss_kib"), qint64(usage.ru_maxrss));
+#endif
 
     logEvent(QStringLiteral("SESSION_OPEN"), details);
 
@@ -426,6 +482,13 @@ void DiagnosticManager::startSession()
         const qint64 currentRssKiB = currentMemoryRssKiB();
         if (currentRssKiB >= 0)
             heartbeatDetails.insert(QStringLiteral("rss_kib"), currentRssKiB);
+
+#ifdef Q_OS_LINUX
+        struct rusage usage {};
+        if (getrusage(RUSAGE_SELF, &usage) == 0)
+            heartbeatDetails.insert(QStringLiteral("peak_rss_kib"), qint64(usage.ru_maxrss));
+#endif
+
         logEvent(QStringLiteral("HEARTBEAT"), heartbeatDetails);
     });
     m_heartbeatTimer->start();
@@ -637,7 +700,9 @@ QString DiagnosticManager::createReportForSession(const QString &sessionPath)
     if (summary.lastMemoryKiB >= 0)
         writeLine(QStringLiteral("Memoire derniere mesure : %1 Mio").arg(summary.lastMemoryKiB / 1024.0, 0, 'f', 1));
     if (summary.peakMemoryKiB >= 0)
-        writeLine(QStringLiteral("Memoire maximum mesuree : %1 Mio").arg(summary.peakMemoryKiB / 1024.0, 0, 'f', 1));
+        writeLine(QStringLiteral("Memoire RSS maximum observee : %1 Mio").arg(summary.peakMemoryKiB / 1024.0, 0, 'f', 1));
+    if (summary.measuredPeakMemoryKiB >= 0)
+        writeLine(QStringLiteral("Pic memoire RSS signale par le systeme : %1 Mio").arg(summary.measuredPeakMemoryKiB / 1024.0, 0, 'f', 1));
 
     writeLine();
     writeLine(QStringLiteral("Derniere action utilisateur :"));

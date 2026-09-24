@@ -17,7 +17,6 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMouseEvent>
-#include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QSysInfo>
 #include <QTimer>
@@ -37,9 +36,9 @@ QString sessionStem(const QString &sessionPath)
 {
     QString name = QFileInfo(sessionPath).fileName();
     if (name.startsWith(QLatin1String(sessionPrefix)))
-        name.remove(0, int(strlen(sessionPrefix)));
+        name.remove(0, QString::fromLatin1(sessionPrefix).size());
     if (name.endsWith(QLatin1String(sessionSuffix)))
-        name.chop(int(strlen(sessionSuffix)));
+        name.chop(QString::fromLatin1(sessionSuffix).size());
     return name;
 }
 
@@ -82,6 +81,11 @@ QString DiagnosticManager::currentSessionId() const
 QStringList DiagnosticManager::pendingReports() const
 {
     return m_pendingReports;
+}
+
+void DiagnosticManager::openDiagnosticsFolder()
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(diagnosticsDirectory()));
 }
 
 void DiagnosticManager::startSession()
@@ -384,7 +388,7 @@ bool DiagnosticManager::eventFilter(QObject *watched, QEvent *event)
 
         const bool printable =
             !keyEvent->text().isEmpty()
-            && !keyEvent->text().at(0).isControl();
+            && keyEvent->text().at(0).isPrint();
 
         if (printable) {
             details.insert(QStringLiteral("input"), QStringLiteral("printable_character"));

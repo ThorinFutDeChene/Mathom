@@ -42,6 +42,7 @@ set(libbasket_SRCS
     settings.cpp settings.h
     settings_versionsync.cpp settings_versionsync.h
     softwareimporters.cpp softwareimporters.h
+    spreadsheetcontent.cpp spreadsheetcontent.h
     tag.cpp tag.h
     tagsedit.cpp tagsedit.h
     tools.cpp tools.h

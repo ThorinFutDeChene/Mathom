@@ -4427,3 +4427,29 @@ msgstr "Masquer l’arborescence"
 #: src/bnpview.cpp
 msgid "Show the organization tree"
 msgstr "Afficher l’arborescence"
+
+
+# Mathom spreadsheet
+msgid "Spreadsheet"
+msgstr "Feuille de calcul"
+
+msgid "&Spreadsheet"
+msgstr "&Feuille de calcul"
+
+msgid "+ Row"
+msgstr "+ Ligne"
+
+msgid "- Row"
+msgstr "- Ligne"
+
+msgid "+ Column"
+msgstr "+ Colonne"
+
+msgid "- Column"
+msgstr "- Colonne"
+
+msgid "Edit this spreadsheet"
+msgstr "Modifier cette feuille de calcul"
+
+msgid "Mathom Spreadsheet (*.mcalc)"
+msgstr "Feuille de calcul Mathom (*.mcalc)"

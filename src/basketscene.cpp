@@ -82,6 +82,7 @@
 #include "common.h"
 #include "debugwindow.h"
 #include "decoratedbasket.h"
+#include "diagnosticmanager.h"
 #include "focusedwidgets.h"
 #include "gitwrapper.h"
 #include "global.h"
@@ -947,6 +948,10 @@ bool BasketScene::save()
     if (!m_loaded)
         return false;
 
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("SHELF_SAVE_BEGIN"),
+        {{QStringLiteral("folder"), folderName()}});
+
     DEBUG_WIN << QStringLiteral("Basket[") + folderName() + QStringLiteral("]: Saving...");
 
     QString data;
@@ -967,6 +972,9 @@ bool BasketScene::save()
     // Write to Disk:
     if (!FileStorage::saveToFile(fullPath() + QStringLiteral(".basket"), data, isEncrypted())) {
         DEBUG_WIN << QStringLiteral("Basket[") + folderName() + QStringLiteral("]: <font color=red>FAILED to save</font>!");
+        DiagnosticManager::instance().logEvent(
+            QStringLiteral("SHELF_SAVE_FAILED"),
+            {{QStringLiteral("folder"), folderName()}});
         return false;
     }
 
@@ -974,6 +982,9 @@ bool BasketScene::save()
 
     m_commitdelay.start(10000); // delay is 10 seconds
 
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("SHELF_SAVE_OK"),
+        {{QStringLiteral("folder"), folderName()}});
     return true;
 }
 
@@ -1965,6 +1976,10 @@ void BasketScene::blindDrop(const QMimeData *mimeData, Qt::DropAction dropAction
 
 void BasketScene::insertEmptyNote(int type)
 {
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("NEW_MATHOM_BEGIN"),
+        {{QStringLiteral("folder"), folderName()},
+         {QStringLiteral("type"), type}});
     if (!isLoaded())
         load();
     if (isDuringEdit())
@@ -2018,6 +2033,10 @@ void BasketScene::insertImage(const QPixmap &image)
 
 void BasketScene::pasteNote(QClipboard::Mode mode)
 {
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("PASTE_BEGIN"),
+        {{QStringLiteral("folder"), folderName()},
+         {QStringLiteral("clipboard_mode"), int(mode)}});
     if (!m_isInsertPopupMenu && redirectEditActions()) {
         if (m_editor->textEdit())
             m_editor->textEdit()->paste();
@@ -3767,6 +3786,11 @@ bool BasketScene::closeEditor(bool deleteEmptyNote /* =true*/)
     if (!isDuringEdit())
         return true;
 
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("MATHOM_EDIT_CLOSE_BEGIN"),
+        {{QStringLiteral("folder"), folderName()},
+         {QStringLiteral("delete_empty"), deleteEmptyNote}});
+
     if (m_doNotCloseEditor)
         return true;
 
@@ -3835,7 +3859,12 @@ bool BasketScene::closeEditor(bool deleteEmptyNote /* =true*/)
         setFocus();
 
     // Return true if the note is still there:
-    return (note != nullptr);
+    const bool noteStillExists = (note != nullptr);
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("MATHOM_EDIT_CLOSE_OK"),
+        {{QStringLiteral("folder"), folderName()},
+         {QStringLiteral("note_still_exists"), noteStillExists}});
+    return noteStillExists;
 }
 
 void BasketScene::closeBasket()
@@ -3936,6 +3965,10 @@ void BasketScene::showEditedNoteWhileFiltering()
 
 void BasketScene::noteEdit(Note *note, bool justAdded, const QPointF &clickedPoint) // TODO: Remove the first parameter!!!
 {
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("MATHOM_EDIT_BEGIN"),
+        {{QStringLiteral("folder"), folderName()},
+         {QStringLiteral("just_added"), justAdded}});
     if (!note)
         note = theSelectedNote(); // TODO: Or pick the focused note!
     if (!note)
@@ -4012,6 +4045,10 @@ void BasketScene::noteEdit(Note *note, bool justAdded, const QPointF &clickedPoi
 
 void BasketScene::noteDelete()
 {
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("DELETE_MATHOM_REQUEST"),
+        {{QStringLiteral("folder"), folderName()},
+         {QStringLiteral("selected_count"), countSelecteds()}});
     if (redirectEditActions()) {
         if (m_editor->textEdit())
             m_editor->textEdit()->textCursor().deleteChar();

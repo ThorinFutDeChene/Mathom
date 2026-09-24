@@ -22,6 +22,8 @@
 #include <QPushButton>
 #include <QScrollBar>
 #include <QTextCharFormat>
+#include <QTableWidget>
+#include <QHeaderView>
 #include <QVBoxLayout>
 #include <QWidgetAction>
 
@@ -50,6 +52,7 @@
 #include "notecontent.h"
 #include "notefactory.h"
 #include "settings.h"
+#include "spreadsheetcontent.h"
 #include "tools.h"
 #include "variouswidgets.h"
 
@@ -179,6 +182,10 @@ NoteEditor *NoteEditor::editNoteContent(NoteContent *noteContent, QWidget *paren
     auto *colorContent = dynamic_cast<ColorContent *>(noteContent);
     if (colorContent)
         return new ColorEditor(colorContent, parent);
+
+    auto *spreadsheetContent = dynamic_cast<SpreadsheetContent *>(noteContent);
+    if (spreadsheetContent)
+        return new SpreadsheetEditor(spreadsheetContent, parent);
 
     auto *unknownContent = dynamic_cast<UnknownContent *>(noteContent);
     if (unknownContent)
@@ -680,6 +687,118 @@ UnknownEditor::UnknownEditor(UnknownContent *unknownContent, QWidget *parent)
 }
 
 /*********************************************************************/
+
+
+/** class SpreadsheetEditor: */
+
+SpreadsheetEditor::SpreadsheetEditor(SpreadsheetContent *spreadsheetContent, QWidget * /*parent*/)
+    : NoteEditor(spreadsheetContent)
+    , m_spreadsheetContent(spreadsheetContent)
+    , m_table(new QTableWidget(spreadsheetContent->rowCount(), spreadsheetContent->columnCount()))
+{
+    auto *container = new QWidget();
+    auto *layout = new QVBoxLayout(container);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(4);
+
+    auto *tools = new QHBoxLayout();
+    auto *addRow = new QPushButton(i18n("+ Row"), container);
+    auto *removeRow = new QPushButton(i18n("- Row"), container);
+    auto *addColumn = new QPushButton(i18n("+ Column"), container);
+    auto *removeColumn = new QPushButton(i18n("- Column"), container);
+    tools->addWidget(addRow);
+    tools->addWidget(removeRow);
+    tools->addWidget(addColumn);
+    tools->addWidget(removeColumn);
+    tools->addStretch();
+    layout->addLayout(tools);
+
+    m_table->setParent(container);
+    m_table->setAlternatingRowColors(true);
+    m_table->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_table->setSelectionBehavior(QAbstractItemView::SelectItems);
+    m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    m_table->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    m_table->verticalHeader()->setDefaultSectionSize(26);
+
+    QStringList headers;
+    for (int column = 0; column < spreadsheetContent->columnCount(); ++column)
+        headers.append(SpreadsheetContent::columnName(column));
+    m_table->setHorizontalHeaderLabels(headers);
+
+    for (int row = 0; row < spreadsheetContent->rowCount(); ++row) {
+        for (int column = 0; column < spreadsheetContent->columnCount(); ++column)
+            m_table->setItem(row, column, new QTableWidgetItem(spreadsheetContent->cell(row, column)));
+    }
+
+    layout->addWidget(m_table);
+    setInlineEditor(container);
+
+    BasketScene *scene = spreadsheetContent->note()->basket();
+
+    connect(m_table, &QTableWidget::itemChanged, scene, &BasketScene::contentChangedInEditor);
+
+    connect(addRow, &QPushButton::clicked, this, [this, scene]() {
+        m_table->insertRow(m_table->rowCount());
+        scene->contentChangedInEditor();
+    });
+    connect(removeRow, &QPushButton::clicked, this, [this, scene]() {
+        if (m_table->rowCount() > 1) {
+            const int row = m_table->currentRow() >= 0 ? m_table->currentRow() : m_table->rowCount() - 1;
+            m_table->removeRow(row);
+            scene->contentChangedInEditor();
+        }
+    });
+    connect(addColumn, &QPushButton::clicked, this, [this, scene]() {
+        const int column = m_table->columnCount();
+        m_table->insertColumn(column);
+        m_table->setHorizontalHeaderItem(column, new QTableWidgetItem(SpreadsheetContent::columnName(column)));
+        scene->contentChangedInEditor();
+    });
+    connect(removeColumn, &QPushButton::clicked, this, [this, scene]() {
+        if (m_table->columnCount() > 1) {
+            const int column = m_table->currentColumn() >= 0 ? m_table->currentColumn() : m_table->columnCount() - 1;
+            m_table->removeColumn(column);
+            for (int index = 0; index < m_table->columnCount(); ++index)
+                m_table->setHorizontalHeaderItem(index, new QTableWidgetItem(SpreadsheetContent::columnName(index)));
+            scene->contentChangedInEditor();
+        }
+    });
+
+    m_table->setCurrentCell(0, 0);
+    m_table->setFocus();
+}
+
+SpreadsheetEditor::~SpreadsheetEditor() = default;
+
+void SpreadsheetEditor::syncContent(bool saveToFile)
+{
+    QVector<QVector<QString>> cells(m_table->rowCount(), QVector<QString>(m_table->columnCount()));
+
+    for (int row = 0; row < m_table->rowCount(); ++row) {
+        for (int column = 0; column < m_table->columnCount(); ++column) {
+            if (QTableWidgetItem *item = m_table->item(row, column))
+                cells[row][column] = item->text();
+        }
+    }
+
+    m_spreadsheetContent->setTableData(m_table->rowCount(), m_table->columnCount(), cells);
+
+    if (saveToFile) {
+        m_spreadsheetContent->saveToFile();
+        m_spreadsheetContent->setEdited();
+    }
+}
+
+void SpreadsheetEditor::validate()
+{
+    syncContent(true);
+}
+
+void SpreadsheetEditor::autoSave(bool toFileToo)
+{
+    syncContent(toFileToo);
+}
 
 /** class LinkEditDialog: */
 

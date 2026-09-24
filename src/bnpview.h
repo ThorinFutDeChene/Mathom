@@ -15,6 +15,7 @@
 class QDomElement;
 
 class QStackedWidget;
+class QToolButton;
 class QWidget;
 class QPixmap;
 class QTreeWidget;
@@ -270,6 +271,12 @@ private:
     void setupActions();
     void setupGlobalShortcuts();
     void updateNavigationBar();
+
+    // Mathom focus mode:
+    // collapse/restore the organization tree from the splitter handle.
+    void toggleTreeVisibility();
+    void updateTreeToggleButton();
+
     DecoratedBasket *currentDecoratedBasket();
 
 public:
@@ -335,6 +342,9 @@ protected:
 
 private:
     BasketTreeListView *m_tree;
+    QToolButton *m_treeToggleButton = nullptr;
+    int m_treeLastWidth = -1;
+
     QWidget *m_contentPane = nullptr;
     MathomNavigationBar *m_navigationBar = nullptr;
     QStackedWidget *m_stack;

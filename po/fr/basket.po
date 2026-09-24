@@ -4359,3 +4359,12 @@ msgstr "Couleur de l’intercalaire :"
 #: src/basketproperties.cpp
 msgid "Automatic"
 msgstr "Automatique"
+
+
+#: src/bnpview.cpp
+msgid "Hide the organization tree"
+msgstr "Masquer l’arborescence"
+
+#: src/bnpview.cpp
+msgid "Show the organization tree"
+msgstr "Afficher l’arborescence"

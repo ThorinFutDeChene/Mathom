@@ -23,6 +23,8 @@
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QStackedWidget>
+#include <QSplitterHandle>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QUndoStack>
 #include <QXmlStreamWriter>
@@ -127,7 +129,14 @@ BNPView::BNPView(QWidget *parent, KXMLGUIClient *aGUIClient, KActionCollection *
 
 BNPView::~BNPView()
 {
-    int treeWidth = sizes()[Settings::treeOnLeft() ? 0 : 1];
+    const QList<int> splitterSizes = sizes();
+    const int treeIndex = indexOf(m_tree);
+
+    int treeWidth =
+        splitterSizes.value(treeIndex);
+
+    if (treeWidth <= 0 && m_treeLastWidth > 0)
+        treeWidth = m_treeLastWidth;
 
     Settings::setBasketTreeWidth(treeWidth);
 
@@ -205,9 +214,13 @@ void BNPView::onFirstShow()
     int treeWidth = Settings::basketTreeWidth();
     if (treeWidth < 0)
         treeWidth = m_tree->fontMetrics().maxWidth() * 11;
+    m_treeLastWidth = treeWidth;
+
     QList<int> splitterSizes;
     splitterSizes.append(treeWidth);
     setSizes(splitterSizes);
+
+    updateTreeToggleButton();
 }
 
 void BNPView::setupGlobalShortcuts()
@@ -336,6 +349,47 @@ void BNPView::initialize()
     setCollapsible(indexOf(m_contentPane), false);
     setStretchFactor(indexOf(m_tree), 0);
     setStretchFactor(indexOf(m_contentPane), 1);
+
+    // Give the splitter handle enough room for a small focus-mode button.
+    setHandleWidth(20);
+
+    QSplitterHandle *treeHandle = handle(1);
+
+    if (treeHandle) {
+        auto *handleLayout = new QVBoxLayout(treeHandle);
+
+        handleLayout->setContentsMargins(1, 0, 1, 0);
+        handleLayout->setSpacing(0);
+        handleLayout->addStretch();
+
+        m_treeToggleButton =
+            new QToolButton(treeHandle);
+
+        m_treeToggleButton->setAutoRaise(true);
+        m_treeToggleButton->setFixedSize(18, 42);
+        m_treeToggleButton->setFocusPolicy(Qt::NoFocus);
+
+        handleLayout->addWidget(
+            m_treeToggleButton,
+            0,
+            Qt::AlignCenter);
+
+        handleLayout->addStretch();
+
+        connect(
+            m_treeToggleButton,
+            &QToolButton::clicked,
+            this,
+            &BNPView::toggleTreeVisibility);
+
+        connect(
+            this,
+            &QSplitter::splitterMoved,
+            this,
+            [this](int, int) {
+                updateTreeToggleButton();
+            });
+    }
 
     /// Configure the List View Signals:
     connect(m_tree, &BasketTreeListView::itemActivated, this, &BNPView::slotPressed);
@@ -1377,6 +1431,12 @@ void BNPView::setCurrentBasket(BasketScene *basket)
     if (currentBasket())
         currentBasket()->closeBasket();
 
+    // A location is loaded lazily. Switching to an unloaded shelf must
+    // actually load its .basket data before activating it. Without this,
+    // imported/welcome shelves can remain indefinitely on "Loading...".
+    if (basket && !basket->isLoaded())
+        basket->load();
+
     if (basket)
         basket->aboutToBeActivated();
 
@@ -1433,12 +1493,121 @@ void BNPView::removeBasket(BasketScene *basket)
     }
 }
 
+void BNPView::toggleTreeVisibility()
+{
+    if (!m_tree || !m_contentPane)
+        return;
+
+    QList<int> currentSizes = sizes();
+
+    const int treeIndex = indexOf(m_tree);
+    const int contentIndex = indexOf(m_contentPane);
+
+    if (treeIndex < 0
+        || contentIndex < 0
+        || currentSizes.size() < 2) {
+        return;
+    }
+
+    const int treeWidth =
+        currentSizes.value(treeIndex);
+
+    int totalWidth = 0;
+
+    for (const int size : currentSizes)
+        totalWidth += size;
+
+    if (treeWidth > 0) {
+        // Remember the user's current width before entering focus mode.
+        m_treeLastWidth = treeWidth;
+
+        currentSizes[treeIndex] = 0;
+        currentSizes[contentIndex] =
+            qMax(1, totalWidth);
+    } else {
+        int restoredWidth = m_treeLastWidth;
+
+        if (restoredWidth <= 0)
+            restoredWidth = Settings::basketTreeWidth();
+
+        if (restoredWidth <= 0)
+            restoredWidth =
+                m_tree->fontMetrics().maxWidth() * 11;
+
+        restoredWidth =
+            qMin(
+                restoredWidth,
+                qMax(1, totalWidth - 100));
+
+        currentSizes[treeIndex] =
+            restoredWidth;
+
+        currentSizes[contentIndex] =
+            qMax(
+                1,
+                totalWidth - restoredWidth);
+    }
+
+    setSizes(currentSizes);
+    updateTreeToggleButton();
+}
+
+void BNPView::updateTreeToggleButton()
+{
+    if (!m_treeToggleButton
+        || !m_tree
+        || !m_contentPane) {
+        return;
+    }
+
+    const QList<int> currentSizes = sizes();
+
+    const int treeIndex = indexOf(m_tree);
+    const int contentIndex = indexOf(m_contentPane);
+
+    if (treeIndex < 0
+        || contentIndex < 0
+        || treeIndex >= currentSizes.size()) {
+        return;
+    }
+
+    const bool treeVisible =
+        currentSizes.value(treeIndex) > 0;
+
+    const bool treeOnLeft =
+        treeIndex < contentIndex;
+
+    Qt::ArrowType arrow;
+
+    if (treeVisible) {
+        arrow =
+            treeOnLeft
+                ? Qt::LeftArrow
+                : Qt::RightArrow;
+
+        m_treeToggleButton->setToolTip(
+            i18n("Hide the organization tree"));
+    } else {
+        arrow =
+            treeOnLeft
+                ? Qt::RightArrow
+                : Qt::LeftArrow;
+
+        m_treeToggleButton->setToolTip(
+            i18n("Show the organization tree"));
+    }
+
+    m_treeToggleButton->setArrowType(arrow);
+}
+
 void BNPView::setTreePlacement(bool onLeft)
 {
     if (onLeft)
         insertWidget(0, m_tree);
     else
         addWidget(m_tree);
+    updateTreeToggleButton();
+
     // updateGeometry();
     qApp->postEvent(this, new QResizeEvent(size(), size()));
 }

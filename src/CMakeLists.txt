@@ -16,6 +16,7 @@ set(libbasket_SRCS
     colorpicker.cpp colorpicker.h
     common.cpp common.h
     debugwindow.cpp debugwindow.h
+    diagnosticmanager.cpp diagnosticmanager.h
     decoratedbasket.cpp decoratedbasket.h
     filter.cpp filter.h
     focusedwidgets.cpp focusedwidgets.h

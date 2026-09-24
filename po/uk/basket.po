@@ -4099,9 +4099,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Як змінити програму, яку буде використано для відкриття файлів і посилань?"
 
-#~ msgid "..."
-#~ msgstr "…"
-
 #~ msgid "Choose an Existing Folder to Store Baskets"
 #~ msgstr "Виберіть наявну теку для зберігання кошиків"
 
@@ -4992,7 +4989,7 @@ msgstr ""
 
 #: src/variouswidgets.cpp:43
 msgid "..."
-msgstr ""
+msgstr "…"
 
 #: src/variouswidgets.cpp:166
 msgid "Use KDE Plasma Application Launchers to open Mathom content"

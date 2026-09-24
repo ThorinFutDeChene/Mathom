@@ -52,6 +52,7 @@
 #include "note.h"
 #include "notedrag.h"
 #include "settings.h"
+#include "spreadsheetcontent.h"
 #include "tools.h"
 #include "variouswidgets.h" //For IconSizeDialog
 #include "xmlwork.h"
@@ -152,6 +153,14 @@ Note *NoteFactory::createNoteColor(const QColor &color, BasketScene *parent)
 {
     Note *note = new Note(parent);
     new ColorContent(note, color);
+    return note;
+}
+
+Note *NoteFactory::createNoteSpreadsheet(BasketScene *parent)
+{
+    Note *note = new Note(parent);
+    auto *content = new SpreadsheetContent(note, createFileForNewNote(parent, QStringLiteral("mcalc")));
+    content->saveToFile();
     return note;
 }
 
@@ -732,6 +741,9 @@ Note *NoteFactory::loadFile(const QString &fileName, NoteType::Id type, BasketSc
     case NoteType::Launcher:
         new LauncherContent(note, fileName);
         break;
+    case NoteType::Spreadsheet:
+        new SpreadsheetContent(note, fileName);
+        break;
     case NoteType::Unknown:
         new UnknownContent(note, fileName);
         break;
@@ -957,6 +969,8 @@ Note *NoteFactory::createEmptyNote(NoteType::Id type, BasketScene *parent)
         return NoteFactory::createNoteLauncher(QUrl(), parent);
     case NoteType::Color:
         return NoteFactory::createNoteColor(Qt::black, parent);
+    case NoteType::Spreadsheet:
+        return NoteFactory::createNoteSpreadsheet(parent);
     default:
     case NoteType::Animation:
     case NoteType::Sound:
@@ -1043,6 +1057,8 @@ void NoteFactory::loadNode(const QDomElement &content, const QString &lowerTypeN
         new LauncherContent(parent, content.text());
     } else if (lowerTypeName == QStringLiteral("color")) {
         new ColorContent(parent, QColor(content.text()));
+    } else if (lowerTypeName == QStringLiteral("spreadsheet")) {
+        new SpreadsheetContent(parent, content.text(), lazyLoad);
     } else if (lowerTypeName == QStringLiteral("unknown")) {
         new UnknownContent(parent, content.text());
     }

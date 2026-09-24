@@ -18,6 +18,7 @@
 #include "aboutdata.h"
 #include "bnpview.h"
 #include "config.h"
+#include "diagnosticmanager.h"
 #include "global.h"
 #include "mainwindow.h"
 #include "mathomicons.h"
@@ -40,6 +41,7 @@ Application::Application(int &argc, char **argv)
     setWindowIcon(MathomIcons::application());
 
     KAboutData::setApplicationData(AboutData());
+    DiagnosticManager::instance().startSession();
     // BasketPart::createAboutData();
 
 #if HAVE_LIBGIT2
@@ -49,6 +51,7 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
+    DiagnosticManager::instance().closeSession();
 #if HAVE_LIBGIT2
     git_libgit2_shutdown();
 #endif

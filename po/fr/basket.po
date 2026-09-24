@@ -4309,3 +4309,44 @@ msgstr "&Basculer vers ce panier (raccourci global)"
 #~ msgstr ""
 #~ "Si renseignée, cette propriété vous permet de coller les marques en tant "
 #~ "qu'équivalents textes."
+
+
+#: src/bnpview.cpp
+msgid "Check for &Updates..."
+msgstr "Rechercher des &mises à jour…"
+
+#: src/updatechecker.cpp
+msgid "Mathom Update"
+msgstr "Mise à jour de Mathom"
+
+#: src/updatechecker.cpp
+msgid "Unable to determine the installed Mathom Debian package version."
+msgstr "Impossible de déterminer la version du paquet Debian Mathom installé."
+
+#: src/updatechecker.cpp
+msgid "Unable to contact the Mathom update server: %1"
+msgstr "Impossible de contacter le serveur de mise à jour de Mathom : %1"
+
+#: src/updatechecker.cpp
+msgid "The update server returned invalid data."
+msgstr "Le serveur de mise à jour a renvoyé des données invalides."
+
+#: src/updatechecker.cpp
+msgid "No Mathom Debian package was found in the latest release."
+msgstr "Aucun paquet Debian Mathom n’a été trouvé dans la dernière version."
+
+#: src/updatechecker.cpp
+msgid "Installed version: %1"
+msgstr "Version installée : %1"
+
+#: src/updatechecker.cpp
+msgid "Available version: %1"
+msgstr "Version disponible : %1"
+
+#: src/updatechecker.cpp
+msgid "A Mathom update is available."
+msgstr "Une mise à jour de Mathom est disponible."
+
+#: src/updatechecker.cpp
+msgid "Mathom is up to date."
+msgstr "Mathom est à jour."

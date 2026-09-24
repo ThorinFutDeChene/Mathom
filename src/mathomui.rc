@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
-<gui name="basket" version="3">
+<gui name="basket" version="4">
  <MenuBar noMerge="1" >
   <Menu name="basket" >
    <text>&amp;Mathom-House</text>
@@ -112,6 +112,7 @@
    <Action name="help_show_tip" />
    <Separator/>
    <Action name="help_welcome_baskets" />
+   <Action name="help_check_updates" />
    <Action name="help_report_bug" />
    <Separator/>
    <Action name="help_about_app" />

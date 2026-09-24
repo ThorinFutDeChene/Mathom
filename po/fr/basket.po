@@ -4453,3 +4453,30 @@ msgstr "Modifier cette feuille de calcul"
 
 msgid "Mathom Spreadsheet (*.mcalc)"
 msgstr "Feuille de calcul Mathom (*.mcalc)"
+
+
+# Spreadsheet formula assistant
+msgid "Function..."
+msgstr "Fonction..."
+
+msgid "Sum"
+msgstr "Somme"
+
+msgid "Average"
+msgstr "Moyenne"
+
+msgid "Minimum"
+msgstr "Minimum"
+
+msgid "Maximum"
+msgstr "Maximum"
+
+msgid "Count"
+msgstr "Compter"
+
+msgid "Value or formula, for example =A1+B1"
+msgstr "Valeur ou formule, par exemple =A1+B1"
+
+msgid "Apply"
+msgstr "Appliquer"
+

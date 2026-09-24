@@ -4043,3 +4043,30 @@ msgstr ""
 
 #~ msgid "Choose an Existing Folder to Store Baskets"
 #~ msgstr "Sepetlerinizi Kaydetmek İçin Oluşturulmuş Bir Klasör Seçin"
+
+
+# Mathom spreadsheet
+msgid "Spreadsheet"
+msgstr "Hesap Tablosu"
+
+msgid "&Spreadsheet"
+msgstr "&Hesap Tablosu"
+
+msgid "+ Row"
+msgstr "+ Satır"
+
+msgid "- Row"
+msgstr "- Satır"
+
+msgid "+ Column"
+msgstr "+ Sütun"
+
+msgid "- Column"
+msgstr "- Sütun"
+
+msgid "Edit this spreadsheet"
+msgstr "Bu hesap tablosunu düzenle"
+
+msgid "Mathom Spreadsheet (*.mcalc)"
+msgstr "Mathom Hesap Tablosu (*.mcalc)"
+

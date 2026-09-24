@@ -1360,9 +1360,26 @@ void BasketScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     bool controlPressed = event->modifiers() & Qt::ControlModifier;
     bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
 
+    // QComboBox popups embedded in a QGraphicsProxyWidget are represented by
+    // child graphics items. Treat the whole proxy subtree as belonging to the
+    // current inline editor so clicks on popup entries reach the combo box.
+    bool clickInsideEditor = false;
+    if (m_editor) {
+        const QPoint viewShift(m_view->horizontalScrollBar()->value(), m_view->verticalScrollBar()->value());
+        QGraphicsItem *hitItem = m_view->itemAt((event->scenePos() - viewShift).toPoint());
+        for (QGraphicsItem *item = hitItem; item; item = item->parentItem()) {
+            if (item == m_editor->graphicsWidget()) {
+                clickInsideEditor = true;
+                break;
+            }
+        }
+    }
+
     // Do nothing if we disabled the click some milliseconds sooner.
-    // For instance when a popup menu has been closed with click, we should not do action:
-    if (event->button() == Qt::LeftButton && (qApp->activePopupWidget() || m_lastDisableClick.msecsTo(QTime::currentTime()) <= 80)) {
+    // For instance when a popup menu has been closed with click, we should not do action.
+    // Never swallow clicks belonging to the active inline editor itself.
+    if (event->button() == Qt::LeftButton && !clickInsideEditor
+        && (qApp->activePopupWidget() || m_lastDisableClick.msecsTo(QTime::currentTime()) <= 80)) {
         doHoverEffects();
         m_noActionOnMouseRelease = true;
         // But we allow to select:
@@ -1378,10 +1395,8 @@ void BasketScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     // if we are editing and no control key are pressed
     if (m_editor && !shiftPressed && !controlPressed) {
-        // if the mouse is over the editor
-        QPoint view_shift(m_view->horizontalScrollBar()->value(), m_view->verticalScrollBar()->value());
-        QGraphicsWidget *widget = dynamic_cast<QGraphicsWidget *>(m_view->itemAt((event->scenePos() - view_shift).toPoint()));
-        if (widget && m_editor->graphicsWidget() == widget) {
+        // if the mouse is over the editor or one of its embedded popup children
+        if (clickInsideEditor) {
             if (m_editor->textEdit()) {
                 if (event->button() == Qt::LeftButton) {
                     m_editorTrackMouseEvent = true;

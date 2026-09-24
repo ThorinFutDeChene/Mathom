@@ -10,8 +10,10 @@
 #include <QMap>
 
 class QString;
+class QCheckBox;
 
 class QKeySequence;
+class KColorCombo2;
 
 class BasketScene;
 
@@ -43,6 +45,9 @@ protected:
 private:
     Ui::BasketPropertiesUi *m_ui;
     BasketScene *m_basket;
+
+    QCheckBox *m_tabColorAutomatic = nullptr;
+    KColorCombo2 *m_tabColor = nullptr;
 
     QMap<int, QString> m_backgroundImagesMap;
 };

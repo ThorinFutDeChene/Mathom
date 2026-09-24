@@ -4350,3 +4350,12 @@ msgstr "Une mise à jour de Mathom est disponible."
 #: src/updatechecker.cpp
 msgid "Mathom is up to date."
 msgstr "Mathom est à jour."
+
+
+#: src/basketproperties.cpp
+msgid "Tab color:"
+msgstr "Couleur de l’intercalaire :"
+
+#: src/basketproperties.cpp
+msgid "Automatic"
+msgstr "Automatique"

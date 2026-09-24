@@ -23,9 +23,13 @@ public:
     struct Entry {
         QString title;
         BasketScene *basket = nullptr;
+        QColor color;
     };
 
     explicit MathomNavigationBar(QWidget *parent = nullptr);
+
+    static QColor automaticColor(
+        const QList<QColor> &usedColors);
 
     void setMathomHouses(
         const QList<Entry> &houses,
@@ -42,7 +46,6 @@ Q_SIGNALS:
     void navigateRequested(BasketScene *basket);
 
 private:
-    static QColor automaticColor(const QList<QColor> &usedColors);
     static int hueDistance(int first, int second);
 
     void clearLayout(QHBoxLayout *layout);

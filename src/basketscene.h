@@ -7,6 +7,7 @@
 #define BASKET_H
 
 #include <QClipboard>
+#include <QColor>
 #include <QGraphicsScene>
 #include <QList>
 #include <QSet>
@@ -276,6 +277,8 @@ private:
     QPixmap *m_selectedBackgroundPixmap;
     bool m_backgroundTiled;
     QColor m_textColorSetting;
+    QColor m_tabColor;
+    bool m_tabColorAutomatic = true;
 
 public:
     inline bool hasBackgroundImage()
@@ -304,6 +307,23 @@ public:
     }
     QColor backgroundColor() const;
     QColor textColor() const;
+
+    QColor tabColor() const
+    {
+        return m_tabColor;
+    }
+
+    bool tabColorAutomatic() const
+    {
+        return m_tabColorAutomatic;
+    }
+
+    void setTabColor(const QColor &color, bool automatic)
+    {
+        m_tabColor = color;
+        m_tabColorAutomatic = automatic;
+    }
+
     void setAppearance(const QString &icon, const QString &name, const QString &backgroundImage, const QColor &backgroundColor, const QColor &textColor);
     void blendBackground(QPainter &painter, const QRectF &rect, qreal xPainter = -1, qreal yPainter = -1, bool opaque = false, QPixmap *bg = nullptr);
     void blendBackground(QPainter &painter, const QRectF &rect, bool opaque, QPixmap *bg);

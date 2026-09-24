@@ -28,6 +28,7 @@ public:
     QString diagnosticsDirectory() const;
     QString currentSessionId() const;
     QStringList pendingReports() const;
+    void openDiagnosticsFolder();
 
     void showPendingReportDialog(QWidget *parent = nullptr);
 

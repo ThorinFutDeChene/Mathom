@@ -73,6 +73,21 @@ NoteEditor::NoteEditor(NoteContent *noteContent)
 
 NoteEditor::~NoteEditor()
 {
+    if (!m_widget)
+        return;
+
+    if (m_deferWidgetDeletion) {
+        // Composite editors can still be inside a Qt Widgets mouse/focus event
+        // when BasketScene closes the Mathom. Destroying the proxy synchronously
+        // can leave Qt dispatching the current event to an already freed widget.
+        // Remove/hide it immediately, but let Qt destroy the widget tree after
+        // the current event has returned to the event loop.
+        m_widget->hide();
+        m_widget->deleteLater();
+        m_widget = nullptr;
+        return;
+    }
+
     delete m_widget;
 }
 
@@ -758,6 +773,7 @@ SpreadsheetEditor::SpreadsheetEditor(SpreadsheetContent *spreadsheetContent, QWi
 
     layout->addWidget(m_table);
     setInlineEditor(container);
+    deferInlineWidgetDeletion();
 
     BasketScene *scene = spreadsheetContent->note()->basket();
 

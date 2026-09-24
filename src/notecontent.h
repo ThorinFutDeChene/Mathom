@@ -85,6 +85,7 @@ enum Id {
     CrossReference,
     Launcher,
     Color,
+    Spreadsheet,
     Unknown
 }; // Always positive
 

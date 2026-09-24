@@ -60,6 +60,7 @@
 #include "colorpicker.h"
 #include "debugwindow.h"
 #include "decoratedbasket.h"
+#include "diagnosticmanager.h"
 #include "formatimporter.h"
 #include "gitwrapper.h"
 #include "global.h"
@@ -901,6 +902,7 @@ void BNPView::slotContextMenu(const QPoint &pos)
  */
 void BNPView::save()
 {
+    DiagnosticManager::instance().logEvent(QStringLiteral("TREE_SAVE_BEGIN"));
     DEBUG_WIN << QStringLiteral("Basket Tree: Saving...");
 
     QString data;
@@ -917,6 +919,7 @@ void BNPView::save()
     FileStorage::safelySaveToFile(Global::basketsFolder() + QStringLiteral("baskets.xml"), data);
 
     GitWrapper::commitBasketView();
+    DiagnosticManager::instance().logEvent(QStringLiteral("TREE_SAVE_OK"));
 }
 
 void BNPView::save(QTreeWidget *listView, QTreeWidgetItem *item, QXmlStreamWriter &stream)
@@ -1425,6 +1428,9 @@ void BNPView::setCurrentBasketInHistory(BasketScene *basket)
 
 void BNPView::setCurrentBasket(BasketScene *basket)
 {
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("SHELF_SWITCH_BEGIN"),
+        {{QStringLiteral("folder"), basket ? basket->folderName() : QStringLiteral("<none>")}});
     // A location can already be the current widget while its notes are still
     // lazily unloaded (notably the location restored as "last opened").
     // Always perform the load BEFORE the early-return check.
@@ -1468,6 +1474,9 @@ void BNPView::setCurrentBasket(BasketScene *basket)
         item->basket()->setFocus();
     }
     m_tree->viewport()->update();
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("SHELF_SWITCH_OK"),
+        {{QStringLiteral("folder"), basket ? basket->folderName() : QStringLiteral("<none>")}});
     Q_EMIT basketChanged();
 }
 
@@ -1508,6 +1517,8 @@ void BNPView::toggleTreeVisibility()
 {
     if (!m_tree || !m_contentPane)
         return;
+
+    DiagnosticManager::instance().logEvent(QStringLiteral("FOCUS_MODE_TOGGLE_BEGIN"));
 
     QList<int> currentSizes = sizes();
 
@@ -1572,6 +1583,9 @@ void BNPView::toggleTreeVisibility()
 
     setSizes(currentSizes);
     updateTreeToggleButton();
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("FOCUS_MODE_TOGGLE_OK"),
+        {{QStringLiteral("tree_hidden"), currentSizes.value(treeIndex) == 0}});
 }
 
 void BNPView::updateTreeToggleButton()
@@ -2299,6 +2313,9 @@ void BNPView::delBasket()
 {
     //  DecoratedBasket *decoBasket    = currentDecoratedBasket();
     BasketScene *basket = currentBasket();
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("DELETE_SHELF_REQUEST"),
+        {{QStringLiteral("folder"), basket ? basket->folderName() : QStringLiteral("<none>")}});
     const bool isShelf = parentBasketOf(basket) != nullptr;
 
     int really = KMessageBox::questionTwoActions(
@@ -2332,9 +2349,15 @@ void BNPView::delBasket()
     }
 
     QString basketFolderName = basket->folderName();
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("DELETE_SHELF_BEGIN"),
+        {{QStringLiteral("folder"), basketFolderName}});
     doBasketDeletion(basket);
 
     GitWrapper::commitDeleteBasket(basketFolderName);
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("DELETE_SHELF_OK"),
+        {{QStringLiteral("folder"), basketFolderName}});
 }
 
 void BNPView::doBasketDeletion(BasketScene *basket)
@@ -2511,6 +2534,10 @@ void BNPView::askNewBasket()
 
 void BNPView::askNewBasket(BasketScene *parent, BasketScene *pickProperties)
 {
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("NEW_SHELF_DIALOG_BEGIN"),
+        {{QStringLiteral("has_parent"), parent != nullptr}});
+
     NewBasketDefaultProperties properties;
     if (pickProperties) {
         properties.backgroundImage = pickProperties->backgroundImageName();
@@ -2520,7 +2547,10 @@ void BNPView::askNewBasket(BasketScene *parent, BasketScene *pickProperties)
         properties.columnCount = pickProperties->columnsCount();
     }
 
-    NewBasketDialog(parent, properties, this).exec();
+    const int result = NewBasketDialog(parent, properties, this).exec();
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("NEW_SHELF_DIALOG_END"),
+        {{QStringLiteral("accepted"), result != 0}});
 }
 
 void BNPView::askNewSubBasket()

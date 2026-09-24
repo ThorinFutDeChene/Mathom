@@ -25,6 +25,7 @@
 
 #include "basketstatusbar.h"
 #include "bnpview.h"
+#include "diagnosticmanager.h"
 #include "global.h"
 #include "settings.h"
 
@@ -90,6 +91,13 @@ void MainWindow::setupActions()
     // actCfgNotifs->setEnabled(false); // Not yet implemented !
 
     actAppConfig = KStandardAction::preferences(this, &MainWindow::showSettingsDialog, actionCollection());
+
+    QAction *diagnosticsAction =
+        actionCollection()->addAction(QStringLiteral("help_open_diagnostics"), this, []() {
+            DiagnosticManager::instance().openDiagnosticsFolder();
+        });
+    diagnosticsAction->setText(i18n("Open Diagnostics Folder"));
+    diagnosticsAction->setIcon(QIcon::fromTheme(QStringLiteral("folder-open")));
 }
 
 SettingsDialog *MainWindow::settings()

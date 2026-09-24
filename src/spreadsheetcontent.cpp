@@ -9,8 +9,13 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLocale>
 #include <QPainter>
 #include <QPalette>
+#include <QSet>
+
+#include <cmath>
+#include <limits>
 
 #include <KLocalizedString>
 
@@ -26,6 +31,484 @@ constexpr qreal RowHeaderWidth = 38.0;
 constexpr qreal ColumnHeaderHeight = 24.0;
 constexpr qreal RowHeight = 26.0;
 constexpr qreal MinimumSpreadsheetWidth = 340.0;
+
+struct FormulaResult {
+    bool ok = false;
+    double value = 0.0;
+    QString error;
+};
+
+QString formatFormulaNumber(double value)
+{
+    if (!std::isfinite(value))
+        return QStringLiteral("#NUM!");
+
+    if (std::fabs(value) < 1e-12)
+        value = 0.0;
+
+    if (std::fabs(value - std::round(value)) < 1e-12)
+        return QLocale().toString(static_cast<qlonglong>(std::llround(value)));
+
+    return QLocale().toString(value, 'g', 12);
+}
+
+bool parsePlainNumber(QString text, double *value)
+{
+    text = text.trimmed();
+    if (text.isEmpty())
+        return false;
+
+    bool ok = false;
+    double number = QLocale().toDouble(text, &ok);
+    if (!ok) {
+        QString normalized = text;
+        normalized.replace(QLatin1Char(','), QLatin1Char('.'));
+        number = QLocale::c().toDouble(normalized, &ok);
+    }
+
+    if (ok && value)
+        *value = number;
+    return ok;
+}
+
+quint64 cellKey(int row, int column)
+{
+    return (quint64(quint32(row)) << 32) | quint32(column);
+}
+
+bool parseCellReferenceToken(const QString &token, int *row, int *column)
+{
+    if (token.isEmpty())
+        return false;
+
+    int index = 0;
+    int col = 0;
+    bool hasColumn = false;
+
+    while (index < token.size() && token.at(index).isLetter()) {
+        const QChar upper = token.at(index).toUpper();
+        if (upper < QLatin1Char('A') || upper > QLatin1Char('Z'))
+            return false;
+        col = col * 26 + (upper.unicode() - QLatin1Char('A').unicode() + 1);
+        hasColumn = true;
+        ++index;
+    }
+
+    if (!hasColumn || index >= token.size())
+        return false;
+
+    const int rowStart = index;
+    while (index < token.size() && token.at(index).isDigit())
+        ++index;
+
+    if (rowStart == index || index != token.size())
+        return false;
+
+    bool ok = false;
+    const int parsedRow = token.mid(rowStart).toInt(&ok);
+    if (!ok || parsedRow <= 0)
+        return false;
+
+    if (row)
+        *row = parsedRow - 1;
+    if (column)
+        *column = col - 1;
+    return true;
+}
+
+class SpreadsheetFormulaParser;
+
+FormulaResult evaluateNumericCell(const SpreadsheetContent *content, int row, int column, QSet<quint64> *stack, bool textAsZero);
+
+class SpreadsheetFormulaParser
+{
+public:
+    SpreadsheetFormulaParser(const SpreadsheetContent *content, const QString &expression, QSet<quint64> *stack)
+        : m_content(content)
+        , m_expression(expression)
+        , m_stack(stack)
+    {
+    }
+
+    FormulaResult parse()
+    {
+        FormulaResult result = parseExpression();
+        skipSpaces();
+
+        if (result.ok && m_pos != m_expression.size())
+            return error(QStringLiteral("#ERROR!"));
+
+        return result;
+    }
+
+private:
+    FormulaResult parseExpression()
+    {
+        FormulaResult left = parseTerm();
+        if (!left.ok)
+            return left;
+
+        while (true) {
+            skipSpaces();
+            if (!consume(QLatin1Char('+')) && !consume(QLatin1Char('-')))
+                break;
+
+            const QChar operation = m_expression.at(m_pos - 1);
+            FormulaResult right = parseTerm();
+            if (!right.ok)
+                return right;
+
+            if (operation == QLatin1Char('+'))
+                left.value += right.value;
+            else
+                left.value -= right.value;
+        }
+
+        return left;
+    }
+
+    FormulaResult parseTerm()
+    {
+        FormulaResult left = parseFactor();
+        if (!left.ok)
+            return left;
+
+        while (true) {
+            skipSpaces();
+            if (!consume(QLatin1Char('*')) && !consume(QLatin1Char('/')))
+                break;
+
+            const QChar operation = m_expression.at(m_pos - 1);
+            FormulaResult right = parseFactor();
+            if (!right.ok)
+                return right;
+
+            if (operation == QLatin1Char('*')) {
+                left.value *= right.value;
+            } else {
+                if (std::fabs(right.value) < 1e-15)
+                    return error(QStringLiteral("#DIV/0!"));
+                left.value /= right.value;
+            }
+        }
+
+        return left;
+    }
+
+    FormulaResult parseFactor()
+    {
+        skipSpaces();
+
+        if (consume(QLatin1Char('+')))
+            return parseFactor();
+
+        if (consume(QLatin1Char('-'))) {
+            FormulaResult value = parseFactor();
+            if (value.ok)
+                value.value = -value.value;
+            return value;
+        }
+
+        if (consume(QLatin1Char('('))) {
+            FormulaResult value = parseExpression();
+            if (!value.ok)
+                return value;
+            skipSpaces();
+            if (!consume(QLatin1Char(')')))
+                return error(QStringLiteral("#ERROR!"));
+            return value;
+        }
+
+        if (m_pos >= m_expression.size())
+            return error(QStringLiteral("#ERROR!"));
+
+        if (m_expression.at(m_pos).isDigit() || m_expression.at(m_pos) == QLatin1Char('.') || m_expression.at(m_pos) == QLatin1Char(','))
+            return parseNumber();
+
+        if (m_expression.at(m_pos).isLetter())
+            return parseIdentifierOrCell();
+
+        return error(QStringLiteral("#ERROR!"));
+    }
+
+    FormulaResult parseNumber()
+    {
+        const int start = m_pos;
+        bool decimalSeparatorSeen = false;
+
+        while (m_pos < m_expression.size()) {
+            const QChar ch = m_expression.at(m_pos);
+            if (ch.isDigit()) {
+                ++m_pos;
+                continue;
+            }
+
+            if ((ch == QLatin1Char('.') || ch == QLatin1Char(',')) && !decimalSeparatorSeen) {
+                decimalSeparatorSeen = true;
+                ++m_pos;
+                continue;
+            }
+
+            break;
+        }
+
+        QString numberText = m_expression.mid(start, m_pos - start);
+        numberText.replace(QLatin1Char(','), QLatin1Char('.'));
+
+        bool ok = false;
+        const double value = QLocale::c().toDouble(numberText, &ok);
+        if (!ok)
+            return error(QStringLiteral("#VALUE!"));
+
+        return success(value);
+    }
+
+    FormulaResult parseIdentifierOrCell()
+    {
+        const int start = m_pos;
+        while (m_pos < m_expression.size() && m_expression.at(m_pos).isLetter())
+            ++m_pos;
+
+        const QString name = m_expression.mid(start, m_pos - start);
+        const int digitsStart = m_pos;
+        while (m_pos < m_expression.size() && m_expression.at(m_pos).isDigit())
+            ++m_pos;
+
+        if (m_pos > digitsStart) {
+            const QString reference = m_expression.mid(start, m_pos - start);
+            int row = -1;
+            int column = -1;
+            if (!parseCellReferenceToken(reference, &row, &column))
+                return error(QStringLiteral("#REF!"));
+            return evaluateNumericCell(m_content, row, column, m_stack, false);
+        }
+
+        skipSpaces();
+        if (!consume(QLatin1Char('(')))
+            return error(QStringLiteral("#NAME?"));
+
+        return parseFunction(name);
+    }
+
+    FormulaResult parseFunction(const QString &name)
+    {
+        const QString function = name.toUpper();
+        if (function != QStringLiteral("SUM") && function != QStringLiteral("AVERAGE") && function != QStringLiteral("MIN")
+            && function != QStringLiteral("MAX") && function != QStringLiteral("COUNT")) {
+            return error(QStringLiteral("#NAME?"));
+        }
+
+        QVector<double> values;
+        int numericCount = 0;
+
+        skipSpaces();
+        if (consume(QLatin1Char(')'))) {
+            if (function == QStringLiteral("COUNT"))
+                return success(0.0);
+            return error(QStringLiteral("#VALUE!"));
+        }
+
+        while (true) {
+            skipSpaces();
+            const int savedPosition = m_pos;
+            int firstRow = -1;
+            int firstColumn = -1;
+
+            if (parseCellReference(&firstRow, &firstColumn)) {
+                skipSpaces();
+                if (consume(QLatin1Char(':'))) {
+                    skipSpaces();
+                    int lastRow = -1;
+                    int lastColumn = -1;
+                    if (!parseCellReference(&lastRow, &lastColumn))
+                        return error(QStringLiteral("#REF!"));
+
+                    if (!validCell(firstRow, firstColumn) || !validCell(lastRow, lastColumn))
+                        return error(QStringLiteral("#REF!"));
+
+                    const int rowMin = qMin(firstRow, lastRow);
+                    const int rowMax = qMax(firstRow, lastRow);
+                    const int columnMin = qMin(firstColumn, lastColumn);
+                    const int columnMax = qMax(firstColumn, lastColumn);
+
+                    for (int row = rowMin; row <= rowMax; ++row) {
+                        for (int column = columnMin; column <= columnMax; ++column) {
+                            FormulaResult value = evaluateNumericCell(m_content, row, column, m_stack, true);
+                            if (!value.ok) {
+                                if (!value.error.isEmpty())
+                                    return value;
+                                continue;
+                            }
+                            values.append(value.value);
+                            ++numericCount;
+                        }
+                    }
+                } else {
+                    if (!validCell(firstRow, firstColumn))
+                        return error(QStringLiteral("#REF!"));
+                    FormulaResult value = evaluateNumericCell(m_content, firstRow, firstColumn, m_stack, true);
+                    if (!value.ok) {
+                        if (!value.error.isEmpty())
+                            return value;
+                    } else {
+                        values.append(value.value);
+                        ++numericCount;
+                    }
+                }
+            } else {
+                m_pos = savedPosition;
+                FormulaResult value = parseExpression();
+                if (!value.ok)
+                    return value;
+                values.append(value.value);
+                ++numericCount;
+            }
+
+            skipSpaces();
+            if (consume(QLatin1Char(')')))
+                break;
+
+            if (!consume(QLatin1Char(';')))
+                return error(QStringLiteral("#ERROR!"));
+        }
+
+        if (function == QStringLiteral("COUNT"))
+            return success(numericCount);
+
+        if (values.isEmpty())
+            return error(QStringLiteral("#VALUE!"));
+
+        if (function == QStringLiteral("SUM")) {
+            double total = 0.0;
+            for (double value : values)
+                total += value;
+            return success(total);
+        }
+
+        if (function == QStringLiteral("AVERAGE")) {
+            double total = 0.0;
+            for (double value : values)
+                total += value;
+            return numericCount > 0 ? success(total / numericCount) : error(QStringLiteral("#DIV/0!"));
+        }
+
+        double result = values.first();
+        for (int index = 1; index < values.size(); ++index) {
+            if (function == QStringLiteral("MIN"))
+                result = qMin(result, values.at(index));
+            else
+                result = qMax(result, values.at(index));
+        }
+        return success(result);
+    }
+
+    bool parseCellReference(int *row, int *column)
+    {
+        const int start = m_pos;
+        while (m_pos < m_expression.size() && m_expression.at(m_pos).isLetter())
+            ++m_pos;
+
+        const int digitsStart = m_pos;
+        while (m_pos < m_expression.size() && m_expression.at(m_pos).isDigit())
+            ++m_pos;
+
+        if (start == digitsStart || digitsStart == m_pos) {
+            m_pos = start;
+            return false;
+        }
+
+        const QString token = m_expression.mid(start, m_pos - start);
+        if (!parseCellReferenceToken(token, row, column)) {
+            m_pos = start;
+            return false;
+        }
+        return true;
+    }
+
+    bool validCell(int row, int column) const
+    {
+        return row >= 0 && row < m_content->rowCount() && column >= 0 && column < m_content->columnCount();
+    }
+
+    void skipSpaces()
+    {
+        while (m_pos < m_expression.size() && m_expression.at(m_pos).isSpace())
+            ++m_pos;
+    }
+
+    bool consume(QChar character)
+    {
+        if (m_pos < m_expression.size() && m_expression.at(m_pos) == character) {
+            ++m_pos;
+            return true;
+        }
+        return false;
+    }
+
+    FormulaResult success(double value) const
+    {
+        FormulaResult result;
+        result.ok = true;
+        result.value = value;
+        return result;
+    }
+
+    FormulaResult error(const QString &message) const
+    {
+        FormulaResult result;
+        result.error = message;
+        return result;
+    }
+
+    const SpreadsheetContent *m_content;
+    QString m_expression;
+    QSet<quint64> *m_stack;
+    int m_pos = 0;
+};
+
+FormulaResult evaluateNumericCell(const SpreadsheetContent *content, int row, int column, QSet<quint64> *stack, bool textAsZero)
+{
+    FormulaResult result;
+
+    if (row < 0 || row >= content->rowCount() || column < 0 || column >= content->columnCount()) {
+        result.error = QStringLiteral("#REF!");
+        return result;
+    }
+
+    const QString raw = content->cell(row, column).trimmed();
+    if (raw.isEmpty()) {
+        result.ok = true;
+        result.value = 0.0;
+        return result;
+    }
+
+    if (!raw.startsWith(QLatin1Char('='))) {
+        double value = 0.0;
+        if (parsePlainNumber(raw, &value)) {
+            result.ok = true;
+            result.value = value;
+            return result;
+        }
+
+        if (textAsZero)
+            return result;
+
+        result.error = QStringLiteral("#VALUE!");
+        return result;
+    }
+
+    const quint64 key = cellKey(row, column);
+    if (stack->contains(key)) {
+        result.error = QStringLiteral("#CYCLE!");
+        return result;
+    }
+
+    stack->insert(key);
+    SpreadsheetFormulaParser parser(content, raw.mid(1), stack);
+    result = parser.parse();
+    stack->remove(key);
+    return result;
+}
 }
 
 SpreadsheetItem::SpreadsheetItem(Note *parent, SpreadsheetContent *content)
@@ -148,7 +631,16 @@ QString SpreadsheetContent::cell(int row, int column) const
 
 QString SpreadsheetContent::displayValue(int row, int column) const
 {
-    return cell(row, column);
+    const QString raw = cell(row, column);
+    if (!raw.trimmed().startsWith(QLatin1Char('=')))
+        return raw;
+
+    QSet<quint64> stack;
+    const FormulaResult result = evaluateNumericCell(this, row, column, &stack, false);
+    if (!result.ok)
+        return result.error.isEmpty() ? QStringLiteral("#ERROR!") : result.error;
+
+    return formatFormulaNumber(result.value);
 }
 
 void SpreadsheetContent::setTableData(int rows, int columns, const QVector<QVector<QString>> &cells)

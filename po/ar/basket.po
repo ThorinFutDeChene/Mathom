@@ -3981,3 +3981,30 @@ msgstr ""
 
 #~ msgid "TextLabel"
 #~ msgstr "لصيقة نصّيّة"
+
+
+# Mathom spreadsheet
+msgid "Spreadsheet"
+msgstr "جدول بيانات"
+
+msgid "&Spreadsheet"
+msgstr "جدول &بيانات"
+
+msgid "+ Row"
+msgstr "+ صف"
+
+msgid "- Row"
+msgstr "- صف"
+
+msgid "+ Column"
+msgstr "+ عمود"
+
+msgid "- Column"
+msgstr "- عمود"
+
+msgid "Edit this spreadsheet"
+msgstr "تحرير جدول البيانات هذا"
+
+msgid "Mathom Spreadsheet (*.mcalc)"
+msgstr "جدول بيانات Mathom (*.mcalc)"
+

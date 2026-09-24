@@ -43,6 +43,7 @@ set(libbasket_SRCS
     tag.cpp tag.h
     tagsedit.cpp tagsedit.h
     tools.cpp tools.h
+    updatechecker.cpp updatechecker.h
     variouswidgets.cpp variouswidgets.h
     xmlwork.cpp xmlwork.h
 )
@@ -86,6 +87,7 @@ target_link_libraries(LibBasket
     KF6::XmlGui
     Qt::Core
     Qt::Multimedia
+    Qt::Network
 )
 
 if(TARGET PkgConfig::gpgme)

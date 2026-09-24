@@ -72,6 +72,7 @@
 #include "settings.h"
 #include "softwareimporters.h"
 #include "tools.h"
+#include "updatechecker.h"
 #include "xmlwork.h"
 
 #include <QFileDialog>
@@ -734,6 +735,13 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("help_welcome_baskets"), this, &BNPView::addWelcomeBaskets);
     a->setText(i18n("&Welcome Mathom-Houses"));
+
+    a = ac->addAction(QStringLiteral("help_check_updates"));
+    a->setText(i18n("Check for &Updates..."));
+    a->setIcon(MathomIcons::icon(QStringLiteral("system-software-update")));
+    connect(a, &QAction::triggered, this, [this]() {
+        UpdateChecker::check(this);
+    });
 }
 
 BasketListViewItem *BNPView::topLevelItem(int i)

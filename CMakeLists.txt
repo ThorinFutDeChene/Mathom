@@ -71,6 +71,7 @@ find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS
     DBus
     Gui
     Multimedia
+    Network
     Widgets
     Xml
     Core5Compat

@@ -17,6 +17,7 @@ class QFontComboBox;
 class QTextCharFormat;
 class QAction;
 class QLineEdit;
+class QTableWidget;
 
 class KIconButton;
 class KUrlRequester;
@@ -45,6 +46,7 @@ class CrossReferenceContent;
 class LauncherContent;
 class ColorContent;
 class UnknownContent;
+class SpreadsheetContent;
 
 /** The base class for every note editor.
  * Scenario:
@@ -239,6 +241,22 @@ class UnknownEditor : public NoteEditor
     Q_OBJECT
 public:
     UnknownEditor(UnknownContent *unknownContent, QWidget *parent);
+};
+
+class SpreadsheetEditor : public NoteEditor
+{
+    Q_OBJECT
+public:
+    SpreadsheetEditor(SpreadsheetContent *spreadsheetContent, QWidget *parent);
+    ~SpreadsheetEditor() override;
+    void validate() override;
+    void autoSave(bool toFileToo) override;
+
+private:
+    void syncContent(bool saveToFile);
+
+    SpreadsheetContent *m_spreadsheetContent;
+    QTableWidget *m_table;
 };
 
 /** The dialog to edit Link Note content.

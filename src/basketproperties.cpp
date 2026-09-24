@@ -7,6 +7,7 @@
 
 #include <QApplication>
 #include <QButtonGroup>
+#include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -63,6 +64,51 @@ BasketPropertiesDialog::BasketPropertiesDialog(BasketScene *basket, QWidget *par
     m_ui->backgroundColor->setColor(m_basket->backgroundColorSetting());
     m_ui->textColor->setDefaultColor(palette().color(QPalette::Text));
     m_ui->textColor->setColor(m_basket->textColorSetting());
+
+    // Mathom shelf tab color
+    auto *tabColorLabel =
+        new QLabel(i18n("Tab color:"), this);
+
+    m_tabColorAutomatic =
+        new QCheckBox(i18n("Automatic"), this);
+
+    m_tabColor =
+        new KColorCombo2(this);
+
+    QColor initialTabColor = m_basket->tabColor();
+
+    if (!initialTabColor.isValid())
+        initialTabColor = QColor::fromHsl(210, 145, 195);
+
+    m_tabColor->setColor(initialTabColor);
+    m_tabColorAutomatic->setChecked(
+        m_basket->tabColorAutomatic());
+
+    m_tabColor->setEnabled(
+        !m_tabColorAutomatic->isChecked());
+
+    auto *tabColorControls =
+        new QHBoxLayout();
+
+    tabColorControls->setContentsMargins(0, 0, 0, 0);
+    tabColorControls->addWidget(m_tabColorAutomatic);
+    tabColorControls->addWidget(m_tabColor, 1);
+
+    m_ui->appearanceLayout->addWidget(
+        tabColorLabel,
+        3,
+        1);
+
+    m_ui->appearanceLayout->addLayout(
+        tabColorControls,
+        3,
+        2);
+
+    connect(
+        m_tabColorAutomatic,
+        &QCheckBox::toggled,
+        m_tabColor,
+        &QWidget::setDisabled);
 
     m_backgroundImagesMap.insert(0, QString());
     QStringList backgrounds = Global::backgroundManager->imageNames();
@@ -169,6 +215,18 @@ void BasketPropertiesDialog::applyChanges()
         m_basket->setShortcut(m_ui->shortcut->shortcut()[0], 1);
     } else if (m_ui->switchButton->isChecked()) {
         m_basket->setShortcut(m_ui->shortcut->shortcut()[0], 2);
+    }
+
+    if (m_tabColorAutomatic->isChecked()) {
+        // Preserve an existing automatic color. If the user explicitly
+        // switches from custom back to automatic, invalidate it so the
+        // navigation bar computes a new well-separated color.
+        if (!m_basket->tabColorAutomatic())
+            m_basket->setTabColor(QColor(), true);
+    } else {
+        m_basket->setTabColor(
+            m_tabColor->color(),
+            false);
     }
 
     // Should be called LAST, because it will emit the propertiesChanged() signal and the tree will be able to show the newly set Alt+Letter shortcut:

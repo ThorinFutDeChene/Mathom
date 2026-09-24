@@ -188,7 +188,11 @@ void MathomNavigationBar::setTabs(
     int requiredHeight = 0;
 
     for (const Entry &entry : tabs) {
-        const QColor color = automaticColor(usedColors);
+        const QColor color =
+            entry.color.isValid()
+                ? entry.color
+                : automaticColor(usedColors);
+
         usedColors.append(color);
 
         auto *button = new QToolButton(m_tabsWidget);
@@ -198,6 +202,11 @@ void MathomNavigationBar::setTabs(
         button->setChecked(entry.basket == activeBasket);
 
         const QColor border = color.darker(125);
+
+        const QColor textColor =
+            color.lightness() < 128
+                ? QColor(QStringLiteral("#ffffff"))
+                : QColor(QStringLiteral("#202020"));
 
         button->setStyleSheet(
             QStringLiteral(
@@ -209,7 +218,7 @@ void MathomNavigationBar::setTabs(
                 " border-top-right-radius: 8px;"
                 " padding: 7px 14px;"
                 " margin-right: 2px;"
-                " color: #202020;"
+                " color: %3;"
                 "}"
                 "QToolButton:hover {"
                 " border: 2px solid %2;"
@@ -220,7 +229,8 @@ void MathomNavigationBar::setTabs(
                 " padding-top: 9px;"
                 "}").arg(
                     color.name(),
-                    border.name()));
+                    border.name(),
+                    textColor.name()));
 
         connect(
             button,

@@ -1272,17 +1272,55 @@ void BNPView::updateNavigationBar()
     }
 
     QList<MathomNavigationBar::Entry> tabs;
+    QList<QColor> usedColors;
+
+    // First reserve every already persisted color, whether automatic
+    // or manually selected. New automatic colors must stay away from
+    // all of them.
+    for (int i = 0; i < navigationRoot->childCount(); ++i) {
+        auto *child =
+            static_cast<BasketListViewItem *>(
+                navigationRoot->child(i));
+
+        const QColor color = child->basket()->tabColor();
+
+        if (color.isValid())
+            usedColors.append(color);
+    }
+
+    bool assignedAutomaticColor = false;
 
     for (int i = 0; i < navigationRoot->childCount(); ++i) {
         auto *child =
             static_cast<BasketListViewItem *>(
                 navigationRoot->child(i));
 
+        QColor color = child->basket()->tabColor();
+
+        if (!color.isValid()) {
+            color =
+                MathomNavigationBar::automaticColor(
+                    usedColors);
+
+            child->basket()->setTabColor(
+                color,
+                true);
+
+            usedColors.append(color);
+            assignedAutomaticColor = true;
+        }
+
         tabs.append({
             child->basket()->basketName(),
-            child->basket()
+            child->basket(),
+            color
         });
     }
+
+    // baskets.xml contains the properties of every hierarchy item,
+    // including shelves that have not loaded their notes yet.
+    if (assignedAutomaticColor && !m_loading)
+        save();
 
     BasketScene *activeBasket = nullptr;
 
@@ -1480,6 +1518,8 @@ void BNPView::updateBasketListViewItem(BasketScene *basket)
             item->setBackground(0, QBrush());
         }
     }
+
+    updateNavigationBar();
 
     // Don't save if we are loading!
     if (!m_loading) {

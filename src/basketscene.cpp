@@ -642,6 +642,32 @@ void BasketScene::loadProperties(const QDomElement &properties)
     QColor backgroundColor = (backgroundColorString.isEmpty() ? QColor() : QColor(backgroundColorString));
     QColor textColor = (textColorString.isEmpty() ? QColor() : QColor(textColorString));
 
+    // Mathom tab color. Old BasKet/Mathom data simply has no such
+    // attributes, so preserve an already loaded value when possible.
+    const QString defaultTabColor =
+        m_tabColor.isValid() ? m_tabColor.name() : QString();
+
+    const QString tabColorString =
+        appearance.attribute(
+            QStringLiteral("tabColor"),
+            defaultTabColor);
+
+    const QString defaultTabColorMode =
+        m_tabColorAutomatic
+            ? QStringLiteral("automatic")
+            : QStringLiteral("custom");
+
+    const QString tabColorMode =
+        appearance.attribute(
+            QStringLiteral("tabColorMode"),
+            defaultTabColorMode);
+
+    if (!tabColorString.isEmpty())
+        m_tabColor = QColor(tabColorString);
+
+    m_tabColorAutomatic =
+        tabColorMode != QStringLiteral("custom");
+
     QDomElement disposition = XMLWork::getElement(properties, QStringLiteral("disposition"));
     bool free = XMLWork::trueOrFalse(disposition.attribute(QStringLiteral("free"), XMLWork::trueOrFalse(isFreeLayout())));
     int columnCount = disposition.attribute(QStringLiteral("columnCount"), QString::number(this->columnsCount())).toInt();
@@ -680,6 +706,8 @@ void BasketScene::saveProperties(QXmlStreamWriter &stream)
     stream.writeAttribute("backgroundColor", backgroundColorSetting().isValid() ? backgroundColorSetting().name() : QString());
     stream.writeAttribute("backgroundImage", backgroundImageName());
     stream.writeAttribute("textColor", textColorSetting().isValid() ? textColorSetting().name() : QString());
+    stream.writeAttribute("tabColor", m_tabColor.isValid() ? m_tabColor.name() : QString());
+    stream.writeAttribute("tabColorMode", m_tabColorAutomatic ? QStringLiteral("automatic") : QStringLiteral("custom"));
     stream.writeEndElement();
 
     stream.writeStartElement("disposition");

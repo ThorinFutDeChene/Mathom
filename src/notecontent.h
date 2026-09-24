@@ -85,8 +85,8 @@ enum Id {
     CrossReference,
     Launcher,
     Color,
-    Spreadsheet,
-    Unknown
+    Unknown,
+    Spreadsheet
 }; // Always positive
 
 QString typeToName(const NoteType::Id noteType);

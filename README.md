@@ -20,6 +20,7 @@ Version publiée : **0.1.1**
 - icône parchemin + plume pour les étagères et sous-étagères ;
 - conservation des icônes personnalisées ;
 - restauration des icônes historiques des marques BasKet ;
+- catalogue central d’icônes Mathom et restauration autonome des icônes de Bienvenue ;
 - interface française ;
 - paquet Debian autonome pour Ubuntu 24.04 LTS amd64.
 
@@ -28,7 +29,7 @@ Version publiée : **0.1.1**
 Télécharger le paquet `.deb` depuis la page des Releases GitHub, puis :
 
 ```bash
-sudo apt install ./mathom_0.1.1-2_amd64.deb
+sudo apt install ./mathom_0.1.1-8_amd64.deb
 ```
 
 Le paquet installe Mathom dans `/opt/mathom` avec les bibliothèques Qt/KF6 nécessaires à son exécution.
@@ -53,7 +54,7 @@ Prérequis principaux :
 Le paquet produit est :
 
 ```text
-packaging/mathom_0.1.1-2_amd64.deb
+packaging/mathom_0.1.1-8_amd64.deb
 ```
 
 ## Développement

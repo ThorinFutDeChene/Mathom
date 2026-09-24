@@ -5499,3 +5499,30 @@ msgstr ""
 #: src/bnpview.cpp
 msgid "Show the organization tree"
 msgstr ""
+
+
+# Spreadsheet formula assistant
+msgid "Function..."
+msgstr "Функція..."
+
+msgid "Sum"
+msgstr "Сума"
+
+msgid "Average"
+msgstr "Середнє"
+
+msgid "Minimum"
+msgstr "Мінімум"
+
+msgid "Maximum"
+msgstr "Максимум"
+
+msgid "Count"
+msgstr "Кількість"
+
+msgid "Value or formula, for example =A1+B1"
+msgstr "Значення або формула, наприклад =A1+B1"
+
+msgid "Apply"
+msgstr "Застосувати"
+

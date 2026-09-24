@@ -23,6 +23,7 @@
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QStackedWidget>
+#include <QVBoxLayout>
 #include <QUndoStack>
 #include <QXmlStreamWriter>
 #include <QtXml/QDomDocument>
@@ -61,6 +62,7 @@
 #include "gitwrapper.h"
 #include "global.h"
 #include "mathomicons.h"
+#include "mathomnavigationbar.h"
 #include "history.h"
 #include "htmlexporter.h"
 #include "newbasketdialog.h"
@@ -72,6 +74,7 @@
 #include "settings.h"
 #include "softwareimporters.h"
 #include "tools.h"
+#include "updatechecker.h"
 #include "xmlwork.h"
 
 #include <QFileDialog>
@@ -177,6 +180,8 @@ void BNPView::lateInit()
         Settings::setWelcomeBasketsAdded(true);
         Settings::saveConfig();
     }
+
+    updateNavigationBar();
 }
 
 void BNPView::addWelcomeBaskets()
@@ -313,14 +318,24 @@ void BNPView::initialize()
     m_tree->viewport()->setAcceptDrops(true);
 
     /// Configure the Splitter:
-    m_stack = new QStackedWidget(this);
+    m_contentPane = new QWidget(this);
+
+    auto *contentLayout = new QVBoxLayout(m_contentPane);
+    contentLayout->setContentsMargins(0, 0, 0, 0);
+    contentLayout->setSpacing(0);
+
+    m_navigationBar = new MathomNavigationBar(m_contentPane);
+    m_stack = new QStackedWidget(m_contentPane);
+
+    contentLayout->addWidget(m_navigationBar);
+    contentLayout->addWidget(m_stack, 1);
 
     setOpaqueResize(true);
 
     setCollapsible(indexOf(m_tree), true);
-    setCollapsible(indexOf(m_stack), false);
+    setCollapsible(indexOf(m_contentPane), false);
     setStretchFactor(indexOf(m_tree), 0);
-    setStretchFactor(indexOf(m_stack), 1);
+    setStretchFactor(indexOf(m_contentPane), 1);
 
     /// Configure the List View Signals:
     connect(m_tree, &BasketTreeListView::itemActivated, this, &BNPView::slotPressed);
@@ -336,6 +351,53 @@ void BNPView::initialize()
     connect(m_tree, &BasketTreeListView::itemCollapsed, this, &BNPView::basketChanged);
 
     connect(this, &BNPView::basketChanged, this, &BNPView::slotBasketChanged);
+    connect(this, &BNPView::basketChanged, this, &BNPView::updateNavigationBar);
+
+    connect(
+        m_navigationBar,
+        &MathomNavigationBar::navigateRequested,
+        this,
+        [this](BasketScene *basket) {
+            setCurrentBasketInHistory(basket);
+        });
+
+    connect(
+        m_tree->model(),
+        &QAbstractItemModel::rowsInserted,
+        this,
+        [this](const QModelIndex &, int, int) {
+            QTimer::singleShot(
+                0,
+                this,
+                &BNPView::updateNavigationBar);
+        });
+
+    connect(
+        m_tree->model(),
+        &QAbstractItemModel::rowsRemoved,
+        this,
+        [this](const QModelIndex &, int, int) {
+            QTimer::singleShot(
+                0,
+                this,
+                &BNPView::updateNavigationBar);
+        });
+
+    connect(
+        m_tree->model(),
+        &QAbstractItemModel::rowsMoved,
+        this,
+        [this](
+            const QModelIndex &,
+            int,
+            int,
+            const QModelIndex &,
+            int) {
+            QTimer::singleShot(
+                0,
+                this,
+                &BNPView::updateNavigationBar);
+        });
 
     connect(m_history, &QUndoStack::canRedoChanged, this, &BNPView::canUndoRedoChanged);
     connect(m_history, &QUndoStack::canUndoChanged, this, &BNPView::canUndoRedoChanged);
@@ -734,6 +796,13 @@ void BNPView::setupActions()
 
     a = ac->addAction(QStringLiteral("help_welcome_baskets"), this, &BNPView::addWelcomeBaskets);
     a->setText(i18n("&Welcome Mathom-Houses"));
+
+    a = ac->addAction(QStringLiteral("help_check_updates"));
+    a->setText(i18n("Check for &Updates..."));
+    a->setIcon(MathomIcons::icon(QStringLiteral("system-software-update")));
+    connect(a, &QAction::triggered, this, [this]() {
+        UpdateChecker::check(this);
+    });
 }
 
 BasketListViewItem *BNPView::topLevelItem(int i)
@@ -1149,6 +1218,97 @@ BasketScene *BNPView::currentBasket()
         return decoBasket->basket();
     else
         return nullptr;
+}
+
+void BNPView::updateNavigationBar()
+{
+    if (!m_navigationBar || !m_tree)
+        return;
+
+    QList<MathomNavigationBar::Entry> houses;
+
+    auto *currentItem =
+        dynamic_cast<BasketListViewItem *>(m_tree->currentItem());
+
+    BasketListViewItem *currentHouse = currentItem;
+
+    while (currentHouse && currentHouse->parent()) {
+        currentHouse =
+            static_cast<BasketListViewItem *>(
+                currentHouse->parent());
+    }
+
+    for (int i = 0; i < m_tree->topLevelItemCount(); ++i) {
+        auto *item =
+            static_cast<BasketListViewItem *>(
+                m_tree->topLevelItem(i));
+
+        houses.append({
+            item->basket()->basketName(),
+            item->basket()
+        });
+    }
+
+    m_navigationBar->setMathomHouses(
+        houses,
+        currentHouse ? currentHouse->basket() : nullptr);
+
+    if (!currentItem) {
+        m_navigationBar->setTabs({}, nullptr);
+        m_navigationBar->setBreadcrumb({});
+        return;
+    }
+
+    BasketListViewItem *navigationRoot = nullptr;
+
+    if (currentItem->childCount() > 0) {
+        navigationRoot = currentItem;
+    } else if (currentItem->parent()) {
+        navigationRoot =
+            static_cast<BasketListViewItem *>(
+                currentItem->parent());
+    } else {
+        navigationRoot = currentItem;
+    }
+
+    QList<MathomNavigationBar::Entry> tabs;
+
+    for (int i = 0; i < navigationRoot->childCount(); ++i) {
+        auto *child =
+            static_cast<BasketListViewItem *>(
+                navigationRoot->child(i));
+
+        tabs.append({
+            child->basket()->basketName(),
+            child->basket()
+        });
+    }
+
+    BasketScene *activeBasket = nullptr;
+
+    if (currentItem->parent() == navigationRoot)
+        activeBasket = currentItem->basket();
+
+    m_navigationBar->setTabs(
+        tabs,
+        activeBasket);
+
+    QList<MathomNavigationBar::Entry> breadcrumb;
+
+    BasketListViewItem *cursor = navigationRoot;
+
+    while (cursor) {
+        breadcrumb.prepend({
+            cursor->basket()->basketName(),
+            cursor->basket()
+        });
+
+        cursor =
+            static_cast<BasketListViewItem *>(
+                cursor->parent());
+    }
+
+    m_navigationBar->setBreadcrumb(breadcrumb);
 }
 
 BasketScene *BNPView::parentBasketOf(BasketScene *basket)

@@ -93,6 +93,20 @@ flatpak-builder --run flatpak-build "$MANIFEST" \
         cp -a /usr/bin/kbuildsycoca6 \
             "$APPDIR/usr/bin/kbuildsycoca6"
 
+        # KIO file worker required by Mathom for local file operations.
+        # linuxdeploy does not automatically deploy the worker and plugin.
+        mkdir -p \
+            "$APPDIR/usr/lib/x86_64-linux-gnu/libexec/kf6" \
+            "$APPDIR/usr/lib/plugins/kf6/kio"
+
+        cp -a \
+            /usr/lib/x86_64-linux-gnu/libexec/kf6/kioworker \
+            "$APPDIR/usr/lib/x86_64-linux-gnu/libexec/kf6/"
+
+        cp -a \
+            /usr/lib/plugins/kf6/kio/kio_file.so \
+            "$APPDIR/usr/lib/plugins/kf6/kio/"
+
         # BasKet/KF6 relies on many standard KDE icon names. Ubuntu MATE
         # does not provide all of them, so Mathom ships Breeze as a fallback
         # theme while still allowing the desktop theme to remain primary.
@@ -272,6 +286,10 @@ dpkg-deb -c "$OUTPUT" > "$CONTENTS_LIST"
 
 grep -q './opt/mathom/usr/share/icons/breeze/index.theme' "$CONTENTS_LIST"
 grep -q './opt/mathom/usr/share/locale/fr/LC_MESSAGES/' "$CONTENTS_LIST"
+
+# KIO local-file support
+grep -q './opt/mathom/usr/lib/x86_64-linux-gnu/libexec/kf6/kioworker' "$CONTENTS_LIST"
+grep -q './opt/mathom/usr/lib/plugins/kf6/kio/kio_file.so' "$CONTENTS_LIST"
 grep -q './usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg' "$CONTENTS_LIST"
 grep -q './usr/share/icons/hicolor/48x48/apps/fr.thorinux.mathom.png' "$CONTENTS_LIST"
 grep -q './usr/share/pixmaps/fr.thorinux.mathom.png' "$CONTENTS_LIST"

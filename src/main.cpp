@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QStandardPaths>
+#include <QTimer>
 #include <config.h>
 #include <kconfig.h> // TMP IN ALPHA 1
 
@@ -24,6 +25,7 @@
 #include "backup.h"
 #include "bnpview.h"
 #include "global.h"
+#include "diagnosticmanager.h"
 #include "mainwindow.h"
 #ifdef DEBUG_PIPE
 #include "debugwindow.h"
@@ -192,6 +194,10 @@ int main(int argc, char *argv[])
         Global::bnpView->enableDebugMode();
 
     win->show();
+
+    QTimer::singleShot(0, win, [win]() {
+        DiagnosticManager::instance().showPendingReportDialog(win);
+    });
 
     // Self-test of the presence of mathomui.rc (the only required file after basket executable)
     if (Global::bnpView->popupMenu(QStringLiteral("basket")) == nullptr)

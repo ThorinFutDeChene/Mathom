@@ -17,6 +17,8 @@ class QFontComboBox;
 class QTextCharFormat;
 class QAction;
 class QLineEdit;
+class QLabel;
+class QComboBox;
 class QTableWidget;
 
 class KIconButton;
@@ -254,9 +256,16 @@ public:
 
 private:
     void syncContent(bool saveToFile);
+    void updateFormulaBar();
+    void commitFormulaBar();
+    void insertFunction(const QString &functionName);
+    void ensureCellExists(int row, int column);
 
     SpreadsheetContent *m_spreadsheetContent;
     QTableWidget *m_table;
+    QLabel *m_cellAddress;
+    QLineEdit *m_formulaEdit;
+    QComboBox *m_functionCombo;
 };
 
 /** The dialog to edit Link Note content.

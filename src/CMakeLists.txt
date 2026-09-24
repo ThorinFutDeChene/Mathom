@@ -28,6 +28,7 @@ set(libbasket_SRCS
     kgpgme.cpp kgpgme.h
     linklabel.cpp linklabel.h
     mathomicons.cpp mathomicons.h
+    mathomnavigationbar.cpp mathomnavigationbar.h
     newbasketdialog.cpp newbasketdialog.h
     note.cpp note.h
     notecontent.cpp notecontent.h

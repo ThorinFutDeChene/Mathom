@@ -15,6 +15,7 @@
 class QDomElement;
 
 class QStackedWidget;
+class QWidget;
 class QPixmap;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -31,6 +32,7 @@ class KXMLGUIClient;
 
 class ColorPicker;
 class RegionGrabber;
+class MathomNavigationBar;
 
 class BasketScene;
 class DecoratedBasket;
@@ -267,6 +269,7 @@ private:
 
     void setupActions();
     void setupGlobalShortcuts();
+    void updateNavigationBar();
     DecoratedBasket *currentDecoratedBasket();
 
 public:
@@ -332,6 +335,8 @@ protected:
 
 private:
     BasketTreeListView *m_tree;
+    QWidget *m_contentPane = nullptr;
+    MathomNavigationBar *m_navigationBar = nullptr;
     QStackedWidget *m_stack;
     bool m_loading;
     bool m_newBasketPopup;

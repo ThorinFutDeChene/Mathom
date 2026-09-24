@@ -1251,6 +1251,7 @@ BasketScene::BasketScene(QWidget *parent, const QString &folderName)
     , m_editor(nullptr)
     , m_redirectEditActions(false)
     , m_editorTrackMouseEvent(false)
+    , m_editorNativeMouseEvent(false)
     , m_editorWidth(-1)
     , m_editorHeight(-1)
     , m_doNotCloseEditor(false)
@@ -1381,12 +1382,22 @@ void BasketScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         QPoint view_shift(m_view->horizontalScrollBar()->value(), m_view->verticalScrollBar()->value());
         QGraphicsWidget *widget = dynamic_cast<QGraphicsWidget *>(m_view->itemAt((event->scenePos() - view_shift).toPoint()));
         if (widget && m_editor->graphicsWidget() == widget) {
-            if (event->button() == Qt::LeftButton) {
-                m_editorTrackMouseEvent = true;
-                m_editor->startSelection(event->scenePos());
-                return;
-            } else if (event->button() == Qt::MiddleButton) {
-                m_editor->paste(event->scenePos(), QClipboard::Selection);
+            if (m_editor->textEdit()) {
+                if (event->button() == Qt::LeftButton) {
+                    m_editorTrackMouseEvent = true;
+                    m_editor->startSelection(event->scenePos());
+                    return;
+                } else if (event->button() == Qt::MiddleButton) {
+                    m_editor->paste(event->scenePos(), QClipboard::Selection);
+                    return;
+                }
+            } else {
+                // Composite inline editors (such as the spreadsheet) contain
+                // their own interactive child widgets. Let QGraphicsScene
+                // deliver mouse events to the proxy widget instead of
+                // swallowing them as text-selection events.
+                m_editorNativeMouseEvent = true;
+                QGraphicsScene::mousePressEvent(event);
                 return;
             }
         }
@@ -2139,6 +2150,12 @@ void BasketScene::acceptDropEvent(QGraphicsSceneDragDropEvent *event, bool preCo
 
 void BasketScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (m_editorNativeMouseEvent) {
+        m_editorNativeMouseEvent = false;
+        QGraphicsScene::mouseReleaseEvent(event);
+        return;
+    }
+
     // Now disallow drag and mouse redirection
     m_canDrag = false;
 
@@ -2401,6 +2418,11 @@ void BasketScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void BasketScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (m_editorNativeMouseEvent) {
+        QGraphicsScene::mouseMoveEvent(event);
+        return;
+    }
+
     // redirect this event to the editor if track mouse event is active
     if (m_editorTrackMouseEvent && (m_pressPos - event->scenePos()).manhattanLength() > QApplication::startDragDistance()) {
         m_editor->updateSelection(event->scenePos());
@@ -3810,6 +3832,7 @@ bool BasketScene::closeEditor(bool deleteEmptyNote /* =true*/)
         }
     }
     m_editorTrackMouseEvent = false;
+    m_editorNativeMouseEvent = false;
     m_editor->graphicsWidget()->widget()->disconnect();
     removeItem(m_editor->graphicsWidget());
     m_editor->validate();

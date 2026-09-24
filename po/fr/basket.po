@@ -4360,6 +4360,65 @@ msgstr "Couleur de l’intercalaire :"
 msgid "Automatic"
 msgstr "Automatique"
 
+#: src/updatechecker.cpp
+msgid "The update download address is invalid."
+msgstr "L’adresse de téléchargement de la mise à jour est invalide."
+
+#: src/updatechecker.cpp
+msgid "The update has no valid SHA-256 integrity information."
+msgstr "La mise à jour ne possède pas d’information d’intégrité SHA-256 valide."
+
+#: src/updatechecker.cpp
+msgid "Unable to create the temporary update directory."
+msgstr "Impossible de créer le répertoire temporaire de mise à jour."
+
+#: src/updatechecker.cpp
+msgid "Unable to create the temporary update file."
+msgstr "Impossible de créer le fichier temporaire de mise à jour."
+
+#: src/updatechecker.cpp
+msgid "Downloading Mathom update..."
+msgstr "Téléchargement de la mise à jour de Mathom…"
+
+#: src/updatechecker.cpp
+msgid "Cancel"
+msgstr "Annuler"
+
+#: src/updatechecker.cpp
+msgid "Unable to download the Mathom update: %1"
+msgstr "Impossible de télécharger la mise à jour de Mathom : %1"
+
+#: src/updatechecker.cpp
+msgid "The downloaded update failed the SHA-256 integrity check. It will not be installed."
+msgstr "Le contrôle d’intégrité SHA-256 de la mise à jour téléchargée a échoué. Elle ne sera pas installée."
+
+#: src/updatechecker.cpp
+msgid "The downloaded file is not the expected Mathom Debian package. It will not be installed."
+msgstr "Le fichier téléchargé n’est pas le paquet Debian Mathom attendu. Il ne sera pas installé."
+
+#: src/updatechecker.cpp
+msgid "Installing Mathom %1..."
+msgstr "Installation de Mathom %1…"
+
+#: src/updatechecker.cpp
+msgid "Mathom %1 could not be installed. The existing installation has not been replaced."
+msgstr "Mathom %1 n’a pas pu être installé. L’installation existante n’a pas été remplacée."
+
+#: src/updatechecker.cpp
+msgid "Mathom %1 has been installed successfully.\n\nRestart Mathom now?"
+msgstr "Mathom %1 a été installé avec succès.\n\nRedémarrer Mathom maintenant ?"
+
+#: src/updatechecker.cpp
+msgid "Unable to start the privileged Mathom installer."
+msgstr "Impossible de démarrer l’installateur privilégié de Mathom."
+
+#: src/updatechecker.cpp
+msgid "No valid Mathom Debian package was found in the latest release."
+msgstr "Aucun paquet Debian Mathom valide n’a été trouvé dans la dernière version."
+
+#: src/updatechecker.cpp
+msgid "Download and install it now?"
+msgstr "Télécharger et installer maintenant ?"
 
 #: src/bnpview.cpp
 msgid "Hide the organization tree"

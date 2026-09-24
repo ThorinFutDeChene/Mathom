@@ -81,6 +81,7 @@
    <text>&amp;Insert</text>
    <Action name="insert_html" />
    <Action name="insert_image" />
+   <Action name="insert_spreadsheet" />
    <Action name="insert_link" />
    <Action name="insert_cross_reference" />
    <Action name="insert_launcher" />

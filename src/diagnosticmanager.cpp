@@ -6,6 +6,7 @@
 
 #include <QAbstractButton>
 #include <QApplication>
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDir>

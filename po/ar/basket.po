@@ -4922,3 +4922,30 @@ msgstr ""
 #: src/bnpview.cpp
 msgid "Show the organization tree"
 msgstr ""
+
+
+# Spreadsheet formula assistant
+msgid "Function..."
+msgstr "دالة..."
+
+msgid "Sum"
+msgstr "المجموع"
+
+msgid "Average"
+msgstr "المتوسط"
+
+msgid "Minimum"
+msgstr "الحد الأدنى"
+
+msgid "Maximum"
+msgstr "الحد الأقصى"
+
+msgid "Count"
+msgstr "العدّ"
+
+msgid "Value or formula, for example =A1+B1"
+msgstr "قيمة أو صيغة، مثلاً =A1+B1"
+
+msgid "Apply"
+msgstr "تطبيق"
+

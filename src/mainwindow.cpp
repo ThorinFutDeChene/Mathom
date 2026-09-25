@@ -8,10 +8,15 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QCheckBox>
+#include <QDialog>
+#include <QDialogButtonBox>
 // #include <QDesktopWidget>
+#include <QLabel>
 #include <QMoveEvent>
 #include <QResizeEvent>
 #include <QStatusBar>
+#include <QVBoxLayout>
 
 #include <KAboutData>
 #include <KActionCollection>
@@ -92,6 +97,11 @@ void MainWindow::setupActions()
 
     actAppConfig = KStandardAction::preferences(this, &MainWindow::showSettingsDialog, actionCollection());
 
+    QAction *updateSettingsAction =
+        actionCollection()->addAction(QStringLiteral("options_update_settings"), this, &MainWindow::showUpdateSettingsDialog);
+    updateSettingsAction->setText(i18n("Update Settings..."));
+    updateSettingsAction->setIcon(QIcon::fromTheme(QStringLiteral("system-software-update")));
+
     QAction *diagnosticsAction =
         actionCollection()->addAction(QStringLiteral("help_open_diagnostics"), this, []() {
             DiagnosticManager::instance().openDiagnosticsFolder();
@@ -164,6 +174,46 @@ void MainWindow::showSettingsDialog()
     }
 
     m_settings->show();
+}
+
+void MainWindow::showUpdateSettingsDialog()
+{
+    QDialog dialog(this);
+    dialog.setWindowTitle(i18n("Mathom Update Settings"));
+
+    auto *layout = new QVBoxLayout(&dialog);
+
+    auto *description = new QLabel(
+        i18n("By default, Mathom installs only stable releases. "
+             "Enable the option below to also receive development versions "
+             "when they are newer than the latest stable release."),
+        &dialog);
+    description->setWordWrap(true);
+    layout->addWidget(description);
+
+    auto *allowDevelopment =
+        new QCheckBox(i18n("Allow development versions of Mathom"), &dialog);
+    allowDevelopment->setChecked(Settings::allowDevelopmentUpdates());
+    layout->addWidget(allowDevelopment);
+
+    auto *warning = new QLabel(
+        i18n("Development versions are intended for testing and may contain bugs."),
+        &dialog);
+    warning->setWordWrap(true);
+    layout->addWidget(warning);
+
+    auto *buttons =
+        new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+    layout->addWidget(buttons);
+
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    Settings::setAllowDevelopmentUpdates(allowDevelopment->isChecked());
+    Settings::saveConfig();
 }
 
 void MainWindow::showShortcutsSettingsDialog()

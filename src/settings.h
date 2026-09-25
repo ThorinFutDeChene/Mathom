@@ -108,6 +108,8 @@ protected:
     static int s_defIconSize;
     /** Version Sync */
     static bool s_versionSyncEnabled;
+    /** Updates */
+    static bool s_allowDevelopmentUpdates;
 
 public: /* And the following methods are just getter / setters */
     /** App settings GET */
@@ -287,6 +289,11 @@ public: /* And the following methods are just getter / setters */
     {
         return s_versionSyncEnabled;
     }
+    /** Updates */
+    static inline bool allowDevelopmentUpdates()
+    {
+        return s_allowDevelopmentUpdates;
+    }
 
     /** App settings SET */
     static void setTreeOnLeft(bool onLeft);
@@ -449,6 +456,11 @@ public: /* And the following methods are just getter / setters */
     {
         s_versionSyncEnabled = enable;
     }
+    // Updates
+    static inline void setAllowDevelopmentUpdates(bool enable)
+    {
+        s_allowDevelopmentUpdates = enable;
+    }
 
 public:
     /* Save and load config */
@@ -523,6 +535,7 @@ private:
     // General
     KComboBox *m_treeOnLeft;
     KComboBox *m_filterOnTop;
+    QCheckBox *m_allowDevelopmentUpdates;
 };
 
 class BASKET_EXPORT BasketsPage : public AbstractSettingsPage

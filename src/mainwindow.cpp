@@ -16,6 +16,8 @@
 #include <QMoveEvent>
 #include <QResizeEvent>
 #include <QStatusBar>
+#include <QTabWidget>
+#include <QTextBrowser>
 #include <QVBoxLayout>
 
 #include <KAboutData>
@@ -108,6 +110,11 @@ void MainWindow::setupActions()
         });
     diagnosticsAction->setText(i18n("Open Diagnostics Folder"));
     diagnosticsAction->setIcon(QIcon::fromTheme(QStringLiteral("folder-open")));
+
+    QAction *aboutThorinuxAction =
+        actionCollection()->addAction(QStringLiteral("help_about_thorinux"), this, &MainWindow::showAboutThorinuxDialog);
+    aboutThorinuxAction->setText(i18n("About Thorinux Systems"));
+    aboutThorinuxAction->setIcon(QIcon::fromTheme(QStringLiteral("help-about")));
 }
 
 SettingsDialog *MainWindow::settings()
@@ -214,6 +221,61 @@ void MainWindow::showUpdateSettingsDialog()
 
     Settings::setAllowDevelopmentUpdates(allowDevelopment->isChecked());
     Settings::saveConfig();
+}
+
+void MainWindow::showAboutThorinuxDialog()
+{
+    QDialog dialog(this);
+    dialog.setWindowTitle(i18n("About Thorinux Systems"));
+    dialog.resize(680, 430);
+
+    auto *layout = new QVBoxLayout(&dialog);
+    auto *tabs = new QTabWidget(&dialog);
+    layout->addWidget(tabs);
+
+    auto makePage = [&tabs](const QString &html) {
+        auto *browser = new QTextBrowser(tabs);
+        browser->setOpenExternalLinks(true);
+        browser->setHtml(html);
+        return browser;
+    };
+
+    const QString aboutHtml =
+        i18n(
+            "<h3>Thorinux Systems</h3>"
+            "<p>Thorinux Systems develops and maintains free and open-source software projects.</p>"
+            "<p><b>Thorinux</b> is a registered trademark. Mathom is a project of the Thorinux brand, "
+            "developed and maintained by Thorinux Systems.</p>"
+            "<p>Mathom is based on BasKet Note Pads and preserves the attribution and licences of the original project.</p>"
+            "<p>For questions or help: <a href=\"mailto:contact@thorinux.fr\">contact@thorinux.fr</a></p>");
+
+    tabs->addTab(makePage(aboutHtml), i18n("About"));
+
+    const QString reportHtml =
+        i18n(
+            "<h3>Bug reports or wishes</h3>"
+            "<p>Mathom includes its own diagnostic system for technical problems. "
+            "When a problem occurs, the diagnostic report can be found from Help → Open Diagnostics Folder.</p>"
+            "<p>For a bug report, a feature request or any other feedback, contact "
+            "<a href=\"mailto:contact@thorinux.fr\">contact@thorinux.fr</a>.</p>");
+
+    tabs->addTab(makePage(reportHtml), i18n("Bug reports or wishes"));
+
+    const QString supportHtml =
+        i18n(
+            "<h3>Support Mathom</h3>"
+            "<p>Mathom is intended to remain free and open-source software.</p>"
+            "<p>Ways to financially support the project will be added later. "
+            "For now, using Mathom, testing development versions and reporting useful feedback already helps the project.</p>");
+
+    tabs->addTab(makePage(supportHtml), i18n("Support Mathom"));
+
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    layout->addWidget(buttons);
+
+    dialog.exec();
 }
 
 void MainWindow::showShortcutsSettingsDialog()

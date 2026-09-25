@@ -23,24 +23,41 @@ AboutData::AboutData()
                  QString(),
                  QString())
 {
-    // Mathom homepage will be added when the Thorinux Systems project page is available.
-    setHomepage(QString());
+    setHomepage(QStringLiteral("https://github.com/ThorinFutDeChene/Mathom"));
+    setBugAddress(QByteArray());
     setOrganizationDomain(QByteArrayLiteral("thorinux.fr"));
     setDesktopFileName(QStringLiteral("fr.thorinux.mathom"));
     setProgramLogo(MathomIcons::application());
 
-    addAuthor(QStringLiteral("Thorinux Systems"), i18n("Mathom fork maintainer"));
+    // Mathom has its own support and diagnostics workflow.  Replacing the
+    // default KAboutData author text also prevents KDE's default bug-report
+    // address from being presented as a Mathom contact point.
+    setCustomAuthorText(
+        i18n("For questions or help with Mathom: contact@thorinux.fr"),
+        i18n("For questions or help with Mathom: <a href=\"mailto:contact@thorinux.fr\">contact@thorinux.fr</a>"));
 
-    addAuthor(i18n("Carl Schwan"), i18n("Co-Maintainer"), QStringLiteral("carl@carlschwan.eu"), QStringLiteral("https://carlschwan.eu"));
-    addAuthor(i18n("Niccolò Venerandi"), i18n("Co-Maintainer"), QStringLiteral("niccolo@venerandi.com"), QStringLiteral("https://niccolo.venerandi.com/"));
-    addAuthor(i18n("OmegaPhil"), i18n("Paste as plaintext option"), QStringLiteral("OmegaPhil@startmail.com"));
-    addAuthor(i18n("Kelvie Wong"), i18n("Ex-Maintainer"), QStringLiteral("kelvie@ieee.org"));
-    addAuthor(i18n("Sébastien Laoût"), i18n("Original Author"), QStringLiteral("slaout@linux62.org"));
-    addAuthor(i18n("Petri Damstén"), i18n("Basket encryption, Kontact integration, KnowIt importer"), QStringLiteral("damu@iki.fi"));
-    addAuthor(i18n("Alex Gontmakher"),
-              i18n("Baskets auto lock, save-status icon, HTML copy/paste, basket name tooltip, drop to basket name"),
-              QStringLiteral("gsasha@cs.technion.ac.il"));
-    addAuthor(i18n("Marco Martin"), i18n("Original icon"), QStringLiteral("m4rt@libero.it"));
+    addAuthor(QStringLiteral("Thorinux Systems"),
+              i18n("Mathom maintainer and user support"),
+              QStringLiteral("contact@thorinux.fr"));
+
+    // Keep the BasKet lineage visible for attribution, but do not present
+    // historical BasKet contributors as current Mathom contacts.
+    addCredit(QStringLiteral("Carl Schwan"),
+              i18n("BasKet historical co-maintainer"));
+    addCredit(QStringLiteral("Niccolò Venerandi"),
+              i18n("BasKet historical co-maintainer"));
+    addCredit(QStringLiteral("OmegaPhil"),
+              i18n("BasKet historical contributor — paste as plain text option"));
+    addCredit(QStringLiteral("Kelvie Wong"),
+              i18n("BasKet former maintainer"));
+    addCredit(QStringLiteral("Sébastien Laoût"),
+              i18n("BasKet original author"));
+    addCredit(QStringLiteral("Petri Damstén"),
+              i18n("BasKet historical contributor — encryption, Kontact integration, KnowIt importer"));
+    addCredit(QStringLiteral("Alex Gontmakher"),
+              i18n("BasKet historical contributor — auto lock, save-status icon, HTML copy/paste, basket name tooltip, drop to basket name"));
+    addCredit(QStringLiteral("Marco Martin"),
+              i18n("BasKet historical contributor — original icon"));
 }
 
 QString AboutData::componentName()

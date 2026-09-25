@@ -36,6 +36,7 @@ public Q_SLOTS:
     void configureToolbars() override;
     void configureNotifications();
     void showSettingsDialog();
+    void showUpdateSettingsDialog();
     void minimizeRestore();
     void quit();
     void slotNewToolbarConfig();

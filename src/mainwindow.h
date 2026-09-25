@@ -37,6 +37,7 @@ public Q_SLOTS:
     void configureNotifications();
     void showSettingsDialog();
     void showUpdateSettingsDialog();
+    void showAboutThorinuxDialog();
     void minimizeRestore();
     void quit();
     void slotNewToolbarConfig();

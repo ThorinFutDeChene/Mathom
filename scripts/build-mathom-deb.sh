@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
 
-VERSION="${MATHOM_VERSION:-0.1.8}"
-REVISION="${MATHOM_DEB_REVISION:-1}"
+VERSION="${MATHOM_VERSION:-0.1.9}"
+REVISION="${MATHOM_DEB_REVISION:-0dev1}"
 ARCH="amd64"
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"

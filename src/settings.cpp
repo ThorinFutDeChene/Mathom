@@ -92,6 +92,8 @@ bool Settings::s_showEmptyBasketInfo = true;
 bool Settings::s_spellCheckTextNotes = true;
 // Version Sync
 bool Settings::s_versionSyncEnabled = false;
+// Updates
+bool Settings::s_allowDevelopmentUpdates = false;
 
 void Settings::loadConfig()
 {
@@ -188,6 +190,9 @@ void Settings::loadConfig()
 
     config = Global::config()->group(QStringLiteral("Version Sync"));
     setVersionSyncEnabled(config.readEntry("enabled", false));
+
+    config = Global::config()->group(QStringLiteral("Updates"));
+    setAllowDevelopmentUpdates(config.readEntry("allowDevelopmentVersions", false));
 }
 
 void Settings::saveConfig()
@@ -256,6 +261,9 @@ void Settings::saveConfig()
 
     config = Global::config()->group(QStringLiteral("Version Sync"));
     config.writeEntry("enabled", versionSyncEnabled());
+
+    config = Global::config()->group(QStringLiteral("Updates"));
+    config.writeEntry("allowDevelopmentVersions", allowDevelopmentUpdates());
 
     config.sync();
 }
@@ -464,6 +472,13 @@ GeneralPage::GeneralPage(QObject *parent, const KPluginMetaData &data)
     layout->addRow(i18n("&Filter bar position:"), m_filterOnTop);
     connect(m_filterOnTop, &QComboBox::activated, this, &KCModule::markAsChanged);
 
+    // Update channel:
+    m_allowDevelopmentUpdates = new QCheckBox(i18n("Allow &development versions of Mathom"), this->widget());
+    m_allowDevelopmentUpdates->setToolTip(
+        i18n("Development versions are proposed only when they are newer than the latest stable release."));
+    layout->addRow(i18n("&Updates:"), m_allowDevelopmentUpdates);
+    connect(m_allowDevelopmentUpdates, &QCheckBox::toggled, this, &KCModule::markAsChanged);
+
     GeneralPage::load();
 }
 
@@ -471,6 +486,7 @@ void GeneralPage::load()
 {
     m_treeOnLeft->setCurrentIndex((int)!Settings::treeOnLeft());
     m_filterOnTop->setCurrentIndex((int)!Settings::filterOnTop());
+    m_allowDevelopmentUpdates->setChecked(Settings::allowDevelopmentUpdates());
     setNeedsSave(false);
 }
 
@@ -478,6 +494,8 @@ void GeneralPage::save()
 {
     Settings::setTreeOnLeft(!m_treeOnLeft->currentIndex());
     Settings::setFilterOnTop(!m_filterOnTop->currentIndex());
+    Settings::setAllowDevelopmentUpdates(m_allowDevelopmentUpdates->isChecked());
+    Settings::saveConfig();
     setNeedsSave(false);
 }
 

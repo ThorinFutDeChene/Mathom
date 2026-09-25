@@ -145,8 +145,6 @@
     <p xml:lang="zh-TW">它讓您排列筆記、追蹤待辦事項等等。</p>
   </description>
   <url type="homepage">https://github.com/ThorinFutDeChene/Mathom</url>
-  <url type="bugtracker">https://github.com/ThorinFutDeChene/Mathom/issues</url>
-  <url type="help">https://github.com/ThorinFutDeChene/Mathom</url>
   <categories>
     <category>Office</category>
   </categories>

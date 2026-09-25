@@ -4480,3 +4480,51 @@ msgstr "Valeur ou formule, par exemple =A1+B1"
 msgid "Apply"
 msgstr "Appliquer"
 
+
+
+msgid "Allow &development versions of Mathom"
+msgstr "Autoriser les versions de &développement de Mathom"
+
+
+msgid "Development versions are proposed only when they are newer than the latest stable release."
+msgstr "Les versions de développement ne sont proposées que lorsqu’elles sont plus récentes que la dernière version stable."
+
+
+msgid "&Updates:"
+msgstr "&Mises à jour :"
+
+
+msgid "Update channel: development"
+msgstr "Canal de mise à jour : développement"
+
+
+msgid "Update channel: stable"
+msgstr "Canal de mise à jour : stable"
+
+
+msgid "A Mathom development update is available."
+msgstr "Une mise à jour de développement de Mathom est disponible."
+
+
+msgid "No valid Mathom Debian package was found in the available releases."
+msgstr "Aucun paquet Debian Mathom valide n’a été trouvé dans les versions disponibles."
+
+
+msgid "Update Settings..."
+msgstr "Paramètres des mises à jour…"
+
+
+msgid "Mathom Update Settings"
+msgstr "Paramètres des mises à jour de Mathom"
+
+
+msgid "By default, Mathom installs only stable releases. Enable the option below to also receive development versions when they are newer than the latest stable release."
+msgstr "Par défaut, Mathom installe uniquement les versions stables. Activez l’option ci-dessous pour recevoir également les versions de développement lorsqu’elles sont plus récentes que la dernière version stable."
+
+
+msgid "Allow development versions of Mathom"
+msgstr "Autoriser les versions de développement de Mathom"
+
+
+msgid "Development versions are intended for testing and may contain bugs."
+msgstr "Les versions de développement sont destinées aux tests et peuvent contenir des bogues."

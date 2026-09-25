@@ -468,13 +468,26 @@ void UpdateChecker::installUpdate(
                     QMessageBox::Yes);
 
             if (answer == QMessageBox::Yes) {
+                // Wait until this Mathom process has fully exited before
+                // starting the new one.  Mathom is a KDBusService::Unique
+                // application: starting too early would activate this old
+                // instance, make the duplicate process exit, and leave no
+                // process to restart after shutdown.
+                const qint64 currentPid =
+                    QCoreApplication::applicationPid();
+
+                const QString restartCommand =
+                    QStringLiteral(
+                        "while kill -0 %1 2>/dev/null; "
+                        "do sleep 0.1; done; "
+                        "exec /usr/bin/mathom")
+                        .arg(currentPid);
+
                 QProcess::startDetached(
                     QStringLiteral("/bin/sh"),
                     {
                         QStringLiteral("-c"),
-                        QStringLiteral(
-                            "sleep 1; "
-                            "exec /usr/bin/mathom"),
+                        restartCommand,
                     });
 
                 QCoreApplication::quit();

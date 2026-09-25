@@ -27,12 +27,19 @@
 #include <KLocalizedString>
 #include <KMessageBox>
 
+#include "settings.h"
+
 namespace
 {
-const QString updateApiUrl =
+const QString stableUpdateApiUrl =
     QStringLiteral(
         "https://api.github.com/repos/"
         "ThorinFutDeChene/Mathom/releases/latest");
+
+const QString allUpdatesApiUrl =
+    QStringLiteral(
+        "https://api.github.com/repos/"
+        "ThorinFutDeChene/Mathom/releases?per_page=20");
 }
 
 UpdateChecker::UpdateChecker(QWidget *parent)
@@ -515,8 +522,14 @@ void UpdateChecker::start()
         return;
     }
 
+    const bool allowDevelopment =
+        Settings::allowDevelopmentUpdates();
+
     QNetworkRequest request{
-        QUrl(updateApiUrl)
+        QUrl(
+            allowDevelopment
+                ? allUpdatesApiUrl
+                : stableUpdateApiUrl)
     };
 
     request.setRawHeader(
@@ -542,7 +555,8 @@ void UpdateChecker::start()
         this,
         [this,
          reply,
-         currentVersion]() {
+         currentVersion,
+         allowDevelopment]() {
             if (reply->error()
                 != QNetworkReply::NoError) {
                 KMessageBox::error(
@@ -571,8 +585,7 @@ void UpdateChecker::start()
                     &parseError);
 
             if (parseError.error
-                    != QJsonParseError::NoError
-                || !document.isObject()) {
+                != QJsonParseError::NoError) {
                 KMessageBox::error(
                     m_parentWidget,
                     i18n(
@@ -584,73 +597,139 @@ void UpdateChecker::start()
                 return;
             }
 
-            const QJsonObject release =
-                document.object();
+            QList<QJsonObject> releases;
 
-            const QJsonArray assets =
-                release.value(
-                    QStringLiteral("assets"))
-                    .toArray();
+            if (document.isObject()) {
+                releases.append(document.object());
+            } else if (document.isArray()) {
+                const QJsonArray array = document.array();
+                for (const QJsonValue &value : array) {
+                    if (value.isObject())
+                        releases.append(value.toObject());
+                }
+            } else {
+                KMessageBox::error(
+                    m_parentWidget,
+                    i18n(
+                        "The update server returned "
+                        "invalid data."),
+                    i18n("Mathom Update"));
+
+                deleteLater();
+                return;
+            }
 
             const QRegularExpression pattern(
                 QStringLiteral(
                     "^mathom_(.+)_amd64\\.deb$"));
 
-            QString newestVersion;
-            QString newestFileName;
-            QString newestSha256;
-            QUrl newestUrl;
+            QString newestStableVersion;
+            QString newestStableFileName;
+            QString newestStableSha256;
+            QUrl newestStableUrl;
 
-            for (const QJsonValue &value : assets) {
-                const QJsonObject asset =
-                    value.toObject();
+            QString newestDevelopmentVersion;
+            QString newestDevelopmentFileName;
+            QString newestDevelopmentSha256;
+            QUrl newestDevelopmentUrl;
 
-                const QString fileName =
-                    asset.value(
-                        QStringLiteral("name"))
-                        .toString();
-
-                const auto match =
-                    pattern.match(fileName);
-
-                if (!match.hasMatch())
+            for (const QJsonObject &release : releases) {
+                if (release.value(QStringLiteral("draft")).toBool())
                     continue;
 
-                const QString version =
-                    match.captured(1);
+                const bool prerelease =
+                    release.value(QStringLiteral("prerelease")).toBool();
 
-                if (!newestVersion.isEmpty()
-                    && !isVersionGreater(
-                        version,
-                        newestVersion)) {
-                    continue;
-                }
+                const QJsonArray assets =
+                    release.value(
+                        QStringLiteral("assets"))
+                        .toArray();
 
-                const QString digest =
-                    asset.value(
-                        QStringLiteral("digest"))
-                        .toString();
+                for (const QJsonValue &value : assets) {
+                    const QJsonObject asset =
+                        value.toObject();
 
-                const QString prefix =
-                    QStringLiteral("sha256:");
+                    const QString fileName =
+                        asset.value(
+                            QStringLiteral("name"))
+                            .toString();
 
-                if (!digest.startsWith(
-                        prefix,
-                        Qt::CaseInsensitive)) {
-                    continue;
-                }
+                    const auto match =
+                        pattern.match(fileName);
 
-                newestVersion = version;
-                newestFileName = fileName;
-                newestSha256 =
-                    digest.mid(prefix.size());
+                    if (!match.hasMatch())
+                        continue;
 
-                newestUrl =
-                    QUrl(
+                    const QString version =
+                        match.captured(1);
+
+                    const QString digest =
+                        asset.value(
+                            QStringLiteral("digest"))
+                            .toString();
+
+                    const QString prefix =
+                        QStringLiteral("sha256:");
+
+                    if (!digest.startsWith(
+                            prefix,
+                            Qt::CaseInsensitive)) {
+                        continue;
+                    }
+
+                    const QUrl url(
                         asset.value(
                             QStringLiteral(
                                 "browser_download_url"))
                             .toString());
+
+                    if (prerelease) {
+                        if (!newestDevelopmentVersion.isEmpty()
+                            && !isVersionGreater(
+                                version,
+                                newestDevelopmentVersion)) {
+                            continue;
+                        }
+
+                        newestDevelopmentVersion = version;
+                        newestDevelopmentFileName = fileName;
+                        newestDevelopmentSha256 =
+                            digest.mid(prefix.size());
+                        newestDevelopmentUrl = url;
+                    } else {
+                        if (!newestStableVersion.isEmpty()
+                            && !isVersionGreater(
+                                version,
+                                newestStableVersion)) {
+                            continue;
+                        }
+
+                        newestStableVersion = version;
+                        newestStableFileName = fileName;
+                        newestStableSha256 =
+                            digest.mid(prefix.size());
+                        newestStableUrl = url;
+                    }
+                }
+            }
+
+            QString newestVersion = newestStableVersion;
+            QString newestFileName = newestStableFileName;
+            QString newestSha256 = newestStableSha256;
+            QUrl newestUrl = newestStableUrl;
+            bool selectedDevelopment = false;
+
+            if (allowDevelopment
+                && !newestDevelopmentVersion.isEmpty()
+                && (newestStableVersion.isEmpty()
+                    || isVersionGreater(
+                        newestDevelopmentVersion,
+                        newestStableVersion))) {
+                newestVersion = newestDevelopmentVersion;
+                newestFileName = newestDevelopmentFileName;
+                newestSha256 = newestDevelopmentSha256;
+                newestUrl = newestDevelopmentUrl;
+                selectedDevelopment = true;
             }
 
             if (newestVersion.isEmpty()) {
@@ -658,14 +737,14 @@ void UpdateChecker::start()
                     m_parentWidget,
                     i18n(
                         "No valid Mathom Debian package "
-                        "was found in the latest release."),
+                        "was found in the available releases."),
                     i18n("Mathom Update"));
 
                 deleteLater();
                 return;
             }
 
-            const QString versions =
+            QString versions =
                 i18n(
                     "Installed version: %1",
                     currentVersion)
@@ -673,6 +752,14 @@ void UpdateChecker::start()
                 + i18n(
                     "Available version: %1",
                     newestVersion);
+
+            if (selectedDevelopment) {
+                versions += QStringLiteral("\n")
+                    + i18n("Update channel: development");
+            } else {
+                versions += QStringLiteral("\n")
+                    + i18n("Update channel: stable");
+            }
 
             if (!isVersionGreater(
                     newestVersion,
@@ -694,7 +781,9 @@ void UpdateChecker::start()
                     m_parentWidget,
                     i18n("Mathom Update"),
                     i18n(
-                        "A Mathom update is available.")
+                        selectedDevelopment
+                            ? i18n("A Mathom development update is available.")
+                            : i18n("A Mathom update is available."))
                         + QStringLiteral("\n\n")
                         + versions
                         + QStringLiteral("\n\n")

@@ -118,7 +118,7 @@
    <Action name="help_open_diagnostics" />
    <Separator/>
    <Action name="help_about_app" />
-   <Action name="help_about_kde" />
+   <Action name="help_about_thorinux" />
   </Menu>
  </MenuBar>
  <ToolBar newline="false" position="Top" noMerge="1" name="mainToolBar" fullWidth="true" >

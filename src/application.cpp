@@ -95,5 +95,13 @@ void Application::onActivateRequested(const QStringList &args, const QString &wo
         // Raise to the top
         m_mainWindow->raise();
     }
-    tryLoadFile(args, workingDir);
+
+    // KDBusService::activateRequested() forwards QCoreApplication::arguments(),
+    // including argv[0].  Do not mistake the Mathom executable itself for a
+    // Mathom-House archive when a second instance activates the running one.
+    QStringList forwardedArgs = args;
+    if (!forwardedArgs.isEmpty())
+        forwardedArgs.removeFirst();
+
+    tryLoadFile(forwardedArgs, workingDir);
 }

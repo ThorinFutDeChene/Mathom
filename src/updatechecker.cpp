@@ -776,14 +776,16 @@ void UpdateChecker::start()
                 return;
             }
 
+            const QString updateMessage =
+                selectedDevelopment
+                    ? i18n("A Mathom development update is available.")
+                    : i18n("A Mathom update is available.");
+
             const auto answer =
                 QMessageBox::question(
                     m_parentWidget,
                     i18n("Mathom Update"),
-                    i18n(
-                        selectedDevelopment
-                            ? i18n("A Mathom development update is available.")
-                            : i18n("A Mathom update is available."))
+                    updateMessage
                         + QStringLiteral("\n\n")
                         + versions
                         + QStringLiteral("\n\n")

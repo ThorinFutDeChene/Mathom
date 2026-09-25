@@ -5526,3 +5526,51 @@ msgstr "Значення або формула, наприклад =A1+B1"
 msgid "Apply"
 msgstr "Застосувати"
 
+
+
+msgid "Allow &development versions of Mathom"
+msgstr "Дозволити &розробницькі версії Mathom"
+
+
+msgid "Development versions are proposed only when they are newer than the latest stable release."
+msgstr "Розробницькі версії пропонуються лише тоді, коли вони новіші за останній стабільний випуск."
+
+
+msgid "&Updates:"
+msgstr "&Оновлення:"
+
+
+msgid "Update channel: development"
+msgstr "Канал оновлень: розробницький"
+
+
+msgid "Update channel: stable"
+msgstr "Канал оновлень: стабільний"
+
+
+msgid "A Mathom development update is available."
+msgstr "Доступне розробницьке оновлення Mathom."
+
+
+msgid "No valid Mathom Debian package was found in the available releases."
+msgstr "У доступних випусках не знайдено коректного пакунка Debian для Mathom."
+
+
+msgid "Update Settings..."
+msgstr "Параметри оновлень..."
+
+
+msgid "Mathom Update Settings"
+msgstr "Параметри оновлень Mathom"
+
+
+msgid "By default, Mathom installs only stable releases. Enable the option below to also receive development versions when they are newer than the latest stable release."
+msgstr "Типово Mathom встановлює лише стабільні випуски. Увімкніть параметр нижче, щоб також отримувати розробницькі версії, коли вони новіші за останній стабільний випуск."
+
+
+msgid "Allow development versions of Mathom"
+msgstr "Дозволити розробницькі версії Mathom"
+
+
+msgid "Development versions are intended for testing and may contain bugs."
+msgstr "Розробницькі версії призначені для тестування і можуть містити помилки."

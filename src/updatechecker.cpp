@@ -636,6 +636,10 @@ void UpdateChecker::start()
                 QStringLiteral(
                     "^mathom_(.+)_amd64\\.deb$"));
 
+            const QRegularExpression developmentVersionPattern(
+                QStringLiteral(
+                    "^\\d+(?:\\.\\d+)*-0dev\\d+$"));
+
             QString newestStableVersion;
             QString newestStableFileName;
             QString newestStableSha256;
@@ -697,6 +701,14 @@ void UpdateChecker::start()
                             .toString());
 
                     if (prerelease) {
+                        // Development packages use a GitHub-safe Debian
+                        // version such as 0.1.8-0dev2.  Reject malformed
+                        // prerelease asset names (for example a '~' silently
+                        // rewritten to '.') so they cannot outrank the future
+                        // stable release.
+                        if (!developmentVersionPattern.match(version).hasMatch())
+                            continue;
+
                         if (!newestDevelopmentVersion.isEmpty()
                             && !isVersionGreater(
                                 version,

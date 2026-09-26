@@ -436,6 +436,10 @@ void BasketScene::groupNoteBefore(Note *note, Note *with)
     Note *last = note->lastSibling();
 
     Note *group = new Note(this);
+
+    if (!m_currentPageId.isEmpty())
+        group->setPageId(m_currentPageId);
+
     group->setPrev(with->prev());
     group->setNext(with->next());
     group->setX(with->x(), true);
@@ -480,6 +484,10 @@ void BasketScene::groupNoteAfter(Note *note, Note *with)
     //  Note *last = note->lastSibling();
 
     Note *group = new Note(this);
+
+    if (!m_currentPageId.isEmpty())
+        group->setPageId(m_currentPageId);
+
     group->setPrev(with->prev());
     group->setNext(with->next());
     group->setX(with->x(), true);
@@ -529,6 +537,10 @@ void BasketScene::loadNotes(const QDomElement &notes, Note *parent)
         // Load a Group:
         if (e.tagName() == QStringLiteral("group")) {
             note = new Note(this); // 1. Create the group...
+
+            note->setPageId(
+                e.attribute(QStringLiteral("page")).trimmed());
+
             loadNotes(e, note); // 3. ... And populate it with child notes.
             int noteCount = note->count();
             if (noteCount > 0 || (parent == nullptr && !isFreeLayout())) { // But don't remove columns!
@@ -605,14 +617,17 @@ void BasketScene::saveNotes(QXmlStreamWriter &stream, Note *parent)
         // Group Properties:
         if (note->isGroup() && !note->isColumn())
             stream.writeAttribute("folded", XMLWork::trueOrFalse(note->isFolded()));
+
+        // Both content Mathoms and structural groups/columns can belong
+        // to one Page.
+        if (!note->pageId().isEmpty())
+            stream.writeAttribute("page", note->pageId());
+
         // Save Content:
         if (note->content()) {
             // Save Dates:
             stream.writeAttribute("added", note->addedDate().toString(Qt::ISODate));
             stream.writeAttribute("lastModification", note->lastModificationDate().toString(Qt::ISODate));
-
-            if (!note->pageId().isEmpty())
-                stream.writeAttribute("page", note->pageId());
 
             // Save Content:
             stream.writeAttribute("type", note->content()->lowerTypeName());
@@ -1330,16 +1345,43 @@ void BasketScene::assignPageToNoteTree(
     if (!note)
         return;
 
-    if (note->content()) {
-        note->setPageId(pageId);
+    // Structural groups belong to the same Page as the Mathoms they
+    // contain. This is required for Page-owned column layouts.
+    note->setPageId(pageId);
+
+    if (note->content())
         return;
-    }
 
     for (Note *child = note->firstChild();
          child;
          child = child->next()) {
         assignPageToNoteTree(child, pageId);
     }
+}
+
+QSet<QString> BasketScene::pageIdsInNoteTree(
+    Note *note) const
+{
+    QSet<QString> result;
+
+    if (!note)
+        return result;
+
+    if (note->content()) {
+        if (!note->pageId().isEmpty())
+            result.insert(note->pageId());
+
+        return result;
+    }
+
+    for (Note *child = note->firstChild();
+         child;
+         child = child->next()) {
+        result.unite(
+            pageIdsInNoteTree(child));
+    }
+
+    return result;
 }
 
 bool BasketScene::normalizePageForNoteTree(
@@ -1352,6 +1394,8 @@ bool BasketScene::normalizePageForNoteTree(
 
     bool changed = false;
 
+    // A real Mathom keeps its existing valid Page assignment.
+    // Only missing or invalid metadata is repaired.
     if (note->content()) {
         if (note->pageId().isEmpty()
             || !validPageIds.contains(note->pageId())) {
@@ -1362,6 +1406,8 @@ bool BasketScene::normalizePageForNoteTree(
         return changed;
     }
 
+    // Normalize children first. Never change a valid Mathom Page merely
+    // because its surrounding group is being migrated.
     for (Note *child = note->firstChild();
          child;
          child = child->next()) {
@@ -1371,6 +1417,45 @@ bool BasketScene::normalizePageForNoteTree(
                 validPageIds,
                 fallbackPageId)
             || changed;
+    }
+
+    // Remove only an invalid structural Page id.
+    if (!note->pageId().isEmpty()
+        && !validPageIds.contains(note->pageId())) {
+        note->setPageId(QString());
+        changed = true;
+    }
+
+    const QSet<QString> childPageIds =
+        pageIdsInNoteTree(note);
+
+    // Pre-0.1.11 top-level columns were shared by every Page.
+    // Keep such columns shared for now. dev6 will convert them safely
+    // when Page-owned layouts become active.
+    const bool legacySharedColumn =
+        note->parentNote() == nullptr
+        && isColumnsLayout()
+        && note->pageId().isEmpty();
+
+    if (legacySharedColumn)
+        return changed;
+
+    QString desiredPageId =
+        note->pageId();
+
+    if (childPageIds.size() == 1) {
+        desiredPageId =
+            *childPageIds.constBegin();
+    } else if (childPageIds.size() > 1) {
+        // A legacy group containing Mathoms from several Pages remains
+        // shared. Its children still retain their own Page ids.
+        desiredPageId.clear();
+    }
+
+    // An empty group with an already valid explicit Page id keeps it.
+    if (note->pageId() != desiredPageId) {
+        note->setPageId(desiredPageId);
+        changed = true;
     }
 
     return changed;

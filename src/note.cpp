@@ -209,9 +209,18 @@ QString Note::toText(const QString &cuttedFullPath)
 
 bool Note::computeMatching(const FilterData &data)
 {
-    // Groups are always matching:
-    if (!content())
+    // A structural group/column can now belong to one Page.
+    // An empty pageId deliberately means "legacy/shared container".
+    if (!content()) {
+        if (basket()
+            && !basket()->currentPageId().isEmpty()
+            && !m_pageId.isEmpty()
+            && m_pageId != basket()->currentPageId()) {
+            return false;
+        }
+
         return true;
+    }
 
     // If we were editing this note and there is a save operation in the middle, then do not hide it suddenly:
     if (basket()->editedNote() == this)

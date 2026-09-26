@@ -5032,3 +5032,39 @@ msgstr "Mathom geliştirme sürümlerine izin ver"
 
 msgid "Development versions are intended for testing and may contain bugs."
 msgstr "Geliştirme sürümleri test amaçlıdır ve hatalar içerebilir."
+
+
+# Mathom pages
+msgid "Page"
+msgstr "Sayfa"
+
+msgid "Pages"
+msgstr "Sayfalar"
+
+msgid "New Page"
+msgstr "Yeni Sayfa"
+
+msgid "Sort"
+msgstr "Sırala"
+
+msgid "Manual order"
+msgstr "Manuel sıralama"
+
+msgid "Date - oldest first"
+msgstr "Tarih - önce en eski"
+
+msgid "Date - newest first"
+msgstr "Tarih - önce en yeni"
+
+msgid "Name - A to Z"
+msgstr "Ad - A'dan Z'ye"
+
+msgid "Name - Z to A"
+msgstr "Ad - Z'den A'ya"
+
+msgid "Hide pages"
+msgstr "Sayfaları gizle"
+
+msgid "Show pages"
+msgstr "Sayfaları göster"
+

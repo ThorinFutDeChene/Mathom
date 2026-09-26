@@ -1787,6 +1787,47 @@ void BasketScene::setCurrentPageDisposition(
             1,
             columnCount);
 
+    // Structural layout changes can delete column Note objects.
+    // The scene may still reference one of those columns as hovered,
+    // focused, insertion target, drag target, etc.
+    //
+    // Clear every transient UI reference while all Notes are still
+    // alive. Otherwise a later hover/focus repaint can call Note::update()
+    // on an already deleted column.
+    if (isDuringEdit())
+        closeEditor(false);
+
+    unselectAll();
+
+    setFocusedNote(nullptr);
+
+    // Use the normal hover cleanup while the old object is still valid.
+    const bool hoverWasLocked =
+        m_lockedHovering;
+
+    m_lockedHovering = true;
+
+    doHoverEffects(
+        nullptr,
+        Note::None,
+        QPointF());
+
+    removeInserter();
+
+    m_hoveredNote = nullptr;
+    m_hoveredZone = Note::None;
+
+    m_resizingNote = nullptr;
+    m_movingNote = nullptr;
+
+    m_clickedToInsert = nullptr;
+    m_savedClickedToInsert = nullptr;
+
+    m_tagPopupNote = nullptr;
+    m_startOfShiftSelectionNote = nullptr;
+
+    m_draggedNotes.clear();
+
     const QString pageId =
         page->id;
 
@@ -1795,6 +1836,34 @@ void BasketScene::setCurrentPageDisposition(
 
     const bool wasOwned =
         page->layoutOwned;
+
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("PAGE_LAYOUT_CHANGE_BEGIN"),
+        {{QStringLiteral("was_free"),
+          wasFree},
+         {QStringLiteral("new_free"),
+          freeLayout},
+         {QStringLiteral("was_owned"),
+          wasOwned},
+         {QStringLiteral("old_columns"),
+          page->columnCount},
+         {QStringLiteral("new_columns"),
+          columnCount}});
+
+    // An already-owned Page whose disposition did not change needs no
+    // structural rewrite. Restore the hover state and leave safely.
+    if (wasOwned
+        && wasFree == freeLayout
+        && (freeLayout
+            || page->columnCount == columnCount)) {
+        m_lockedHovering =
+            hoverWasLocked;
+
+        if (!m_lockedHovering)
+            doHoverEffects();
+
+        return;
+    }
 
     QList<Note *> extracted;
 
@@ -1944,6 +2013,21 @@ void BasketScene::setCurrentPageDisposition(
         equalizeColumnSizes();
 
     save();
+
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("PAGE_LAYOUT_CHANGE_OK"),
+        {{QStringLiteral("free"),
+          page->freeLayout},
+         {QStringLiteral("columns"),
+          page->columnCount},
+         {QStringLiteral("owned"),
+          page->layoutOwned}});
+
+    m_lockedHovering =
+        hoverWasLocked;
+
+    if (!m_lockedHovering)
+        doHoverEffects();
 
     Q_EMIT pagesChanged();
 }
@@ -2239,6 +2323,14 @@ QString BasketScene::ensureTodayPage()
         }
     }
 
+    // When the first Page is created after an empty Mathom has already
+    // been inserted, that Mathom can still live inside the legacy shelf
+    // structure. Keep that structure visible until the Mathom receives
+    // its Page id and the layout is explicitly converted.
+    const bool reuseExistingStructure =
+        m_pages.isEmpty()
+        && firstNote() != nullptr;
+
     PageInfo page;
     page.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     page.dayKey = dayKey;
@@ -2279,16 +2371,27 @@ QString BasketScene::ensureTodayPage()
             std::max(1, columnsCount());
     }
 
-    page.layoutOwned = true;
+    page.layoutOwned =
+        !reuseExistingStructure;
 
     m_pages.append(page);
     m_currentPageId = page.id;
 
-    if (!page.freeLayout) {
+    if (page.layoutOwned
+        && !page.freeLayout) {
         createOwnedColumnsForPage(
             page.id,
             page.columnCount);
     }
+
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("PAGE_AUTO_CREATE"),
+        {{QStringLiteral("reuse_existing_structure"),
+          reuseExistingStructure},
+         {QStringLiteral("free_layout"),
+          page.freeLayout},
+         {QStringLiteral("column_count"),
+          page.columnCount}});
 
     refreshPageAppearance();
 

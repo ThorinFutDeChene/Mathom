@@ -302,6 +302,9 @@ private:
         const QString &pageId,
         int columnCount);
 
+    void placeTopLevelNoteInCurrentPageLayout(
+        Note *note);
+
     void assignPageToNoteTree(Note *note, const QString &pageId);
     QSet<QString> pageIdsInNoteTree(Note *note) const;
     bool normalizePageForNoteTree(

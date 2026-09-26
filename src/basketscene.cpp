@@ -1783,6 +1783,30 @@ void BasketScene::createOwnedColumnsForPage(
     }
 }
 
+void BasketScene::placeTopLevelNoteInCurrentPageLayout(
+    Note *note)
+{
+    if (!note
+        || note->parentNote() != nullptr
+        || !isColumnsLayout()) {
+        return;
+    }
+
+    Note *column =
+        firstColumnForCurrentPage();
+
+    if (!column
+        || column == note) {
+        return;
+    }
+
+    detachNoteForPageLayout(note);
+
+    appendChildForPageLayout(
+        note,
+        column);
+}
+
 void BasketScene::setCurrentPageDisposition(
     bool freeLayout,
     int columnCount)
@@ -2350,7 +2374,8 @@ QString BasketScene::ensureTodayPage()
     // its Page id and the layout is explicitly converted.
     const bool reuseExistingStructure =
         m_pages.isEmpty()
-        && firstNote() != nullptr;
+        && firstNote() != nullptr
+        && firstNote()->isGroup();
 
     PageInfo page;
     page.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -3071,7 +3096,10 @@ void BasketScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     // Insertion Popup Menu:
     if ((event->button() == Qt::RightButton)
-        && ((!clicked && isFreeLayout())
+        && ((!clicked
+             && (isFreeLayout()
+                 || (m_pages.isEmpty()
+                     && m_firstNote == nullptr)))
             || (clicked
                 && (zone == Note::TopInsert || zone == Note::TopGroup || zone == Note::BottomInsert || zone == Note::BottomGroup
                     || zone == Note::BottomColumn)))) {
@@ -3358,7 +3386,12 @@ void BasketScene::insertNote(Note *note, Note *clicked, int zone, const QPointF 
         }
 
         /// Free insertion:
-    } else if (isFreeLayout()) {
+    // A brand-new shelf has no Page and therefore no Page-owned column yet.
+    // Allow one provisional top-level Mathom so editing can begin without
+    // recreating the obsolete shelf-owned column structure.
+    } else if (isFreeLayout()
+               || (m_pages.isEmpty()
+                   && m_firstNote == nullptr)) {
         // Group if note have siblings:
         if (note->next()) {
             Note *group = new Note(this);
@@ -3906,7 +3939,13 @@ void BasketScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     //  Note *clicked = noteAt(event->pos().x(), event->pos().y());
     if (!clicked) {
-        if (isFreeLayout() && event->button() == Qt::LeftButton) {
+        const bool emptyShelfWithoutPage =
+            m_pages.isEmpty()
+            && m_firstNote == nullptr;
+
+        if ((isFreeLayout()
+             || emptyShelfWithoutPage)
+            && event->button() == Qt::LeftButton) {
             clickedToInsert(event);
             save();
         }
@@ -5517,6 +5556,9 @@ bool BasketScene::closeEditor(bool deleteEmptyNote /* =true*/)
 
         assignPageToNoteTree(note, pageId);
 
+        placeTopLevelNoteInCurrentPageLayout(
+            note);
+
         // ensureTodayPage() peut avoir activé le filtre avant que
         // le Mathom ne possède encore son pageId.
         // Refiltrer maintenant pour rendre le Mathom visible.
@@ -5749,6 +5791,9 @@ void BasketScene::noteEdit(Note *note, bool justAdded, const QPointF &clickedPoi
             assignPageToNoteTree(
                 editor->note(),
                 pageId);
+
+            placeTopLevelNoteInCurrentPageLayout(
+                editor->note());
 
             filterAgain(/*andEnsureVisible=*/false);
             save();

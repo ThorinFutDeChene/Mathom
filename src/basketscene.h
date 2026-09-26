@@ -254,6 +254,12 @@ private:
     void loadPages(const QDomElement &pages);
     void savePages(QXmlStreamWriter &stream);
 
+    const PageInfo *currentPageInfo() const;
+    QString effectiveBackgroundImageName() const;
+    QColor effectiveBackgroundColorSetting() const;
+    QColor effectiveTextColorSetting() const;
+    void refreshPageAppearance();
+
     void assignPageToNoteTree(Note *note, const QString &pageId);
     bool normalizePageForNoteTree(
         Note *note,
@@ -327,6 +333,13 @@ private:
     QPixmap *m_opaqueBackgroundPixmap;
     QPixmap *m_selectedBackgroundPixmap;
     bool m_backgroundTiled;
+
+    // Keep the exact subscription values so switching Page cannot
+    // unsubscribe the wrong image/color pair.
+    QString m_subscribedBackgroundImageName;
+    QColor m_subscribedBackgroundColor;
+    QColor m_subscribedSelectionColor;
+
     QColor m_textColorSetting;
     QColor m_tabColor;
     bool m_tabColorAutomatic = true;

@@ -744,27 +744,79 @@ void BasketScene::saveProperties(QXmlStreamWriter &stream)
 
 void BasketScene::subscribeBackgroundImages()
 {
-    if (!m_backgroundImageName.isEmpty()) {
-        Global::backgroundManager->subscribe(m_backgroundImageName);
-        Global::backgroundManager->subscribe(m_backgroundImageName, this->backgroundColor());
-        Global::backgroundManager->subscribe(m_backgroundImageName, selectionRectInsideColor());
-        m_backgroundPixmap = Global::backgroundManager->pixmap(m_backgroundImageName);
-        m_opaqueBackgroundPixmap = Global::backgroundManager->opaquePixmap(m_backgroundImageName, this->backgroundColor());
-        m_selectedBackgroundPixmap = Global::backgroundManager->opaquePixmap(m_backgroundImageName, selectionRectInsideColor());
-        m_backgroundTiled = Global::backgroundManager->tiled(m_backgroundImageName);
-    }
+    const QString imageName =
+        effectiveBackgroundImageName();
+
+    if (imageName.isEmpty())
+        return;
+
+    const QColor background =
+        backgroundColor();
+
+    const QColor selection =
+        selectionRectInsideColor();
+
+    if (!Global::backgroundManager->subscribe(imageName))
+        return;
+
+    Global::backgroundManager->subscribe(
+        imageName,
+        background);
+
+    Global::backgroundManager->subscribe(
+        imageName,
+        selection);
+
+    m_backgroundPixmap =
+        Global::backgroundManager->pixmap(
+            imageName);
+
+    m_opaqueBackgroundPixmap =
+        Global::backgroundManager->opaquePixmap(
+            imageName,
+            background);
+
+    m_selectedBackgroundPixmap =
+        Global::backgroundManager->opaquePixmap(
+            imageName,
+            selection);
+
+    m_backgroundTiled =
+        Global::backgroundManager->tiled(
+            imageName);
+
+    m_subscribedBackgroundImageName =
+        imageName;
+
+    m_subscribedBackgroundColor =
+        background;
+
+    m_subscribedSelectionColor =
+        selection;
 }
 
 void BasketScene::unsubscribeBackgroundImages()
 {
-    if (hasBackgroundImage()) {
-        Global::backgroundManager->unsubscribe(m_backgroundImageName);
-        Global::backgroundManager->unsubscribe(m_backgroundImageName, this->backgroundColor());
-        Global::backgroundManager->unsubscribe(m_backgroundImageName, selectionRectInsideColor());
-        m_backgroundPixmap = nullptr;
-        m_opaqueBackgroundPixmap = nullptr;
-        m_selectedBackgroundPixmap = nullptr;
+    if (!m_subscribedBackgroundImageName.isEmpty()) {
+        Global::backgroundManager->unsubscribe(
+            m_subscribedBackgroundImageName);
+
+        Global::backgroundManager->unsubscribe(
+            m_subscribedBackgroundImageName,
+            m_subscribedBackgroundColor);
+
+        Global::backgroundManager->unsubscribe(
+            m_subscribedBackgroundImageName,
+            m_subscribedSelectionColor);
     }
+
+    m_backgroundPixmap = nullptr;
+    m_opaqueBackgroundPixmap = nullptr;
+    m_selectedBackgroundPixmap = nullptr;
+
+    m_subscribedBackgroundImageName.clear();
+    m_subscribedBackgroundColor = QColor();
+    m_subscribedSelectionColor = QColor();
 }
 
 void BasketScene::setAppearance(const QString &icon,
@@ -1149,6 +1201,84 @@ void BasketScene::loadPages(const QDomElement &pagesElement)
         m_currentPageId = m_pages.first().id;
 }
 
+const BasketScene::PageInfo *BasketScene::currentPageInfo() const
+{
+    if (m_currentPageId.isEmpty())
+        return nullptr;
+
+    for (const PageInfo &page : m_pages) {
+        if (page.id == m_currentPageId)
+            return &page;
+    }
+
+    return nullptr;
+}
+
+QString BasketScene::effectiveBackgroundImageName() const
+{
+    const PageInfo *page = currentPageInfo();
+
+    if (page)
+        return page->backgroundImage;
+
+    return m_backgroundImageName;
+}
+
+QColor BasketScene::effectiveBackgroundColorSetting() const
+{
+    const PageInfo *page = currentPageInfo();
+
+    if (page)
+        return page->backgroundColor;
+
+    return m_backgroundColorSetting;
+}
+
+QColor BasketScene::effectiveTextColorSetting() const
+{
+    const PageInfo *page = currentPageInfo();
+
+    if (page)
+        return page->textColor;
+
+    return m_textColorSetting;
+}
+
+void BasketScene::refreshPageAppearance()
+{
+    unsubscribeBackgroundImages();
+
+    if (m_loadingLaunched)
+        subscribeBackgroundImages();
+
+    recomputeAllStyles();
+    recomputeBlankRects();
+    unbufferizeAll();
+
+    if (isDuringEdit()
+        && m_editor
+        && m_editor->graphicsWidget()) {
+        QPalette editorPalette;
+
+        editorPalette.setColor(
+            m_editor->graphicsWidget()
+                ->widget()
+                ->backgroundRole(),
+            m_editor->note()->backgroundColor());
+
+        editorPalette.setColor(
+            m_editor->graphicsWidget()
+                ->widget()
+                ->foregroundRole(),
+            m_editor->note()->textColor());
+
+        m_editor->graphicsWidget()
+            ->setPalette(editorPalette);
+    }
+
+    invalidate();
+}
+
 void BasketScene::assignPageToNoteTree(
     Note *note,
     const QString &pageId)
@@ -1337,6 +1467,8 @@ QString BasketScene::createPage()
     m_pages.append(page);
     m_currentPageId = page.id;
 
+    refreshPageAppearance();
+
     if (m_loaded)
         filterAgain(/*andEnsureVisible=*/false);
 
@@ -1403,6 +1535,8 @@ QString BasketScene::ensureTodayPage()
     m_pages.append(page);
     m_currentPageId = page.id;
 
+    refreshPageAppearance();
+
     if (m_loaded)
         filterAgain(/*andEnsureVisible=*/false);
 
@@ -1434,6 +1568,8 @@ void BasketScene::setCurrentPageId(const QString &pageId)
         closeEditor();
 
     m_currentPageId = pageId;
+
+    refreshPageAppearance();
 
     if (m_loaded) {
         filterAgain(/*andEnsureVisible=*/false);
@@ -1579,6 +1715,10 @@ void BasketScene::load()
 
     QDomElement pagesElement = XMLWork::getElement(docElem, QStringLiteral("pages"));
     loadPages(pagesElement);
+
+    // Shelf appearance remains available for old-file migration,
+    // but rendering now follows the currently selected Page.
+    refreshPageAppearance();
 
     // Keep the DOM document alive while its elements are still being used.
 
@@ -4236,18 +4376,24 @@ bool BasketScene::selectedNotesHaveTags()
 
 QColor BasketScene::backgroundColor() const
 {
-    if (m_backgroundColorSetting.isValid())
-        return m_backgroundColorSetting;
-    else
-        return palette().color(QPalette::Base);
+    const QColor setting =
+        effectiveBackgroundColorSetting();
+
+    if (setting.isValid())
+        return setting;
+
+    return palette().color(QPalette::Base);
 }
 
 QColor BasketScene::textColor() const
 {
-    if (m_textColorSetting.isValid())
-        return m_textColorSetting;
-    else
-        return palette().color(QPalette::Text);
+    const QColor setting =
+        effectiveTextColorSetting();
+
+    if (setting.isValid())
+        return setting;
+
+    return palette().color(QPalette::Text);
 }
 
 void BasketScene::unbufferizeAll()

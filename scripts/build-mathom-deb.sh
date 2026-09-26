@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-VERSION="${MATHOM_VERSION:-0.1.10-0dev3}"
+VERSION="${MATHOM_VERSION:-0.1.10-0dev4}"
 REVISION="${MATHOM_DEB_REVISION-}"
 ARCH="amd64"
 
@@ -234,7 +234,7 @@ Section: office
 Priority: optional
 Architecture: ${ARCH}
 Maintainer: Thorinux Systems
-Depends: libc6
+Depends: libc6, apport, systemd-coredump, xdg-utils
 Description: Mathom - notes and information organizer
  Mathom is an application for recording ideas as mathoms and
  organizing them into Mathom-Houses and shelves.
@@ -293,6 +293,15 @@ echo "=== 7/7 Contrôles ==="
 test "$(dpkg-deb -f "$OUTPUT" Package)" = "mathom"
 test "$(dpkg-deb -f "$OUTPUT" Version)" = "${PACKAGE_VERSION}"
 test "$(dpkg-deb -f "$OUTPUT" Architecture)" = "$ARCH"
+
+DEPENDS="$(dpkg-deb -f "$OUTPUT" Depends)"
+
+for dependency in apport systemd-coredump xdg-utils; do
+    if ! printf '%s\n' "$DEPENDS" | grep -Eq "(^|, )${dependency}(,|$)"; then
+        echo "Erreur : dependance diagnostic absente : $dependency"
+        exit 1
+    fi
+done
 
 CONTENTS_LIST="$PACKAGING/mathom-deb-contents.txt"
 dpkg-deb -c "$OUTPUT" > "$CONTENTS_LIST"

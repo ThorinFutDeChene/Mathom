@@ -23,6 +23,7 @@
 #include <QStandardPaths>
 #include <QSysInfo>
 #include <QTimer>
+#include <QTemporaryDir>
 #include <QTextStream>
 #include <QUrl>
 #include <QUrlQuery>
@@ -63,22 +64,212 @@ QString safeObjectName(QObject *object)
     return name.left(120);
 }
 
-QString binaryBuildId()
+QString fileSha256(const QString &path, int maxHexCharacters = 64)
 {
-    QFile executable(QCoreApplication::applicationFilePath());
-    if (!executable.open(QIODevice::ReadOnly))
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
         return QStringLiteral("indisponible");
 
     QCryptographicHash hash(QCryptographicHash::Sha256);
-    while (!executable.atEnd()) {
-        const QByteArray chunk = executable.read(1024 * 1024);
-        if (chunk.isEmpty() && executable.error() != QFileDevice::NoError)
+
+    while (!file.atEnd()) {
+        const QByteArray chunk = file.read(1024 * 1024);
+        if (chunk.isEmpty() && file.error() != QFileDevice::NoError)
             return QStringLiteral("indisponible");
         hash.addData(chunk);
     }
 
+    return QString::fromLatin1(
+        hash.result().toHex().left(maxHexCharacters));
+}
+
+QString mathomRuntimeLibrary(const QString &fileName)
+{
+    const QFileInfo executable(
+        QCoreApplication::applicationFilePath());
+
+    return QDir::cleanPath(
+        executable.dir().filePath(
+            QStringLiteral("../lib/%1").arg(fileName)));
+}
+
+QString binaryBuildId()
+{
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+
+    const QStringList files = {
+        QCoreApplication::applicationFilePath(),
+        mathomRuntimeLibrary(QStringLiteral("libLibBasket.so.2"))
+    };
+
+    bool hashedSomething = false;
+
+    for (const QString &path : files) {
+        QFile file(path);
+        if (!file.open(QIODevice::ReadOnly))
+            continue;
+
+        hashedSomething = true;
+
+        hash.addData(QFileInfo(path).fileName().toUtf8());
+        hash.addData(QByteArray(1, '\0'));
+
+        while (!file.atEnd()) {
+            const QByteArray chunk = file.read(1024 * 1024);
+            if (chunk.isEmpty()
+                && file.error() != QFileDevice::NoError) {
+                break;
+            }
+            hash.addData(chunk);
+        }
+    }
+
+    if (!hashedSomething)
+        return QStringLiteral("indisponible");
+
     return QStringLiteral("sha256:%1")
-        .arg(QString::fromLatin1(hash.result().toHex().left(16)));
+        .arg(QString::fromLatin1(
+            hash.result().toHex().left(16)));
+}
+
+QString limitedOutput(QString text, int maximumCharacters = 24000)
+{
+    text = text.trimmed();
+
+    if (text.size() <= maximumCharacters)
+        return text;
+
+    return text.left(maximumCharacters)
+        + QStringLiteral(
+            "\n...[sortie tronquee automatiquement par Mathom]...");
+}
+
+QString runDiagnosticCommand(
+    const QString &program,
+    const QStringList &arguments,
+    int timeoutMs = 4000)
+{
+    QString executable = program;
+
+    if (!program.contains(QLatin1Char('/')))
+        executable = QStandardPaths::findExecutable(program);
+
+    if (executable.isEmpty())
+        return QStringLiteral("[commande indisponible : %1]")
+            .arg(program);
+
+    QProcess process;
+    process.setProgram(executable);
+    process.setArguments(arguments);
+    process.start();
+
+    if (!process.waitForStarted(1000)) {
+        return QStringLiteral(
+                   "[impossible de demarrer : %1]")
+            .arg(program);
+    }
+
+    if (!process.waitForFinished(timeoutMs)) {
+        process.kill();
+        process.waitForFinished(1000);
+
+        return QStringLiteral(
+                   "[delai depasse pour : %1]")
+            .arg(program);
+    }
+
+    QString result =
+        QString::fromUtf8(process.readAllStandardOutput())
+            .trimmed();
+
+    const QString error =
+        QString::fromUtf8(process.readAllStandardError())
+            .trimmed();
+
+    if (!error.isEmpty()) {
+        if (!result.isEmpty())
+            result += QLatin1Char('\n');
+        result += error;
+    }
+
+    if (result.isEmpty())
+        result = QStringLiteral("[aucune sortie]");
+
+    if (process.exitStatus() != QProcess::NormalExit
+        || process.exitCode() != 0) {
+        result.prepend(
+            QStringLiteral("[code retour %1]\n")
+                .arg(process.exitCode()));
+    }
+
+    return limitedOutput(result);
+}
+
+QString filteredJournal(const QString &journal, qint64 pid)
+{
+    const QString pidMarker =
+        pid > 0
+            ? QStringLiteral("[%1]").arg(pid)
+            : QString();
+
+    const QStringList keywords = {
+        QStringLiteral("mathom"),
+        QStringLiteral("apprun"),
+        QStringLiteral("segfault"),
+        QStringLiteral("sigsegv"),
+        QStringLiteral("qt6"),
+        QStringLiteral("glibc"),
+        QStringLiteral("apport"),
+        QStringLiteral("whoopsie"),
+        QStringLiteral("core dumped"),
+        QStringLiteral("signal 11"),
+        QStringLiteral("trap")
+    };
+
+    QStringList kept;
+
+    const QStringList lines =
+        journal.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+
+    for (const QString &line : lines) {
+        const QString lower = line.toLower();
+
+        bool relevant =
+            !pidMarker.isEmpty()
+            && line.contains(pidMarker);
+
+        if (!relevant) {
+            for (const QString &keyword : keywords) {
+                if (lower.contains(keyword)) {
+                    relevant = true;
+                    break;
+                }
+            }
+        }
+
+        if (relevant)
+            kept.append(line);
+    }
+
+    if (kept.isEmpty())
+        return QStringLiteral(
+            "[aucune ligne pertinente ou journal inaccessible]");
+
+    return limitedOutput(kept.join(QLatin1Char('\n')));
+}
+
+QString readTextFileLimited(
+    const QString &path,
+    int maximumCharacters = 24000)
+{
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QString();
+
+    return limitedOutput(
+        QString::fromUtf8(file.readAll()),
+        maximumCharacters);
 }
 
 QString formatDuration(qint64 milliseconds)
@@ -248,6 +439,7 @@ struct ParsedSession
     QString kernel;
     QString architecture;
     QString buildId;
+    qint64 pid = -1;
     qint64 uptimeMs = -1;
     qint64 lastMemoryKiB = -1;
     qint64 peakMemoryKiB = -1;
@@ -293,6 +485,7 @@ ParsedSession parseSession(QFile &input)
             summary.kernel = details.value(QStringLiteral("kernel")).toString();
             summary.architecture = details.value(QStringLiteral("architecture")).toString();
             summary.buildId = details.value(QStringLiteral("build_id")).toString();
+            summary.pid = details.value(QStringLiteral("pid"), -1).toLongLong();
         }
 
         const qint64 rssKiB = details.value(QStringLiteral("rss_kib"), -1).toLongLong();
@@ -773,8 +966,370 @@ void DiagnosticManager::openReport(const QString &reportPath)
     QDesktopServices::openUrl(QUrl::fromLocalFile(reportPath));
 }
 
+void DiagnosticManager::appendPostMortemDiagnostics(
+    const QString &reportPath)
+{
+    static const QByteArray marker(
+        "DIAGNOSTIC POST-MORTEM AUTOMATIQUE");
+
+    QFile existing(reportPath);
+    if (existing.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (existing.readAll().contains(marker))
+            return;
+    }
+
+    QString stem = QFileInfo(reportPath).completeBaseName();
+
+    if (!stem.startsWith(QLatin1String(reportPrefix)))
+        return;
+
+    stem.remove(
+        0,
+        QString::fromLatin1(reportPrefix).size());
+
+    const QString sessionPath =
+        QDir(diagnosticsDirectory()).filePath(
+            QStringLiteral("%1%2%3")
+                .arg(
+                    QLatin1String(sessionPrefix),
+                    stem,
+                    QLatin1String(sessionSuffix)));
+
+    QFile sessionFile(sessionPath);
+
+    if (!sessionFile.open(
+            QIODevice::ReadOnly | QIODevice::Text)) {
+        return;
+    }
+
+    const ParsedSession summary =
+        parseSession(sessionFile);
+
+    QDateTime crashTime =
+        QDateTime::fromString(
+            summary.lastTimestamp,
+            Qt::ISODateWithMs);
+
+    if (!crashTime.isValid()) {
+        crashTime =
+            QDateTime::fromString(
+                summary.lastTimestamp,
+                Qt::ISODate);
+    }
+
+    QString systemJournal =
+        QStringLiteral(
+            "[horodatage du crash indisponible]");
+
+    QString userJournal =
+        QStringLiteral(
+            "[horodatage du crash indisponible]");
+
+    if (crashTime.isValid()) {
+        const QString since =
+            crashTime.addSecs(-15)
+                .toString(
+                    QStringLiteral(
+                        "yyyy-MM-dd HH:mm:ss"));
+
+        const QString until =
+            crashTime.addSecs(15)
+                .toString(
+                    QStringLiteral(
+                        "yyyy-MM-dd HH:mm:ss"));
+
+        const QString rawSystem =
+            runDiagnosticCommand(
+                QStringLiteral("journalctl"),
+                {
+                    QStringLiteral("-b"),
+                    QStringLiteral("--since"),
+                    since,
+                    QStringLiteral("--until"),
+                    until,
+                    QStringLiteral("--no-pager")
+                },
+                5000);
+
+        systemJournal =
+            filteredJournal(rawSystem, summary.pid);
+
+        const QString rawUser =
+            runDiagnosticCommand(
+                QStringLiteral("journalctl"),
+                {
+                    QStringLiteral("--user"),
+                    QStringLiteral("-b"),
+                    QStringLiteral("--since"),
+                    since,
+                    QStringLiteral("--until"),
+                    until,
+                    QStringLiteral("--no-pager")
+                },
+                5000);
+
+        userJournal =
+            filteredJournal(rawUser, summary.pid);
+    }
+
+    const QString packageInfo =
+        runDiagnosticCommand(
+            QStringLiteral("dpkg-query"),
+            {
+                QStringLiteral("-W"),
+                QStringLiteral(
+                    "-f=Package: ${Package}\\n"
+                    "Version: ${Version}\\n"
+                    "Architecture: ${Architecture}\\n"),
+                QStringLiteral("mathom")
+            });
+
+    const QString executable =
+        QCoreApplication::applicationFilePath();
+
+    const QString libBasket =
+        mathomRuntimeLibrary(
+            QStringLiteral("libLibBasket.so.2"));
+
+    const QString qtWidgets =
+        mathomRuntimeLibrary(
+            QStringLiteral("libQt6Widgets.so.6"));
+
+    QString hashes;
+    hashes +=
+        QStringLiteral("mathom : sha256:%1\n")
+            .arg(fileSha256(executable));
+
+    hashes +=
+        QStringLiteral(
+            "libLibBasket.so.2 : sha256:%1\n")
+            .arg(fileSha256(libBasket));
+
+    hashes +=
+        QStringLiteral(
+            "libQt6Widgets.so.6 : sha256:%1")
+            .arg(fileSha256(qtWidgets));
+
+    QString coredumpInfo;
+
+    if (summary.pid > 0) {
+        coredumpInfo =
+            runDiagnosticCommand(
+                QStringLiteral("coredumpctl"),
+                {
+                    QStringLiteral("info"),
+                    QString::number(summary.pid),
+                    QStringLiteral("--no-pager")
+                },
+                6000);
+    } else {
+        coredumpInfo =
+            QStringLiteral(
+                "[PID de la session precedente indisponible]");
+    }
+
+    bool hasUsefulCoredump =
+        !coredumpInfo.contains(
+            QStringLiteral("No coredumps found"),
+            Qt::CaseInsensitive)
+        && !coredumpInfo.contains(
+            QStringLiteral("aucune sortie"),
+            Qt::CaseInsensitive)
+        && !coredumpInfo.contains(
+            QStringLiteral("commande indisponible"),
+            Qt::CaseInsensitive);
+
+    QString apportInfo;
+    bool hasApportStack = false;
+
+#ifdef Q_OS_LINUX
+    QDir crashDir(QStringLiteral("/var/crash"));
+
+    const QFileInfoList crashFiles =
+        crashDir.entryInfoList(
+            {
+                QStringLiteral(
+                    "_opt_mathom_usr_bin_mathom.*.crash")
+            },
+            QDir::Files,
+            QDir::Time);
+
+    QFileInfo selectedCrash;
+
+    for (const QFileInfo &candidate : crashFiles) {
+        if (!crashTime.isValid()) {
+            selectedCrash = candidate;
+            break;
+        }
+
+        const qint64 delta =
+            candidate.lastModified().secsTo(crashTime);
+
+        if (delta >= -300 && delta <= 300) {
+            selectedCrash = candidate;
+            break;
+        }
+    }
+
+    if (selectedCrash.exists()) {
+        apportInfo +=
+            QStringLiteral("Fichier Apport : %1\n")
+                .arg(selectedCrash.fileName());
+
+        const QString apportUnpack =
+            QStandardPaths::findExecutable(
+                QStringLiteral("apport-unpack"));
+
+        if (!apportUnpack.isEmpty()) {
+            QTemporaryDir temporaryDirectory;
+
+            if (temporaryDirectory.isValid()) {
+                const QString unpackResult =
+                    runDiagnosticCommand(
+                        apportUnpack,
+                        {
+                            selectedCrash.absoluteFilePath(),
+                            temporaryDirectory.path()
+                        },
+                        8000);
+
+                if (!unpackResult.contains(
+                        QStringLiteral("code retour"),
+                        Qt::CaseInsensitive)) {
+                    const QStringList fields = {
+                        QStringLiteral("ProblemType"),
+                        QStringLiteral("Date"),
+                        QStringLiteral("ExecutablePath"),
+                        QStringLiteral("Signal"),
+                        QStringLiteral("SignalName"),
+                        QStringLiteral("JournalErrors"),
+                        QStringLiteral("SegvAnalysis"),
+                        QStringLiteral("StacktraceTop"),
+                        QStringLiteral("Stacktrace"),
+                        QStringLiteral("ThreadStacktrace")
+                    };
+
+                    for (const QString &field : fields) {
+                        const QString value =
+                            readTextFileLimited(
+                                QDir(
+                                    temporaryDirectory.path())
+                                    .filePath(field));
+
+                        if (value.isEmpty())
+                            continue;
+
+                        apportInfo +=
+                            QStringLiteral(
+                                "\n----- %1 -----\n%2\n")
+                                .arg(field, value);
+
+                        if (field.startsWith(
+                                QStringLiteral(
+                                    "Stacktrace"))) {
+                            hasApportStack = true;
+                        }
+
+                        if (field
+                                == QStringLiteral(
+                                    "ThreadStacktrace")) {
+                            hasApportStack = true;
+                        }
+                    }
+                } else {
+                    apportInfo += unpackResult;
+                    apportInfo += QLatin1Char('\n');
+                }
+            }
+        } else {
+            apportInfo +=
+                QStringLiteral(
+                    "[apport-unpack indisponible]\n");
+        }
+    } else {
+        apportInfo =
+            QStringLiteral(
+                "[aucun rapport Apport correspondant "
+                "a la fenetre du crash]");
+    }
+#else
+    apportInfo =
+        QStringLiteral(
+            "[diagnostic Apport disponible uniquement "
+            "sous Linux]");
+#endif
+
+    const bool complete =
+        hasApportStack || hasUsefulCoredump;
+
+    QString diagnostic;
+    QTextStream out(&diagnostic);
+
+    out << "\n\n"
+        << "DIAGNOSTIC POST-MORTEM AUTOMATIQUE\n"
+        << "==================================\n\n";
+
+    out << "Niveau de diagnostic : "
+        << (complete ? "COMPLET" : "PARTIEL")
+        << "\n\n";
+
+    out << "Ce diagnostic a ete execute automatiquement "
+           "par Mathom sans privilege sudo avant "
+           "la preparation du courriel.\n\n";
+
+    out << "PAQUET INSTALLE AU MOMENT DE L'ENVOI\n"
+        << "-------------------------------------\n"
+        << packageInfo << "\n\n";
+
+    out << "EMPREINTES DES COMPOSANTS\n"
+        << "-------------------------\n"
+        << hashes << "\n\n";
+
+    out << "JOURNAL SYSTEME AUTOUR DU CRASH\n"
+        << "-------------------------------\n"
+        << systemJournal << "\n\n";
+
+    out << "JOURNAL UTILISATEUR AUTOUR DU CRASH\n"
+        << "-----------------------------------\n"
+        << userJournal << "\n\n";
+
+    out << "COREDUMPCTL\n"
+        << "-----------\n"
+        << coredumpInfo << "\n\n";
+
+    out << "APPORT\n"
+        << "------\n"
+        << limitedOutput(apportInfo, 60000)
+        << "\n\n";
+
+    out << "CONFIDENTIALITE DU DIAGNOSTIC COMPLEMENTAIRE\n"
+        << "--------------------------------------------\n"
+        << "Aucun texte contenu dans les Mathoms "
+           "n'est collecte.\n"
+        << "Les journaux sont limites a une fenetre "
+           "de 30 secondes autour de la derniere trace "
+           "et filtres sur les evenements techniques "
+           "pertinents pour Mathom.\n"
+        << "Des chemins de fichiers, versions de "
+           "bibliotheques, identifiants de processus "
+           "et adresses memoire techniques peuvent "
+           "apparaitre dans les traces systeme.\n";
+
+    QFile report(reportPath);
+
+    if (!report.open(
+            QIODevice::Append | QIODevice::Text)) {
+        return;
+    }
+
+    report.write(diagnostic.toUtf8());
+    report.flush();
+}
+
 void DiagnosticManager::prepareEmail(const QString &reportPath)
 {
+    appendPostMortemDiagnostics(reportPath);
+
     const QString subject =
         QStringLiteral("[Mathom Bug] %1").arg(QFileInfo(reportPath).completeBaseName());
 

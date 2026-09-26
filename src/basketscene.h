@@ -217,6 +217,15 @@ public:
         QString id;
         QString title;
         QString dayKey;
+
+        // Appearance owned by the Page.
+        QString backgroundImage;
+        QColor backgroundColor;
+        QColor textColor;
+
+        // Layout owned by the Page.
+        bool freeLayout = false;
+        int columnCount = 1;
     };
 
     const QList<PageInfo> &pages() const

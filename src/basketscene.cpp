@@ -1015,6 +1015,33 @@ void BasketScene::savePages(QXmlStreamWriter &stream)
         stream.writeAttribute(QStringLiteral("id"), page.id);
         stream.writeAttribute(QStringLiteral("title"), page.title);
         stream.writeAttribute(QStringLiteral("day"), page.dayKey);
+
+        stream.writeStartElement(QStringLiteral("appearance"));
+        stream.writeAttribute(
+            QStringLiteral("backgroundImage"),
+            page.backgroundImage);
+        stream.writeAttribute(
+            QStringLiteral("backgroundColor"),
+            page.backgroundColor.isValid()
+                ? page.backgroundColor.name()
+                : QString());
+        stream.writeAttribute(
+            QStringLiteral("textColor"),
+            page.textColor.isValid()
+                ? page.textColor.name()
+                : QString());
+        stream.writeEndElement();
+
+        stream.writeStartElement(QStringLiteral("disposition"));
+        stream.writeAttribute(
+            QStringLiteral("free"),
+            XMLWork::trueOrFalse(page.freeLayout));
+        stream.writeAttribute(
+            QStringLiteral("columnCount"),
+            QString::number(
+                std::max(1, page.columnCount)));
+        stream.writeEndElement();
+
         stream.writeEndElement();
     }
 
@@ -1038,6 +1065,65 @@ void BasketScene::loadPages(const QDomElement &pagesElement)
         page.id = pageElement.attribute(QStringLiteral("id")).trimmed();
         page.title = pageElement.attribute(QStringLiteral("title")).trimmed();
         page.dayKey = pageElement.attribute(QStringLiteral("day")).trimmed();
+
+        // Migration fallback:
+        // Pages created before 0.1.11 stored appearance and disposition
+        // only at shelf level. Start with those values, then override them
+        // when the Page already owns explicit properties.
+        page.backgroundImage = backgroundImageName();
+        page.backgroundColor = backgroundColorSetting();
+        page.textColor = textColorSetting();
+        page.freeLayout = isFreeLayout();
+        page.columnCount = std::max(1, columnsCount());
+
+        const QDomElement pageAppearance =
+            pageElement.firstChildElement(
+                QStringLiteral("appearance"));
+
+        if (!pageAppearance.isNull()) {
+            page.backgroundImage =
+                pageAppearance.attribute(
+                    QStringLiteral("backgroundImage"),
+                    page.backgroundImage);
+
+            const QString backgroundColorString =
+                pageAppearance.attribute(
+                    QStringLiteral("backgroundColor"));
+
+            if (!backgroundColorString.isEmpty())
+                page.backgroundColor =
+                    QColor(backgroundColorString);
+
+            const QString textColorString =
+                pageAppearance.attribute(
+                    QStringLiteral("textColor"));
+
+            if (!textColorString.isEmpty())
+                page.textColor =
+                    QColor(textColorString);
+        }
+
+        const QDomElement pageDisposition =
+            pageElement.firstChildElement(
+                QStringLiteral("disposition"));
+
+        if (!pageDisposition.isNull()) {
+            page.freeLayout =
+                XMLWork::trueOrFalse(
+                    pageDisposition.attribute(
+                        QStringLiteral("free"),
+                        XMLWork::trueOrFalse(
+                            page.freeLayout)));
+
+            page.columnCount =
+                std::max(
+                    1,
+                    pageDisposition.attribute(
+                        QStringLiteral("columnCount"),
+                        QString::number(
+                            page.columnCount))
+                        .toInt());
+        }
 
         if (page.id.isEmpty() || seenIds.contains(page.id))
             continue;
@@ -1134,6 +1220,12 @@ bool BasketScene::migratePageAssignments()
         page.title = i18n("Page");
         page.dayKey.clear();
 
+        page.backgroundImage = backgroundImageName();
+        page.backgroundColor = backgroundColorSetting();
+        page.textColor = textColorSetting();
+        page.freeLayout = isFreeLayout();
+        page.columnCount = std::max(1, columnsCount());
+
         m_pages.append(page);
         m_currentPageId = page.id;
         changed = true;
@@ -1207,6 +1299,41 @@ QString BasketScene::createPage()
     page.dayKey.clear();
     page.title = title;
 
+    bool inherited = false;
+
+    for (const PageInfo &existing :
+         std::as_const(m_pages)) {
+        if (existing.id != m_currentPageId)
+            continue;
+
+        page.backgroundImage =
+            existing.backgroundImage;
+        page.backgroundColor =
+            existing.backgroundColor;
+        page.textColor =
+            existing.textColor;
+        page.freeLayout =
+            existing.freeLayout;
+        page.columnCount =
+            existing.columnCount;
+
+        inherited = true;
+        break;
+    }
+
+    if (!inherited) {
+        page.backgroundImage =
+            backgroundImageName();
+        page.backgroundColor =
+            backgroundColorSetting();
+        page.textColor =
+            textColorSetting();
+        page.freeLayout =
+            isFreeLayout();
+        page.columnCount =
+            std::max(1, columnsCount());
+    }
+
     m_pages.append(page);
     m_currentPageId = page.id;
 
@@ -1237,6 +1364,41 @@ QString BasketScene::ensureTodayPage()
     page.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     page.dayKey = dayKey;
     page.title = QLocale().toString(today, QLocale::ShortFormat);
+
+    bool inherited = false;
+
+    for (const PageInfo &existing :
+         std::as_const(m_pages)) {
+        if (existing.id != m_currentPageId)
+            continue;
+
+        page.backgroundImage =
+            existing.backgroundImage;
+        page.backgroundColor =
+            existing.backgroundColor;
+        page.textColor =
+            existing.textColor;
+        page.freeLayout =
+            existing.freeLayout;
+        page.columnCount =
+            existing.columnCount;
+
+        inherited = true;
+        break;
+    }
+
+    if (!inherited) {
+        page.backgroundImage =
+            backgroundImageName();
+        page.backgroundColor =
+            backgroundColorSetting();
+        page.textColor =
+            textColorSetting();
+        page.freeLayout =
+            isFreeLayout();
+        page.columnCount =
+            std::max(1, columnsCount());
+    }
 
     m_pages.append(page);
     m_currentPageId = page.id;

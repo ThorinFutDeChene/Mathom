@@ -11,6 +11,7 @@
 #include <QGraphicsScene>
 #include <QList>
 #include <QSet>
+#include <QStringList>
 #include <QTextCursor>
 #include <QTimer>
 
@@ -209,6 +210,39 @@ private Q_SLOTS:
     /// TOOL TIPS:
 protected:
     void helpEvent(QGraphicsSceneHelpEvent *event) override;
+
+    /// PAGES:
+public:
+    struct PageInfo {
+        QString id;
+        QString title;
+        QString dayKey;
+    };
+
+    const QList<PageInfo> &pages() const
+    {
+        return m_pages;
+    }
+
+    QString currentPageId() const
+    {
+        return m_currentPageId;
+    }
+
+    QString ensureTodayPage();
+    void setCurrentPageId(const QString &pageId);
+    void renamePage(const QString &pageId, const QString &title);
+    void reorderPages(const QStringList &pageIds);
+
+Q_SIGNALS:
+    void pagesChanged();
+    void currentPageChanged(const QString &pageId);
+
+private:
+    QList<PageInfo> m_pages;
+    QString m_currentPageId;
+    void loadPages(const QDomElement &pages);
+    void savePages(QXmlStreamWriter &stream);
 
     /// LOAD AND SAVE:
 private:

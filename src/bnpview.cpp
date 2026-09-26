@@ -1434,8 +1434,12 @@ void BNPView::updateNavigationBar()
 
     // baskets.xml contains the properties of every hierarchy item,
     // including shelves that have not loaded their notes yet.
-    if (assignedAutomaticColor && !m_loading)
-        save();
+    if (assignedAutomaticColor) {
+        m_tree->viewport()->update();
+
+        if (!m_loading)
+            save();
+    }
 
     BasketScene *activeBasket = nullptr;
 
@@ -1839,11 +1843,20 @@ void BNPView::updateBasketListViewItem(BasketScene *basket)
             setWindowTitle(basket->basketName());
         }
 
-        if (basket->backgroundColor().isValid()) {
-            item->setBackground(0, QBrush(basket->backgroundColor()));
+        if (basket->tabColor().isValid()) {
+            item->setBackground(
+                0,
+                QBrush(basket->tabColor()));
         } else {
-            item->setBackground(0, QBrush());
+            item->setBackground(
+                0,
+                QBrush());
         }
+
+        // The shelf has no independent text color.
+        item->setForeground(
+            0,
+            QBrush());
     }
 
     updateNavigationBar();

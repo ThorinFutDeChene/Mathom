@@ -449,12 +449,15 @@ void FoundCountIcon::paint(QPainter *painter, const QStyleOptionViewItem &option
     int effectiveWidth = option.rect.right() - (countPixmap.isNull() ? 0 : countPixmap.width() + MARGIN)
         - (showLoadingIcon || showEncryptedIcon ? BASKET_ICON_SIZE + MARGIN : 0);
 
-    bool drawRoundRect = basket->backgroundColorSetting().isValid() || basket->textColorSetting().isValid();
+    const QColor background =
+        basket->tabColor();
 
-    // Draw the rounded rectangle:
+    const bool drawRoundRect =
+        background.isValid();
+
+    // Draw the rounded rectangle using exactly the tab color.
     if (drawRoundRect) {
         QPixmap roundRectBmp;
-        QColor background = basket->backgroundColor();
         int textWidth = m_basketTree->fontMetrics().horizontalAdvance(basketInTree->text(/*column=*/0));
         int iconTextMargin = m_basketTree->style()->pixelMetric(QStyle::PM_FocusFrameHMargin); ///< Space between icon and text
 
@@ -482,8 +485,23 @@ void FoundCountIcon::paint(QPainter *painter, const QStyleOptionViewItem &option
             QPixmapCache::insert(key, roundRectBmp);
         }
 
-        basketInTree->setBackground(0, QBrush(roundRectBmp));
-        basketInTree->setForeground(0, QBrush(basket->textColor()));
+        basketInTree->setBackground(
+            0,
+            QBrush(roundRectBmp));
+
+        // No shelf-specific text color:
+        // use the normal theme rendering.
+        basketInTree->setForeground(
+            0,
+            QBrush());
+    } else {
+        basketInTree->setBackground(
+            0,
+            QBrush());
+
+        basketInTree->setForeground(
+            0,
+            QBrush());
     }
     // end if drawRoundRect
 

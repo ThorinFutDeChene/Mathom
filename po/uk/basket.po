@@ -5574,3 +5574,39 @@ msgstr "Дозволити розробницькі версії Mathom"
 
 msgid "Development versions are intended for testing and may contain bugs."
 msgstr "Розробницькі версії призначені для тестування і можуть містити помилки."
+
+
+# Mathom pages
+msgid "Page"
+msgstr "Сторінка"
+
+msgid "Pages"
+msgstr "Сторінки"
+
+msgid "New Page"
+msgstr "Нова сторінка"
+
+msgid "Sort"
+msgstr "Сортувати"
+
+msgid "Manual order"
+msgstr "Ручний порядок"
+
+msgid "Date - oldest first"
+msgstr "Дата - спочатку найстаріші"
+
+msgid "Date - newest first"
+msgstr "Дата - спочатку найновіші"
+
+msgid "Name - A to Z"
+msgstr "Назва - від А до Я"
+
+msgid "Name - Z to A"
+msgstr "Назва - від Я до А"
+
+msgid "Hide pages"
+msgstr "Приховати сторінки"
+
+msgid "Show pages"
+msgstr "Показати сторінки"
+

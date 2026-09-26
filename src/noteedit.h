@@ -107,7 +107,7 @@ private:
     bool m_isEmpty;
     bool m_canceled;
     QGraphicsProxyWidget *m_widget;
-    bool m_deferWidgetDeletion = false;
+    bool m_deferWidgetDeletion = true;
     KTextEdit *m_textEdit;
     QLineEdit *m_lineEdit;
     NoteContent *m_noteContent;

@@ -4024,7 +4024,6 @@ bool BasketScene::closeEditor(bool deleteEmptyNote /* =true*/)
     }
     m_editorTrackMouseEvent = false;
     m_editorNativeMouseEvent = false;
-    m_editor->graphicsWidget()->widget()->disconnect();
     removeItem(m_editor->graphicsWidget());
     m_editor->validate();
 

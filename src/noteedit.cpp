@@ -217,7 +217,11 @@ void NoteEditor::setInlineEditor(QWidget *inlineEditor)
     } else if (m_widget->widget() != inlineEditor) {
         QWidget *w = m_widget->widget();
         m_widget->setWidget(nullptr);
-        delete w;
+
+        if (w) {
+            w->hide();
+            w->deleteLater();
+        }
     }
     m_widget->setWidget(inlineEditor);
     m_widget->setZValue(500);

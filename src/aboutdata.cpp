@@ -14,7 +14,7 @@
 AboutData::AboutData()
     : KAboutData(AboutData::componentName(),
                  AboutData::displayName(),
-                 QStringLiteral("0.1.10-dev2"),
+                 QStringLiteral("0.1.10-dev3"),
                  i18n("<p><b>Taking care of your ideas.</b></p>"
                       "<p>A note-taking application that makes it easy to record ideas as you think, and quickly find them later. "
                       "Organizing your notes has never been so easy.</p>"),

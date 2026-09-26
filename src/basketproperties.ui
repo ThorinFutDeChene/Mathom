@@ -42,11 +42,11 @@
    </item>
 
    <item row="1" column="0">
-    <widget class="QGroupBox" name="appearanceGroup">
+    <widget class="QGroupBox" name="tabGroup">
      <property name="title">
       <string>Tab</string>
      </property>
-     <layout class="QGridLayout" name="appearanceLayout">
+     <layout class="QGridLayout" name="tabLayout">
       <property name="leftMargin">
        <number>4</number>
       </property>

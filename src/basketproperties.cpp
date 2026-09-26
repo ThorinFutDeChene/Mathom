@@ -5,35 +5,20 @@
 
 #include "basketproperties.h"
 
-#include <QApplication>
-#include <QButtonGroup>
 #include <QCheckBox>
 #include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
-#include <QPixmap>
 #include <QPushButton>
-#include <QRadioButton>
-#include <QStringList>
-#include <QStyle>
-#include <QVBoxLayout>
 
-#include <KComboBox>
-#include <KConfigGroup>
-#include <KIconDialog>
 #include <KIconLoader>
 #include <KLocalizedString>
 #include <KShortcutWidget>
 
 #include <algorithm>
 
-#include "backgroundmanager.h"
 #include "basketscene.h"
 #include "gitwrapper.h"
-#include "global.h"
 #include "kcolorcombo2.h"
 #include "variouswidgets.h"
 
@@ -89,12 +74,12 @@ BasketPropertiesDialog::BasketPropertiesDialog(BasketScene *basket, QWidget *par
     tabColorControls->addWidget(m_tabColorAutomatic);
     tabColorControls->addWidget(m_tabColor, 1);
 
-    m_ui->appearanceLayout->addWidget(
+    m_ui->tabLayout->addWidget(
         tabColorLabel,
         0,
         0);
 
-    m_ui->appearanceLayout->addLayout(
+    m_ui->tabLayout->addLayout(
         tabColorControls,
         0,
         1);

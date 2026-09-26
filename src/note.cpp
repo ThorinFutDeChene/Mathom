@@ -1337,6 +1337,24 @@ qreal Note::groupWidth() const
 
 qreal Note::rightLimit() const
 {
+    // Before the first Page exists, a newly typed Mathom temporarily lives
+    // at top level. Visually render it like a one-column Mathom instead of
+    // using the old fixed group width.
+    if (m_content
+        && !parentNote()
+        && m_pageId.isEmpty()
+        && basket()
+        && basket()->pages().isEmpty()
+        && basket()->currentPageId().isEmpty()) {
+        return std::max(
+            x() + minWidth(),
+            static_cast<qreal>(
+                basket()
+                    ->graphicsView()
+                    ->viewport()
+                    ->width()));
+    }
+
     if (isColumn()
         && basket()
         && !basket()->nextColumnInSamePage(
@@ -1357,6 +1375,23 @@ qreal Note::rightLimit() const
 
 qreal Note::finalRightLimit() const
 {
+    // Same provisional rendering rule as rightLimit(): no Page is created
+    // merely to obtain the normal one-column visual width.
+    if (m_content
+        && !parentNote()
+        && m_pageId.isEmpty()
+        && basket()
+        && basket()->pages().isEmpty()
+        && basket()->currentPageId().isEmpty()) {
+        return std::max(
+            x() + minWidth(),
+            static_cast<qreal>(
+                basket()
+                    ->graphicsView()
+                    ->viewport()
+                    ->width()));
+    }
+
     if (isColumn()
         && basket()
         && !basket()->nextColumnInSamePage(

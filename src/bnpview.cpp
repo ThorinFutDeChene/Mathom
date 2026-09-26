@@ -2662,27 +2662,20 @@ void BNPView::isLockedChanged()
 
 void BNPView::askNewBasket()
 {
-    askNewBasket(nullptr, nullptr);
+    askNewBasket(nullptr);
 
     GitWrapper::commitCreateBasket();
 }
 
-void BNPView::askNewBasket(BasketScene *parent, BasketScene *pickProperties)
+void BNPView::askNewBasket(BasketScene *parent)
 {
     DiagnosticManager::instance().logEvent(
         QStringLiteral("NEW_SHELF_DIALOG_BEGIN"),
         {{QStringLiteral("has_parent"), parent != nullptr}});
 
-    NewBasketDefaultProperties properties;
-    if (pickProperties) {
-        properties.backgroundImage = pickProperties->backgroundImageName();
-        properties.backgroundColor = pickProperties->backgroundColorSetting();
-        properties.textColor = pickProperties->textColorSetting();
-        properties.freeLayout = pickProperties->isFreeLayout();
-        properties.columnCount = pickProperties->columnsCount();
-    }
+    const int result =
+        NewBasketDialog(parent, this).exec();
 
-    const int result = NewBasketDialog(parent, properties, this).exec();
     DiagnosticManager::instance().logEvent(
         QStringLiteral("NEW_SHELF_DIALOG_END"),
         {{QStringLiteral("accepted"), result != 0}});
@@ -2690,12 +2683,13 @@ void BNPView::askNewBasket(BasketScene *parent, BasketScene *pickProperties)
 
 void BNPView::askNewSubBasket()
 {
-    askNewBasket(/*parent=*/currentBasket(), /*pickPropertiesOf=*/currentBasket());
+    askNewBasket(currentBasket());
 }
 
 void BNPView::askNewSiblingBasket()
 {
-    askNewBasket(/*parent=*/parentBasketOf(currentBasket()), /*pickPropertiesOf=*/currentBasket());
+    askNewBasket(
+        parentBasketOf(currentBasket()));
 }
 
 void BNPView::globalPasteInCurrentBasket()

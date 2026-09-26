@@ -15,29 +15,10 @@ class KIconButton;
 class QLineEdit;
 class KComboBox;
 class QTreeWidgetItem;
-class QListWidget;
+class QPushButton;
 
 class BasketScene;
 
-class KColorCombo2;
-
-/** Struct to store default properties of a new basket.
- * When the dialog shows up, the @p icon is used, as well as the @p backgroundColor.
- * A template is chosen depending on @p freeLayout and @p columnLayout.
- * If @p columnLayout is too high, the template with the more columns will be chosen instead.
- * If the user change the background color in the dialog, then @p backgroundImage and @p textColor will not be used!
- * @author Sébastien Laoût
- */
-struct NewBasketDefaultProperties {
-    QString icon;
-    QString backgroundImage;
-    QColor backgroundColor;
-    QColor textColor;
-    bool freeLayout;
-    int columnCount;
-
-    NewBasketDefaultProperties();
-};
 
 /** The dialog to create a new basket from a template.
  * @author Sébastien Laoût
@@ -46,12 +27,11 @@ class NewBasketDialog : public QDialog
 {
     Q_OBJECT
 public:
-    NewBasketDialog(BasketScene *parentBasket, const NewBasketDefaultProperties &defaultProperties, QWidget *parent = nullptr);
+    NewBasketDialog(BasketScene *parentBasket, QWidget *parent = nullptr);
     ~NewBasketDialog() override;
 protected Q_SLOTS:
     void slotOk();
     void returnPressed();
-    void manageTemplates();
     void nameChanged(const QString &newName);
 
 protected:
@@ -59,11 +39,8 @@ protected:
 
 private:
     int populateBasketsList(QTreeWidgetItem *item, int indent, int index);
-    NewBasketDefaultProperties m_defaultProperties;
     KIconButton *m_icon;
     QLineEdit *m_name;
-    KColorCombo2 *m_backgroundColor;
-    QListWidget *m_templates;
     KComboBox *m_createIn;
     QMap<int, BasketScene *> m_basketsMap;
     QPushButton *okButton;

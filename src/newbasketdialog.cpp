@@ -1,6 +1,5 @@
 /**
  * SPDX-FileCopyrightText: (C) 2003 Sébastien Laoût <slaout@linux62.org>
- *
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
@@ -9,23 +8,16 @@
 #include <QDialogButtonBox>
 #include <QEvent>
 #include <QHBoxLayout>
-#include <QHash>
 #include <QLabel>
 #include <QLineEdit>
-#include <QListWidget>
-#include <QPainter>
-#include <QPixmap>
 #include <QPushButton>
 #include <QVBoxLayout>
 
 #include <KComboBox>
-#include <KConfigGroup>
-#include <KGuiItem>
 #include <KIconButton>
 #include <KIconLoader>
 #include <KLocalizedString>
 #include <KMainWindow>
-#include <KMessageBox>
 
 #include <algorithm>
 
@@ -34,290 +26,156 @@
 #include "basketscene.h"
 #include "bnpview.h"
 #include "global.h"
-#include "kcolorcombo2.h"
 #include "mathomicons.h"
 #include "tools.h"
-#include "variouswidgets.h" //For HelpLabel
 
-enum {
-    TemplateRole = Qt::UserRole,
-};
-
-/** class UnselectableListWidget: */
-
-/** Helper class to avoid delecting items.
- */
-class UnselectableListWidget : public QListWidget
-{
-public:
-    UnselectableListWidget(QWidget *parent = nullptr);
-
-protected:
-    QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex &index, const QEvent *event = nullptr) const override;
-};
-
-UnselectableListWidget::UnselectableListWidget(QWidget *parent)
-    : QListWidget(parent)
-{
-}
-
-QItemSelectionModel::SelectionFlags UnselectableListWidget::selectionCommand(const QModelIndex &index, const QEvent *event) const
-{
-    QItemSelectionModel::SelectionFlags baseFlags = QListWidget::selectionCommand(index, event);
-    baseFlags &= ~QItemSelectionModel::Deselect;
-    return baseFlags;
-}
-
-/** class NewBasketDefaultProperties: */
-
-NewBasketDefaultProperties::NewBasketDefaultProperties()
-    : icon(QStringLiteral("mathom-house"))
-    , backgroundImage(QString())
-    , backgroundColor()
-    , textColor()
-    , freeLayout(false)
-    , columnCount(1)
-{
-}
-
-/** class NewBasketDialog: */
-
-NewBasketDialog::NewBasketDialog(BasketScene *parentBasket, const NewBasketDefaultProperties &defaultProperties, QWidget *parent)
+NewBasketDialog::NewBasketDialog(
+    BasketScene *parentBasket,
+    QWidget *parent)
     : QDialog(parent)
-    , m_defaultProperties(defaultProperties)
 {
-    // QDialog options
     setWindowTitle(i18n("New Mathom-House"));
-
-    auto *mainWidget = new QWidget(this);
-    auto *mainLayout = new QVBoxLayout;
-    setLayout(mainLayout);
-    mainLayout->addWidget(mainWidget);
-
-    setObjectName("NewBasket");
+    setObjectName(QStringLiteral("NewBasket"));
     setModal(true);
 
-    auto *page = new QWidget(this);
-    auto *topLayout = new QVBoxLayout(page);
+    auto *mainLayout = new QVBoxLayout(this);
 
-    // Icon, Name and Background Color:
-    auto *nameLayout = new QHBoxLayout;
-    // QHBoxLayout *nameLayout = new QHBoxLayout(this);
-    m_icon = new KIconButton(page);
-    m_icon->setIconType(KIconLoader::NoGroup, KIconLoader::Action);
+    auto *identityLayout = new QHBoxLayout();
+
+    m_icon = new KIconButton(this);
+    m_icon->setIconType(
+        KIconLoader::NoGroup,
+        KIconLoader::Action);
     m_icon->setIconSize(16);
-    m_icon->setIcon(m_defaultProperties.icon);
+    m_icon->setIcon(QStringLiteral("mathom-house"));
 
-    int size = std::max(m_icon->sizeHint().width(), m_icon->sizeHint().height());
-    m_icon->setFixedSize(size, size); // Make it square!
+    const int iconSize =
+        std::max(
+            m_icon->sizeHint().width(),
+            m_icon->sizeHint().height());
 
+    m_icon->setFixedSize(iconSize, iconSize);
     m_icon->setToolTip(i18n("Icon"));
-    m_name = new QLineEdit(/*i18n("Basket"), */ page);
-    m_name->setMinimumWidth(m_name->fontMetrics().maxWidth() * 20);
-    connect(m_name, &QLineEdit::textChanged, this, &NewBasketDialog::nameChanged);
 
+    m_name = new QLineEdit(this);
+    m_name->setMinimumWidth(
+        m_name->fontMetrics().maxWidth() * 20);
     m_name->setToolTip(i18n("Name"));
-    m_backgroundColor = new KColorCombo2(QColor(), palette().color(QPalette::Base), page);
-    m_backgroundColor->setColor(QColor());
-    m_backgroundColor->setFixedSize(m_backgroundColor->sizeHint());
-    m_backgroundColor->setColor(m_defaultProperties.backgroundColor);
-    m_backgroundColor->setToolTip(i18n("Background color"));
-    nameLayout->addWidget(m_icon);
-    nameLayout->addWidget(m_name);
-    nameLayout->addWidget(m_backgroundColor);
-    topLayout->addLayout(nameLayout);
 
-    auto *layout = new QHBoxLayout;
-    auto *button = new QPushButton(page);
-    KGuiItem::assign(button, KGuiItem(i18n("&Manage Templates..."), QStringLiteral("configure")));
-    connect(button, &QPushButton::clicked, this, &NewBasketDialog::manageTemplates);
-    button->hide();
+    identityLayout->addWidget(m_icon);
+    identityLayout->addWidget(m_name, 1);
 
-    // Compute the right template to use as the default:
-    QString defaultTemplate = QStringLiteral("free");
-    if (!m_defaultProperties.freeLayout) {
-        if (m_defaultProperties.columnCount == 1)
-            defaultTemplate = QStringLiteral("1column");
-        else if (m_defaultProperties.columnCount == 2)
-            defaultTemplate = QStringLiteral("2columns");
-        else
-            defaultTemplate = QStringLiteral("3columns");
-    }
-    QHash<QString, QListWidgetItem *> templateItems;
+    mainLayout->addLayout(identityLayout);
 
-    // Empty:
-    // * * * * *
-    // Personal:
-    // *To Do
-    // Professional:
-    // *Meeting Summary
-    // Hobbies:
-    // *
-    m_templates = new UnselectableListWidget(page);
-    m_templates->setViewMode(QListView::IconMode);
-    m_templates->setDragEnabled(false);
-    m_templates->setSelectionMode(QAbstractItemView::SingleSelection);
-    QListWidgetItem *lastTemplate = nullptr;
-    QPixmap icon(40, 53);
-    const QRect iconBorderRect = icon.rect().adjusted(0, 0, -1, -1);
+    auto *locationLayout = new QHBoxLayout();
 
-    QPainter painter(&icon);
-    painter.fillRect(iconBorderRect, palette().color(QPalette::Base));
-    painter.setPen(palette().color(QPalette::Text));
-    painter.drawRect(iconBorderRect);
-    painter.end();
-    lastTemplate = new QListWidgetItem(icon, i18n("One column"), m_templates);
-    lastTemplate->setData(TemplateRole, QStringLiteral("1column"));
-    templateItems.insert(lastTemplate->data(TemplateRole).toString(), lastTemplate);
+    auto *locationLabel =
+        new QLabel(i18n("C&reate in:"), this);
 
-    painter.begin(&icon);
-    painter.fillRect(iconBorderRect, palette().color(QPalette::Base));
-    painter.setPen(palette().color(QPalette::Text));
-    painter.drawRect(iconBorderRect);
-    painter.drawLine(icon.width() / 2, 0, icon.width() / 2, icon.height());
-    painter.end();
-    lastTemplate = new QListWidgetItem(icon, i18n("Two columns"), m_templates);
-    lastTemplate->setData(TemplateRole, QStringLiteral("2columns"));
-    templateItems.insert(lastTemplate->data(TemplateRole).toString(), lastTemplate);
-
-    painter.begin(&icon);
-    painter.fillRect(iconBorderRect, palette().color(QPalette::Base));
-    painter.setPen(palette().color(QPalette::Text));
-    painter.drawRect(iconBorderRect);
-    painter.drawLine(icon.width() / 3, 0, icon.width() / 3, icon.height());
-    painter.drawLine(icon.width() * 2 / 3, 0, icon.width() * 2 / 3, icon.height());
-    painter.end();
-    lastTemplate = new QListWidgetItem(icon, i18n("Three columns"), m_templates);
-    lastTemplate->setData(TemplateRole, QStringLiteral("3columns"));
-    templateItems.insert(lastTemplate->data(TemplateRole).toString(), lastTemplate);
-
-    painter.begin(&icon);
-    painter.fillRect(iconBorderRect, palette().color(QPalette::Base));
-    painter.setPen(palette().color(QPalette::Text));
-    painter.drawRect(iconBorderRect);
-    painter.drawRect(icon.width() / 5, icon.width() / 5, icon.width() / 4, icon.height() / 8);
-    painter.drawRect(icon.width() * 2 / 5, icon.width() * 2 / 5, icon.width() / 4, icon.height() / 8);
-    painter.end();
-    lastTemplate = new QListWidgetItem(icon, i18n("Free-form"), m_templates);
-    lastTemplate->setData(TemplateRole, QStringLiteral("free"));
-    templateItems.insert(lastTemplate->data(TemplateRole).toString(), lastTemplate);
-
-    if (QListWidgetItem *defaultTemplateItem = templateItems.value(defaultTemplate))
-        m_templates->setCurrentItem(defaultTemplateItem);
-
-    m_templates->setMinimumHeight(topLayout->minimumSize().width() * 9 / 16);
-
-    auto *label = new QLabel(page);
-    label->setText(i18n("&Template:"));
-    label->setBuddy(m_templates);
-    layout->addWidget(label, /*stretch=*/0, Qt::AlignBottom);
-    layout->addStretch();
-    layout->addWidget(button, /*stretch=*/0, Qt::AlignBottom);
-    topLayout->addLayout(layout);
-    topLayout->addWidget(m_templates);
-
-    layout = new QHBoxLayout;
-    m_createIn = new KComboBox(page);
+    m_createIn = new KComboBox(this);
     m_createIn->addItem(i18n("(Mathom-Houses)"));
 
-    connect(m_createIn,
-            qOverload<int>(&QComboBox::currentIndexChanged),
-            this,
-            [this](int index) {
-                setWindowTitle(index == 0 ? i18n("New Mathom-House")
-                                          : i18n("New Shelf"));
+    locationLabel->setBuddy(m_createIn);
 
-                // Keep Mathom's semantic defaults in sync with the selected
-                // hierarchy level, without overwriting a user-selected icon.
-                const QString currentIcon = m_icon->icon();
-                if (currentIcon == QStringLiteral("mathom-house")
-                    || currentIcon == QStringLiteral("mathom-shelf")) {
-                    m_icon->setIcon(index == 0
-                                        ? QStringLiteral("mathom-house")
-                                        : QStringLiteral("mathom-shelf"));
-                }
-            });
-    label = new QLabel(page);
-    label->setText(i18n("C&reate in:"));
-    label->setBuddy(m_createIn);
-    auto *helpLabel = new HelpLabel(i18n("How is it useful?"),
-                                    i18n("<p>Creating shelves inside Mathom-Houses and other shelves forms a hierarchy that helps you organize your mathoms:</p><ul>"
-                                         "<li>Grouping mathoms by themes or topics;</li>"
-                                         "<li>Creating shelves for different projects;</li>"
-                                         "<li>Creating nested shelves representing sections, chapters or pages;</li>"
-                                         "<li>Grouping related locations so they can be exported together.</li></ul>"),
-                                    page);
-    layout->addWidget(label);
-    layout->addWidget(m_createIn);
-    layout->addWidget(helpLabel);
-    layout->addStretch();
-    topLayout->addLayout(layout);
+    locationLayout->addWidget(locationLabel);
+    locationLayout->addWidget(m_createIn, 1);
+
+    mainLayout->addLayout(locationLayout);
 
     m_basketsMap.clear();
-    int index;
-    m_basketsMap.insert(/*index=*/0, /*basket=*/nullptr);
-    index = 1;
-    for (int i = 0; i < Global::bnpView->topLevelItemCount(); i++) {
-        index = populateBasketsList(Global::bnpView->topLevelItem(i), /*indent=*/1, /*index=*/index);
+    m_basketsMap.insert(0, nullptr);
+
+    int index = 1;
+
+    for (int i = 0;
+         i < Global::bnpView->topLevelItemCount();
+         ++i) {
+        index =
+            populateBasketsList(
+                Global::bnpView->topLevelItem(i),
+                1,
+                index);
     }
 
-    connect(m_templates, &QListWidget::itemDoubleClicked, this, &NewBasketDialog::slotOk);
-    connect(m_templates, &QListWidget::itemActivated, this, &NewBasketDialog::returnPressed);
+    connect(
+        m_createIn,
+        qOverload<int>(
+            &QComboBox::currentIndexChanged),
+        this,
+        [this](int index) {
+            setWindowTitle(
+                index == 0
+                    ? i18n("New Mathom-House")
+                    : i18n("New Shelf"));
 
-    mainLayout->addWidget(page);
+            const QString currentIcon =
+                m_icon->icon();
 
-    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-    okButton = buttonBox->button(QDialogButtonBox::Ok);
+            if (currentIcon == QStringLiteral("mathom-house")
+                || currentIcon == QStringLiteral("mathom-shelf")) {
+                m_icon->setIcon(
+                    index == 0
+                        ? QStringLiteral("mathom-house")
+                        : QStringLiteral("mathom-shelf"));
+            }
+        });
+
+    auto *buttonBox =
+        new QDialogButtonBox(
+            QDialogButtonBox::Ok
+                | QDialogButtonBox::Cancel,
+            this);
+
+    okButton =
+        buttonBox->button(QDialogButtonBox::Ok);
+
     okButton->setDefault(true);
     okButton->setShortcut(Qt::CTRL | Qt::Key_Return);
-    connect(okButton, &QPushButton::clicked, this, &NewBasketDialog::slotOk);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &NewBasketDialog::accept);
-    connect(buttonBox, &QDialogButtonBox::rejected, this, &NewBasketDialog::reject);
-    mainLayout->addWidget(buttonBox);
     okButton->setEnabled(false);
 
-    if (parentBasket) {
-        int index = 0;
+    connect(
+        m_name,
+        &QLineEdit::textChanged,
+        this,
+        &NewBasketDialog::nameChanged);
 
-        for (QMap<int, BasketScene *>::Iterator it = m_basketsMap.begin(); it != m_basketsMap.end(); ++it) {
+    connect(
+        okButton,
+        &QPushButton::clicked,
+        this,
+        &NewBasketDialog::slotOk);
+
+    connect(
+        buttonBox,
+        &QDialogButtonBox::accepted,
+        this,
+        &QDialog::accept);
+
+    connect(
+        buttonBox,
+        &QDialogButtonBox::rejected,
+        this,
+        &QDialog::reject);
+
+    mainLayout->addWidget(buttonBox);
+
+    if (parentBasket) {
+        int parentIndex = 0;
+
+        for (auto it = m_basketsMap.constBegin();
+             it != m_basketsMap.constEnd();
+             ++it) {
             if (it.value() == parentBasket) {
-                index = it.key();
+                parentIndex = it.key();
                 break;
             }
         }
 
-        if (index <= 0)
-            return;
-
-        if (m_createIn->currentIndex() != index)
-            m_createIn->setCurrentIndex(index);
+        if (parentIndex > 0)
+            m_createIn->setCurrentIndex(parentIndex);
     }
 
     m_name->setFocus();
-}
-
-void NewBasketDialog::returnPressed()
-{
-    okButton->animateClick();
-}
-
-int NewBasketDialog::populateBasketsList(QTreeWidgetItem *item, int indent, int index)
-{
-    static const int ICON_SIZE = 16;
-    // Get the basket data:
-    BasketScene *basket = ((BasketListViewItem *)item)->basket();
-    QPixmap icon = MathomIcons::hierarchy(basket->icon(), item->parent() == nullptr).pixmap(ICON_SIZE, ICON_SIZE);
-    icon = Tools::indentPixmap(icon, indent, 2 * ICON_SIZE / 3);
-    m_createIn->addItem(icon, basket->basketName());
-    m_basketsMap.insert(index, basket);
-    ++index;
-
-    for (int i = 0; i < item->childCount(); i++) {
-        // Append children of item to the list:
-        index = populateBasketsList(item->child(i), indent + 1, index);
-    }
-
-    return index;
 }
 
 NewBasketDialog::~NewBasketDialog() = default;
@@ -325,56 +183,91 @@ NewBasketDialog::~NewBasketDialog() = default;
 bool NewBasketDialog::event(QEvent *event)
 {
     const bool result = QDialog::event(event);
-    if (event->type() == QEvent::Polish) {
+
+    if (event->type() == QEvent::Polish)
         m_name->setFocus();
-    }
+
     return result;
 }
 
-void NewBasketDialog::nameChanged(const QString &newName)
+void NewBasketDialog::returnPressed()
 {
-    okButton->setEnabled(!newName.isEmpty());
+    okButton->animateClick();
+}
+
+void NewBasketDialog::nameChanged(
+    const QString &newName)
+{
+    okButton->setEnabled(
+        !newName.trimmed().isEmpty());
+}
+
+int NewBasketDialog::populateBasketsList(
+    QTreeWidgetItem *item,
+    int indent,
+    int index)
+{
+    static const int ICON_SIZE = 16;
+
+    BasketScene *basket =
+        static_cast<BasketListViewItem *>(item)
+            ->basket();
+
+    QPixmap icon =
+        MathomIcons::hierarchy(
+            basket->icon(),
+            item->parent() == nullptr)
+            .pixmap(ICON_SIZE, ICON_SIZE);
+
+    icon =
+        Tools::indentPixmap(
+            icon,
+            indent,
+            2 * ICON_SIZE / 3);
+
+    m_createIn->addItem(
+        icon,
+        basket->basketName());
+
+    m_basketsMap.insert(index, basket);
+    ++index;
+
+    for (int i = 0;
+         i < item->childCount();
+         ++i) {
+        index =
+            populateBasketsList(
+                item->child(i),
+                indent + 1,
+                index);
+    }
+
+    return index;
 }
 
 void NewBasketDialog::slotOk()
 {
-    QListWidgetItem *item = m_templates->currentItem();
-    if (!item)
-        return;
-    const QString templateName = item->data(TemplateRole).toString();
-
     Global::bnpView->closeAllEditors();
 
-    QString backgroundImage;
-    QColor textColor;
-    if (m_backgroundColor->color() == m_defaultProperties.backgroundColor) {
-        backgroundImage = m_defaultProperties.backgroundImage;
-        textColor = m_defaultProperties.textColor;
-    }
-
     QString selectedIcon = m_icon->icon();
+
     if (selectedIcon.isEmpty()
-        || selectedIcon == QStringLiteral("fr.thorinux.mathom")) {
-        selectedIcon = m_createIn->currentIndex() == 0
-            ? QStringLiteral("mathom-house")
-            : QStringLiteral("mathom-shelf");
+        || selectedIcon
+            == QStringLiteral("fr.thorinux.mathom")) {
+        selectedIcon =
+            m_createIn->currentIndex() == 0
+                ? QStringLiteral("mathom-house")
+                : QStringLiteral("mathom-shelf");
     }
 
-    BasketFactory::newBasket(selectedIcon,
-                             m_name->text(),
-                             m_basketsMap[m_createIn->currentIndex()],
-                             backgroundImage,
-                             m_backgroundColor->color(),
-                             textColor,
-                             templateName);
+    BasketFactory::newBasket(
+        selectedIcon,
+        m_name->text().trimmed(),
+        m_basketsMap.value(
+            m_createIn->currentIndex()));
 
     if (Global::activeMainWindow())
         Global::activeMainWindow()->show();
-}
-
-void NewBasketDialog::manageTemplates()
-{
-    KMessageBox::information(this, QStringLiteral("Wait a minute! There is no template for now: they will come with time... :-D"));
 }
 
 #include "moc_newbasketdialog.cpp"

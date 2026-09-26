@@ -2147,6 +2147,20 @@ void BasketScene::clickedToInsert(QGraphicsSceneMouseEvent *event, Note *clicked
     if (!note)
         return;
 
+    QString pageId = m_currentPageId;
+
+    // Un collage par bouton central contient déjà un vrai Mathom :
+    // s'il n'existe aucune Page, créer celle du jour immédiatement.
+    if (pageId.isEmpty()
+        && event->button() == Qt::MiddleButton) {
+        pageId = ensureTodayPage();
+    }
+
+    // Pour un nouveau Mathom texte vide dans une Page existante,
+    // l'affecter avant insertNote() afin que le filtre ne le masque pas.
+    if (!pageId.isEmpty())
+        assignPageToNoteTree(note, pageId);
+
     insertNote(note, clicked, zone, QPointF(event->scenePos()));
 
     //  ensureNoteVisible(lastInsertedNote()); // TODO: in insertNote()
@@ -2249,7 +2263,10 @@ void BasketScene::dropEvent(QGraphicsSceneDragDropEvent *event)
         bool animateNewPosition = movingWithinSameShelf;
 
         if (!movingWithinSameShelf) {
-            const QString pageId = ensureTodayPage();
+            QString pageId = m_currentPageId;
+
+            if (pageId.isEmpty())
+                pageId = ensureTodayPage();
 
             for (Note *current = note;
                  current;
@@ -2355,6 +2372,10 @@ void BasketScene::insertEmptyNote(int type)
     if (isDuringEdit())
         closeEditor();
     Note *note = NoteFactory::createEmptyNote((NoteType::Id)type, this);
+
+    if (!m_currentPageId.isEmpty())
+        assignPageToNoteTree(note, m_currentPageId);
+
     insertCreatedNote(
         note,
         /*assignPage=*/false);
@@ -2435,7 +2456,10 @@ void BasketScene::pasteNote(QClipboard::Mode mode)
 void BasketScene::insertCreatedNote(Note *note, bool assignPage)
 {
     if (assignPage && note) {
-        const QString pageId = ensureTodayPage();
+        QString pageId = m_currentPageId;
+
+        if (pageId.isEmpty())
+            pageId = ensureTodayPage();
 
         // Do this before insertNote(): after insertion, the last new Mathom
         // can become linked to pre-existing Mathoms in the shelf.
@@ -4226,8 +4250,17 @@ bool BasketScene::closeEditor(bool deleteEmptyNote /* =true*/)
     if (!isEmpty
         && note
         && note->pageId().isEmpty()) {
-        const QString pageId = ensureTodayPage();
+        QString pageId = m_currentPageId;
+
+        if (pageId.isEmpty())
+            pageId = ensureTodayPage();
+
         assignPageToNoteTree(note, pageId);
+
+        // ensureTodayPage() peut avoir activé le filtre avant que
+        // le Mathom ne possède encore son pageId.
+        // Refiltrer maintenant pour rendre le Mathom visible.
+        filterAgain(/*andEnsureVisible=*/false);
         save();
     }
 
@@ -4448,10 +4481,16 @@ void BasketScene::noteEdit(Note *note, bool justAdded, const QPointF &clickedPoi
         } else if (justAdded
                    && editor->note()
                    && editor->note()->pageId().isEmpty()) {
-            const QString pageId = ensureTodayPage();
+            QString pageId = m_currentPageId;
+
+            if (pageId.isEmpty())
+                pageId = ensureTodayPage();
+
             assignPageToNoteTree(
                 editor->note(),
                 pageId);
+
+            filterAgain(/*andEnsureVisible=*/false);
             save();
         }
         editor->deleteLater();

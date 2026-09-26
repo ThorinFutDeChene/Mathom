@@ -60,11 +60,6 @@ BasketPropertiesDialog::BasketPropertiesDialog(BasketScene *basket, QWidget *par
     m_ui->name->setText(m_basket->basketName());
     m_ui->name->setMinimumWidth(m_ui->name->fontMetrics().maxWidth() * 20);
 
-    m_ui->backgroundColor->setDefaultColor(palette().color(QPalette::Base));
-    m_ui->backgroundColor->setColor(m_basket->backgroundColorSetting());
-    m_ui->textColor->setDefaultColor(palette().color(QPalette::Text));
-    m_ui->textColor->setColor(m_basket->textColorSetting());
-
     // Mathom shelf tab color
     auto *tabColorLabel =
         new QLabel(i18n("Tab color:"), this);
@@ -96,13 +91,13 @@ BasketPropertiesDialog::BasketPropertiesDialog(BasketScene *basket, QWidget *par
 
     m_ui->appearanceLayout->addWidget(
         tabColorLabel,
-        3,
-        1);
+        0,
+        0);
 
     m_ui->appearanceLayout->addLayout(
         tabColorControls,
-        3,
-        2);
+        0,
+        1);
 
     connect(
         m_tabColorAutomatic,
@@ -110,42 +105,6 @@ BasketPropertiesDialog::BasketPropertiesDialog(BasketScene *basket, QWidget *par
         m_tabColor,
         &QWidget::setDisabled);
 
-    m_backgroundImagesMap.insert(0, QString());
-    QStringList backgrounds = Global::backgroundManager->imageNames();
-    int index = 1;
-    for (QStringList::Iterator it = backgrounds.begin(); it != backgrounds.end(); ++it) {
-        QPixmap *preview = Global::backgroundManager->preview(*it);
-        if (preview) {
-            m_backgroundImagesMap.insert(index, *it);
-            m_ui->backgroundImage->insertItem(index, *it);
-            m_ui->backgroundImage->setItemData(index, *preview, Qt::DecorationRole);
-            if (m_basket->backgroundImageName() == *it)
-                m_ui->backgroundImage->setCurrentIndex(index);
-            index++;
-        }
-    }
-    //  m_backgroundImage->insertItem(i18n("Other..."), -1);
-    int BUTTON_MARGIN = qApp->style()->pixelMetric(QStyle::PM_ButtonMargin);
-    m_ui->backgroundImage->setMaxVisibleItems(50 /*75 * 6 / m_backgroundImage->sizeHint().height()*/);
-    m_ui->backgroundImage->setMinimumHeight(75 + 2 * BUTTON_MARGIN);
-
-    // Disposition:
-
-    m_ui->columnCount->setValue(m_basket->columnsCount());
-    connect(m_ui->columnCount, &QSpinBox::valueChanged, this, &BasketPropertiesDialog::selectColumnsLayout);
-
-    int height = std::max(m_ui->mindMap->sizeHint().height(), m_ui->columnCount->sizeHint().height()); // Make all radioButtons vertically equally-spaced!
-    m_ui->mindMap->setMinimumSize(m_ui->mindMap->sizeHint().width(),
-                                  height); // Because the m_columnCount can be higher, and make radio1 and radio2 more spaced than radio2 and radio3.
-
-    if (!m_basket->isFreeLayout())
-        m_ui->columnForm->setChecked(true);
-    else if (m_basket->isMindMap())
-        m_ui->mindMap->setChecked(true);
-    else
-        m_ui->freeForm->setChecked(true);
-
-    m_ui->mindMap->hide();
 
     // Keyboard Shortcut:
     QList<QKeySequence> shortcuts{m_basket->shortcut()};
@@ -201,14 +160,6 @@ bool BasketPropertiesDialog::event(QEvent *event)
 
 void BasketPropertiesDialog::applyChanges()
 {
-    if (m_ui->columnForm->isChecked()) {
-        m_basket->setDisposition(0, m_ui->columnCount->value());
-    } else if (m_ui->freeForm->isChecked()) {
-        m_basket->setDisposition(1, m_ui->columnCount->value());
-    } else {
-        m_basket->setDisposition(2, m_ui->columnCount->value());
-    }
-
     if (m_ui->showBasket->isChecked()) {
         m_basket->setShortcut(m_ui->shortcut->shortcut()[0], 0);
     } else if (m_ui->globalButton->isChecked()) {
@@ -229,12 +180,12 @@ void BasketPropertiesDialog::applyChanges()
             false);
     }
 
-    // Should be called LAST, because it will emit the propertiesChanged() signal and the tree will be able to show the newly set Alt+Letter shortcut:
-    m_basket->setAppearance(m_ui->icon->icon(),
-                            m_ui->name->text(),
-                            m_backgroundImagesMap[m_ui->backgroundImage->currentIndex()],
-                            m_ui->backgroundColor->color(),
-                            m_ui->textColor->color());
+    // Called last because it emits propertiesChanged() so the
+    // navigation tree also refreshes the name, icon, shortcut
+    // and shelf tab color.
+    m_basket->setShelfIdentity(
+        m_ui->icon->icon(),
+        m_ui->name->text());
     GitWrapper::commitBasket(m_basket);
     m_basket->save();
 }
@@ -243,11 +194,6 @@ void BasketPropertiesDialog::capturedShortcut(const QList<QKeySequence> &sc)
 {
     // TODO: Validate it!
     m_ui->shortcut->setShortcut(sc);
-}
-
-void BasketPropertiesDialog::selectColumnsLayout()
-{
-    m_ui->columnForm->setChecked(true);
 }
 
 #include "moc_basketproperties.cpp"

@@ -846,6 +846,27 @@ void BasketScene::unsubscribeBackgroundImages()
     m_subscribedSelectionColor = QColor();
 }
 
+void BasketScene::setShelfIdentity(
+    const QString &icon,
+    const QString &name)
+{
+    m_basketName = name;
+
+    m_action->setText(
+        QStringLiteral("BASKET SHORTCUT: ")
+        + name);
+
+    const QString customIcon =
+        MathomIcons::resolveCustomPath(icon);
+
+    m_icon =
+        customIcon.isEmpty()
+            ? icon
+            : customIcon;
+
+    Q_EMIT propertiesChanged(this);
+}
+
 void BasketScene::setAppearance(const QString &icon,
                                 const QString &name,
                                 const QString &backgroundImage,

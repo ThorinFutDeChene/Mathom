@@ -431,6 +431,10 @@ public:
         m_tabColorAutomatic = automatic;
     }
 
+    void setShelfIdentity(
+        const QString &icon,
+        const QString &name);
+
     void setAppearance(const QString &icon, const QString &name, const QString &backgroundImage, const QColor &backgroundColor, const QColor &textColor);
     void blendBackground(QPainter &painter, const QRectF &rect, qreal xPainter = -1, qreal yPainter = -1, bool opaque = false, QPixmap *bg = nullptr);
     void blendBackground(QPainter &painter, const QRectF &rect, bool opaque, QPixmap *bg);

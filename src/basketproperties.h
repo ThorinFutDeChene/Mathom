@@ -7,7 +7,6 @@
 #define BASKETPROPERTIES_H
 
 #include <QDialog>
-#include <QMap>
 
 class QString;
 class QCheckBox;
@@ -37,7 +36,6 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
     void capturedShortcut(const QList<QKeySequence> &shortcut);
-    void selectColumnsLayout();
 
 protected:
     bool event(QEvent *event) override;
@@ -49,7 +47,6 @@ private:
     QCheckBox *m_tabColorAutomatic = nullptr;
     KColorCombo2 *m_tabColor = nullptr;
 
-    QMap<int, QString> m_backgroundImagesMap;
 };
 
 #endif // BASKETPROPERTIES_H

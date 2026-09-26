@@ -6,6 +6,7 @@
 
 #include "pagesidebar.h"
 
+#include <algorithm>
 #include <QAbstractItemModel>
 #include <QActionGroup>
 #include <QHBoxLayout>
@@ -14,6 +15,7 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QSignalBlocker>
+#include <QStringList>
 #include <QToolButton>
 #include <QVBoxLayout>
 

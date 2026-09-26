@@ -664,7 +664,29 @@ bool Note::hasResizer() const
 
 qreal Note::resizerHeight() const
 {
-    return (isColumn() ? basket()->sceneRect().height() : d->height);
+    if (!isColumn())
+        return d->height;
+
+    BasketScene *scene = basket();
+
+    if (!scene)
+        return d->height;
+
+    qreal viewportHeight = 0;
+
+    if (scene->graphicsView()
+        && scene->graphicsView()->viewport()) {
+        viewportHeight =
+            scene->graphicsView()->viewport()->height();
+    }
+
+    // Never call QGraphicsScene::sceneRect() from boundingRect().
+    // When the scene rectangle has not yet been explicitly established,
+    // Qt computes it from itemsBoundingRect(), which calls boundingRect()
+    // again and causes infinite recursion for column resizers.
+    return std::max(
+        viewportHeight,
+        scene->tmpHeight);
 }
 
 void Note::setHoveredZone(Zone zone) // TODO: Remove setHovered(bool) and assume it is hovered if zone != None !!!!!!!

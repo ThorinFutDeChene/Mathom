@@ -1172,6 +1172,55 @@ bool BasketScene::migratePageAssignments()
     return changed;
 }
 
+QString BasketScene::createPage()
+{
+    const QString baseTitle = i18n("New Page");
+
+    QString title = baseTitle;
+    int number = 2;
+
+    bool alreadyExists = true;
+
+    while (alreadyExists) {
+        alreadyExists = false;
+
+        for (const PageInfo &existing : std::as_const(m_pages)) {
+            if (existing.title == title) {
+                alreadyExists = true;
+                title =
+                    QStringLiteral("%1 %2")
+                        .arg(baseTitle)
+                        .arg(number++);
+                break;
+            }
+        }
+    }
+
+    PageInfo page;
+    page.id =
+        QUuid::createUuid().toString(
+            QUuid::WithoutBraces);
+
+    // Manual Pages are not "the Page of today".
+    // Otherwise ensureTodayPage() would mistake them
+    // for the automatically generated dated Page.
+    page.dayKey.clear();
+    page.title = title;
+
+    m_pages.append(page);
+    m_currentPageId = page.id;
+
+    if (m_loaded)
+        filterAgain(/*andEnsureVisible=*/false);
+
+    Q_EMIT pagesChanged();
+    Q_EMIT currentPageChanged(m_currentPageId);
+
+    save();
+
+    return page.id;
+}
+
 QString BasketScene::ensureTodayPage()
 {
     const QDate today = QDate::currentDate();

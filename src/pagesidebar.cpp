@@ -98,7 +98,7 @@ PageSidebar::PageSidebar(QWidget *parent)
         if (!m_basket)
             return;
 
-        const QString pageId = m_basket->ensureTodayPage();
+        const QString pageId = m_basket->createPage();
         rebuild();
         selectPage(pageId);
     });

@@ -4044,12 +4044,18 @@ bool BasketScene::closeEditor(bool deleteEmptyNote /* =true*/)
     if (isEmpty && deleteEmptyNote) {
         focusANonSelectedNoteAboveOrThenBelow();
         note->setSelected(true);
-        note->deleteSelectedNotes();
+        note->deleteSelectedNotes(false, &m_notesToBeDeleted);
         if (m_hoveredNote == note)
             m_hoveredNote = nullptr;
         if (m_focusedNote == note)
             m_focusedNote = nullptr;
-        delete note;
+
+        // The Mathom may be closed from inside a mouse/focus event.
+        // Defer its destruction until control returns to the Qt event loop.
+        if (!m_notesToBeDeleted.isEmpty()) {
+            QTimer::singleShot(0, this, &BasketScene::doCleanUp);
+        }
+
         save();
         note = nullptr;
     }

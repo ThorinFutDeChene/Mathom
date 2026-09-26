@@ -4528,3 +4528,39 @@ msgstr "Autoriser les versions de développement de Mathom"
 
 msgid "Development versions are intended for testing and may contain bugs."
 msgstr "Les versions de développement sont destinées aux tests et peuvent contenir des bogues."
+
+
+# Mathom pages
+msgid "Page"
+msgstr "Page"
+
+msgid "Pages"
+msgstr "Pages"
+
+msgid "New Page"
+msgstr "Nouvelle page"
+
+msgid "Sort"
+msgstr "Trier"
+
+msgid "Manual order"
+msgstr "Ordre manuel"
+
+msgid "Date - oldest first"
+msgstr "Date - plus ancienne d'abord"
+
+msgid "Date - newest first"
+msgstr "Date - plus récente d'abord"
+
+msgid "Name - A to Z"
+msgstr "Nom - A à Z"
+
+msgid "Name - Z to A"
+msgstr "Nom - Z à A"
+
+msgid "Hide pages"
+msgstr "Masquer les pages"
+
+msgid "Show pages"
+msgstr "Afficher les pages"
+

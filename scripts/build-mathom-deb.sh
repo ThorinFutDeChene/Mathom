@@ -121,12 +121,20 @@ flatpak-builder --run flatpak-build "$MANIFEST" \
         # The AppDir is executed outside Flatpak. Qt/KF6 libraries alone are
         # not enough: their standard actions (Cut/Copy/Paste/etc.) are
         # translated by framework catalogs supplied by the KDE runtime.
-        # Copy the French runtime catalogs so the native Debian package has
-        # the same translations as the Flatpak laboratory environment.
-        mkdir -p "$APPDIR/usr/share/locale/fr/LC_MESSAGES"
-        for mo in /usr/share/locale/fr/LC_MESSAGES/*.mo; do
-            [ -f "$mo" ] || continue
-            cp -a "$mo" "$APPDIR/usr/share/locale/fr/LC_MESSAGES/"
+        # Ship the runtime catalogs for the languages currently validated
+        # for Mathom so the native Debian package matches the lab build.
+        for locale in fr ar tr uk; do
+            source_dir="/usr/share/locale/$locale/LC_MESSAGES"
+            destination_dir="$APPDIR/usr/share/locale/$locale/LC_MESSAGES"
+
+            [ -d "$source_dir" ] || continue
+
+            mkdir -p "$destination_dir"
+
+            for mo in "$source_dir"/*.mo; do
+                [ -f "$mo" ] || continue
+                cp -a "$mo" "$destination_dir/"
+            done
         done
     '
 
@@ -285,7 +293,9 @@ CONTENTS_LIST="$PACKAGING/mathom-deb-contents.txt"
 dpkg-deb -c "$OUTPUT" > "$CONTENTS_LIST"
 
 grep -q './opt/mathom/usr/share/icons/breeze/index.theme' "$CONTENTS_LIST"
-grep -q './opt/mathom/usr/share/locale/fr/LC_MESSAGES/' "$CONTENTS_LIST"
+for locale in fr ar tr uk; do
+    grep -q "./opt/mathom/usr/share/locale/$locale/LC_MESSAGES/" "$CONTENTS_LIST"
+done
 
 # KIO local-file support
 grep -q './opt/mathom/usr/lib/x86_64-linux-gnu/libexec/kf6/kioworker' "$CONTENTS_LIST"

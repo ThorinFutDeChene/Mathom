@@ -566,7 +566,7 @@ Archive::createArchiveFromSource(const QString &sourcePath, const QString &previ
     /// \todo write a way to create preview the way it's done in Archive::save
     QString previewImagePath = previewImage;
     if (previewImage.isEmpty() && !QFileInfo(previewImage).exists()) {
-        previewImagePath = QStringLiteral(":/images/128-apps-fr.thorinux.mathom.png");
+        previewImagePath = QStringLiteral(":/mathom/icons/app.png");
     }
 
     // Finally Save to the Real Destination file:

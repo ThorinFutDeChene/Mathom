@@ -218,23 +218,65 @@ void Archive::saveBasketToArchive(BasketScene *basket,
             tar->addLocalFile(tempIconFile, QStringLiteral("basket-icons/") + iconFileName);
         }
     }
-    // Save basket background image:
-    QString imageName = basket->backgroundImageName();
-    if (!basket->backgroundImageName().isEmpty() && !backgrounds.contains(imageName)) {
-        QString backgroundPath = Global::backgroundManager->pathForImageName(imageName);
-        if (!backgroundPath.isEmpty()) {
-            // Save the background image:
-            tar->addLocalFile(backgroundPath, QStringLiteral("backgrounds/") + imageName);
-            // Save the preview image:
-            QString previewPath = Global::backgroundManager->previewPathForImageName(imageName);
-            if (!previewPath.isEmpty())
-                tar->addLocalFile(previewPath, QStringLiteral("backgrounds/previews/") + imageName);
-            // Save the configuration file:
-            QString configPath = backgroundPath + QStringLiteral(".config");
-            if (dir.exists(configPath))
-                tar->addLocalFile(configPath, QStringLiteral("backgrounds/") + imageName + QStringLiteral(".config"));
-        }
-        backgrounds.append(imageName);
+    // Export one background image only once for the whole archive.
+    // Page background images are stored in the .basket file by name, so
+    // every referenced image must also be present in the archive.
+    const auto archiveBackgroundImage =
+        [&](const QString &imageName) {
+            if (imageName.isEmpty()
+                || backgrounds.contains(imageName)) {
+                return;
+            }
+
+            const QString backgroundPath =
+                Global::backgroundManager
+                    ->pathForImageName(imageName);
+
+            if (!backgroundPath.isEmpty()) {
+                tar->addLocalFile(
+                    backgroundPath,
+                    QStringLiteral("backgrounds/")
+                        + imageName);
+
+                const QString previewPath =
+                    Global::backgroundManager
+                        ->previewPathForImageName(
+                            imageName);
+
+                if (!previewPath.isEmpty()) {
+                    tar->addLocalFile(
+                        previewPath,
+                        QStringLiteral(
+                            "backgrounds/previews/")
+                            + imageName);
+                }
+
+                const QString configPath =
+                    backgroundPath
+                    + QStringLiteral(".config");
+
+                if (QFileInfo::exists(configPath)) {
+                    tar->addLocalFile(
+                        configPath,
+                        QStringLiteral("backgrounds/")
+                            + imageName
+                            + QStringLiteral(".config"));
+                }
+            }
+
+            backgrounds.append(imageName);
+        };
+
+    // Compatibility with pre-Pages Mathom/BasKet data.
+    archiveBackgroundImage(
+        basket->backgroundImageName());
+
+    // Since 0.1.11, appearance belongs to Pages.
+    // Export every Page background, not only the currently displayed one.
+    for (const BasketScene::PageInfo &page :
+         basket->pages()) {
+        archiveBackgroundImage(
+            page.backgroundImage);
     }
 
     progress->setValue(progress->value() + 1); // Basket exportation finished

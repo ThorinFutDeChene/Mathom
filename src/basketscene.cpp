@@ -96,6 +96,7 @@
 #include "noteedit.h"
 #include "notefactory.h"
 #include "noteselection.h"
+#include "pagepropertiesdialog.h"
 #include "settings.h"
 #include "tagsedit.h"
 #include "tools.h"
@@ -1279,6 +1280,49 @@ void BasketScene::refreshPageAppearance()
     invalidate();
 }
 
+QString BasketScene::currentPageBackgroundImageName() const
+{
+    return effectiveBackgroundImageName();
+}
+
+QColor BasketScene::currentPageBackgroundColorSetting() const
+{
+    return effectiveBackgroundColorSetting();
+}
+
+QColor BasketScene::currentPageTextColorSetting() const
+{
+    return effectiveTextColorSetting();
+}
+
+void BasketScene::setCurrentPageAppearance(
+    const QString &backgroundImage,
+    const QColor &backgroundColor,
+    const QColor &textColor)
+{
+    if (m_currentPageId.isEmpty())
+        ensureTodayPage();
+
+    for (PageInfo &page : m_pages) {
+        if (page.id != m_currentPageId)
+            continue;
+
+        if (page.backgroundImage == backgroundImage
+            && page.backgroundColor == backgroundColor
+            && page.textColor == textColor) {
+            return;
+        }
+
+        page.backgroundImage = backgroundImage;
+        page.backgroundColor = backgroundColor;
+        page.textColor = textColor;
+
+        refreshPageAppearance();
+        save();
+        return;
+    }
+}
+
 void BasketScene::assignPageToNoteTree(
     Note *note,
     const QString &pageId)
@@ -2223,6 +2267,27 @@ void BasketScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
             m_insertMenuTitle = menu.insertSection(first, i18nc("Verb (for the 'insert' menu)", "Group"));
         else
             m_insertMenuTitle = menu.insertSection(first, i18nc("Verb (for the 'insert' menu)", "Insert"));
+
+        menu.addSeparator();
+
+        QAction *pagePropertiesAction =
+            menu.addAction(
+                i18n("Page Properties..."));
+
+        connect(
+            pagePropertiesAction,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (m_currentPageId.isEmpty())
+                    ensureTodayPage();
+
+                PagePropertiesDialog dialog(
+                    this,
+                    m_view);
+
+                dialog.exec();
+            });
 
         setInsertPopupMenu();
         connect(&menu, &QMenu::aboutToHide, this, &BasketScene::delayedCancelInsertPopupMenu);

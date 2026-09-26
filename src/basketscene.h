@@ -244,6 +244,15 @@ public:
     void renamePage(const QString &pageId, const QString &title);
     void reorderPages(const QStringList &pageIds);
 
+    QString currentPageBackgroundImageName() const;
+    QColor currentPageBackgroundColorSetting() const;
+    QColor currentPageTextColorSetting() const;
+
+    void setCurrentPageAppearance(
+        const QString &backgroundImage,
+        const QColor &backgroundColor,
+        const QColor &textColor);
+
 Q_SIGNALS:
     void pagesChanged();
     void currentPageChanged(const QString &pageId);

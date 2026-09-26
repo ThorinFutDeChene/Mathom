@@ -36,6 +36,7 @@ set(libbasket_SRCS
     notedrag.cpp notedrag.h
     noteedit.cpp noteedit.h
     pagesidebar.cpp pagesidebar.h
+    pagepropertiesdialog.cpp pagepropertiesdialog.h
     notefactory.cpp notefactory.h
     noteselection.cpp noteselection.h
     passworddialog.cpp passworddialog.h

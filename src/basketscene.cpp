@@ -35,6 +35,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLocale>
 #include <QList>
 #include <QMenu>
 #include <QMouseEvent>
@@ -48,6 +49,7 @@
 #include <QTextDocument>
 #include <QTimeLine>
 #include <QToolTip>
+#include <QUuid>
 #include <QWheelEvent>
 #include <QXmlStreamWriter>
 #include <QtXml/QDomDocument>
@@ -961,6 +963,10 @@ bool BasketScene::save()
     // Create Properties Element and Populate It:
     saveProperties(stream);
 
+    // Save page metadata inside the shelf document so it follows
+    // encryption, backups and Mathom-House archives.
+    savePages(stream);
+
     // Create Notes Element and Populate It:
     stream.writeStartElement("notes");
     saveNotes(stream, nullptr);
@@ -986,6 +992,170 @@ bool BasketScene::save()
         QStringLiteral("SHELF_SAVE_OK"),
         {{QStringLiteral("folder"), folderName()}});
     return true;
+}
+
+void BasketScene::savePages(QXmlStreamWriter &stream)
+{
+    stream.writeStartElement(QStringLiteral("pages"));
+
+    if (!m_currentPageId.isEmpty())
+        stream.writeAttribute(QStringLiteral("current"), m_currentPageId);
+
+    for (const PageInfo &page : std::as_const(m_pages)) {
+        stream.writeStartElement(QStringLiteral("page"));
+        stream.writeAttribute(QStringLiteral("id"), page.id);
+        stream.writeAttribute(QStringLiteral("title"), page.title);
+        stream.writeAttribute(QStringLiteral("day"), page.dayKey);
+        stream.writeEndElement();
+    }
+
+    stream.writeEndElement();
+}
+
+void BasketScene::loadPages(const QDomElement &pagesElement)
+{
+    m_pages.clear();
+    m_currentPageId.clear();
+
+    if (pagesElement.isNull())
+        return;
+
+    QSet<QString> seenIds;
+
+    for (QDomElement pageElement = pagesElement.firstChildElement(QStringLiteral("page"));
+         !pageElement.isNull();
+         pageElement = pageElement.nextSiblingElement(QStringLiteral("page"))) {
+        PageInfo page;
+        page.id = pageElement.attribute(QStringLiteral("id")).trimmed();
+        page.title = pageElement.attribute(QStringLiteral("title")).trimmed();
+        page.dayKey = pageElement.attribute(QStringLiteral("day")).trimmed();
+
+        if (page.id.isEmpty() || seenIds.contains(page.id))
+            continue;
+
+        if (page.title.isEmpty())
+            page.title = page.dayKey.isEmpty() ? i18n("Page") : page.dayKey;
+
+        seenIds.insert(page.id);
+        m_pages.append(page);
+    }
+
+    const QString requestedCurrent =
+        pagesElement.attribute(QStringLiteral("current")).trimmed();
+
+    for (const PageInfo &page : std::as_const(m_pages)) {
+        if (page.id == requestedCurrent) {
+            m_currentPageId = requestedCurrent;
+            break;
+        }
+    }
+
+    if (m_currentPageId.isEmpty() && !m_pages.isEmpty())
+        m_currentPageId = m_pages.first().id;
+}
+
+QString BasketScene::ensureTodayPage()
+{
+    const QDate today = QDate::currentDate();
+    const QString dayKey = today.toString(Qt::ISODate);
+
+    for (const PageInfo &page : std::as_const(m_pages)) {
+        if (page.dayKey == dayKey) {
+            setCurrentPageId(page.id);
+            return page.id;
+        }
+    }
+
+    PageInfo page;
+    page.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    page.dayKey = dayKey;
+    page.title = QLocale().toString(today, QLocale::ShortFormat);
+
+    m_pages.append(page);
+    m_currentPageId = page.id;
+
+    Q_EMIT pagesChanged();
+    Q_EMIT currentPageChanged(m_currentPageId);
+
+    save();
+    return page.id;
+}
+
+void BasketScene::setCurrentPageId(const QString &pageId)
+{
+    if (pageId == m_currentPageId)
+        return;
+
+    for (const PageInfo &page : std::as_const(m_pages)) {
+        if (page.id == pageId) {
+            m_currentPageId = pageId;
+            Q_EMIT currentPageChanged(m_currentPageId);
+            return;
+        }
+    }
+}
+
+void BasketScene::renamePage(const QString &pageId, const QString &title)
+{
+    const QString trimmedTitle = title.trimmed();
+
+    if (trimmedTitle.isEmpty()) {
+        Q_EMIT pagesChanged();
+        return;
+    }
+
+    for (PageInfo &page : m_pages) {
+        if (page.id != pageId)
+            continue;
+
+        if (page.title == trimmedTitle)
+            return;
+
+        page.title = trimmedTitle;
+        save();
+        Q_EMIT pagesChanged();
+        return;
+    }
+}
+
+void BasketScene::reorderPages(const QStringList &pageIds)
+{
+    if (pageIds.size() != m_pages.size())
+        return;
+
+    QHash<QString, PageInfo> byId;
+
+    for (const PageInfo &page : std::as_const(m_pages))
+        byId.insert(page.id, page);
+
+    QList<PageInfo> reordered;
+    reordered.reserve(m_pages.size());
+
+    for (const QString &pageId : pageIds) {
+        if (!byId.contains(pageId))
+            return;
+
+        reordered.append(byId.take(pageId));
+    }
+
+    if (!byId.isEmpty())
+        return;
+
+    bool changed = false;
+
+    for (int index = 0; index < reordered.size(); ++index) {
+        if (reordered.at(index).id != m_pages.at(index).id) {
+            changed = true;
+            break;
+        }
+    }
+
+    if (!changed)
+        return;
+
+    m_pages = reordered;
+    save();
+    Q_EMIT pagesChanged();
 }
 
 void BasketScene::commitEdit()
@@ -1058,6 +1228,10 @@ void BasketScene::load()
     QDomElement properties = XMLWork::getElement(docElem, QStringLiteral("properties"));
 
     loadProperties(properties); // Since we are loading, this time the background image will also be loaded!
+
+    QDomElement pagesElement = XMLWork::getElement(docElem, QStringLiteral("pages"));
+    loadPages(pagesElement);
+
     // Keep the DOM document alive while its elements are still being used.
 
     // BEGIN Compatibility with 0.6.0 Pre-Alpha versions:

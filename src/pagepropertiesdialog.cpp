@@ -8,9 +8,12 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QPixmap>
 #include <QPushButton>
+#include <QRadioButton>
+#include <QSpinBox>
 #include <QStyle>
 #include <QVBoxLayout>
 
@@ -137,6 +140,72 @@ PagePropertiesDialog::PagePropertiesDialog(
     mainLayout->addWidget(
         appearanceGroup);
 
+    auto *dispositionGroup =
+        new QGroupBox(
+            i18n("Disposition"),
+            this);
+
+    auto *dispositionLayout =
+        new QGridLayout(
+            dispositionGroup);
+
+    m_columnForm =
+        new QRadioButton(
+            i18n("Columns:"),
+            dispositionGroup);
+
+    m_columnCount =
+        new QSpinBox(
+            dispositionGroup);
+
+    m_columnCount->setRange(
+        1,
+        20);
+
+    m_columnCount->setValue(
+        m_basket
+            ->currentPageColumnCountSetting());
+
+    m_freeForm =
+        new QRadioButton(
+            i18n("Free-form"),
+            dispositionGroup);
+
+    if (m_basket
+            ->currentPageFreeLayoutSetting()) {
+        m_freeForm->setChecked(true);
+    } else {
+        m_columnForm->setChecked(true);
+    }
+
+    dispositionLayout->addWidget(
+        m_columnForm,
+        0,
+        0);
+
+    dispositionLayout->addWidget(
+        m_columnCount,
+        0,
+        1);
+
+    dispositionLayout->addWidget(
+        m_freeForm,
+        1,
+        0,
+        1,
+        2);
+
+    connect(
+        m_columnCount,
+        &QSpinBox::valueChanged,
+        this,
+        [this](int) {
+            m_columnForm->setChecked(true);
+        });
+
+    mainLayout->addWidget(
+        dispositionGroup);
+
     auto *buttonBox =
         new QDialogButtonBox(
             QDialogButtonBox::Ok
@@ -178,6 +247,10 @@ void PagePropertiesDialog::applyChanges()
             m_backgroundImage->currentIndex()),
         m_backgroundColor->color(),
         m_textColor->color());
+
+    m_basket->setCurrentPageDisposition(
+        m_freeForm->isChecked(),
+        m_columnCount->value());
 
     GitWrapper::commitBasket(m_basket);
 }

@@ -10,6 +10,8 @@
 
 class BasketScene;
 class QComboBox;
+class QRadioButton;
+class QSpinBox;
 class KColorCombo2;
 
 class PagePropertiesDialog final : public QDialog
@@ -27,6 +29,10 @@ private:
     QComboBox *m_backgroundImage = nullptr;
     KColorCombo2 *m_backgroundColor = nullptr;
     KColorCombo2 *m_textColor = nullptr;
+
+    QRadioButton *m_columnForm = nullptr;
+    QRadioButton *m_freeForm = nullptr;
+    QSpinBox *m_columnCount = nullptr;
 
     QMap<int, QString> m_backgroundImagesMap;
 };

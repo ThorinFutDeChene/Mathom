@@ -122,22 +122,19 @@ public:
     {
         return m_firstNote;
     }
-    inline int columnsCount()
-    {
-        return m_columnsCount;
-    }
-    inline bool isColumnsLayout()
-    {
-        return m_columnsCount > 0;
-    }
-    inline bool isFreeLayout()
-    {
-        return m_columnsCount <= 0;
-    }
-    inline bool isMindMap()
-    {
-        return isFreeLayout() && m_mindMap;
-    }
+    int columnsCount() const;
+    bool isColumnsLayout() const;
+    bool isFreeLayout() const;
+    bool isMindMap() const;
+
+    bool isFreeLayoutForPage(
+        const QString &pageId) const;
+    bool isColumnsLayoutForPage(
+        const QString &pageId) const;
+
+    Note *firstColumnForCurrentPage() const;
+    Note *nextColumnInSamePage(Note *column) const;
+    Note *previousColumnInSamePage(Note *column) const;
     Note *resizingNote()
     {
         return m_resizingNote;
@@ -226,6 +223,10 @@ public:
         // Layout owned by the Page.
         bool freeLayout = false;
         int columnCount = 1;
+
+        // false = legacy shelf structure still shared.
+        // true  = this Page owns its structural layout.
+        bool layoutOwned = false;
     };
 
     const QList<PageInfo> &pages() const
@@ -248,10 +249,18 @@ public:
     QColor currentPageBackgroundColorSetting() const;
     QColor currentPageTextColorSetting() const;
 
+    bool currentPageFreeLayoutSetting() const;
+    int currentPageColumnCountSetting() const;
+    bool currentPageOwnsLayout() const;
+
     void setCurrentPageAppearance(
         const QString &backgroundImage,
         const QColor &backgroundColor,
         const QColor &textColor);
+
+    void setCurrentPageDisposition(
+        bool freeLayout,
+        int columnCount);
 
 Q_SIGNALS:
     void pagesChanged();
@@ -263,11 +272,35 @@ private:
     void loadPages(const QDomElement &pages);
     void savePages(QXmlStreamWriter &stream);
 
+    const PageInfo *pageInfoById(
+        const QString &pageId) const;
     const PageInfo *currentPageInfo() const;
+
     QString effectiveBackgroundImageName() const;
     QColor effectiveBackgroundColorSetting() const;
     QColor effectiveTextColorSetting() const;
     void refreshPageAppearance();
+
+    QList<Note *> ownedColumnsForPage(
+        const QString &pageId) const;
+
+    void detachNoteForPageLayout(Note *note);
+    void appendTopLevelForPageLayout(Note *note);
+    void appendChildForPageLayout(
+        Note *note,
+        Note *parent);
+
+    void extractPageNodesFromSharedGroup(
+        Note *group,
+        const QString &pageId,
+        QList<Note *> &result);
+
+    QList<Note *> takePageNodesFromLegacySharedStructure(
+        const QString &pageId);
+
+    void createOwnedColumnsForPage(
+        const QString &pageId,
+        int columnCount);
 
     void assignPageToNoteTree(Note *note, const QString &pageId);
     QSet<QString> pageIdsInNoteTree(Note *note) const;

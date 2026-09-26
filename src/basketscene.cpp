@@ -738,10 +738,21 @@ void BasketScene::saveProperties(QXmlStreamWriter &stream)
     stream.writeAttribute("tabColorMode", m_tabColorAutomatic ? QStringLiteral("automatic") : QStringLiteral("custom"));
     stream.writeEndElement();
 
+    // Legacy shelf disposition is kept only as migration fallback.
+    // Active layout now belongs to each Page.
     stream.writeStartElement("disposition");
-    stream.writeAttribute("columnCount", QString::number(columnsCount()));
-    stream.writeAttribute("free", XMLWork::trueOrFalse(isFreeLayout()));
-    stream.writeAttribute("mindMap", XMLWork::trueOrFalse(isMindMap()));
+    stream.writeAttribute(
+        "columnCount",
+        QString::number(
+            std::max(1, m_columnsCount)));
+    stream.writeAttribute(
+        "free",
+        XMLWork::trueOrFalse(
+            m_columnsCount <= 0));
+    stream.writeAttribute(
+        "mindMap",
+        XMLWork::trueOrFalse(
+            m_columnsCount <= 0 && m_mindMap));
     stream.writeEndElement();
 
     stream.writeStartElement("shortcut");
@@ -884,7 +895,27 @@ void BasketScene::setDisposition(int disposition, int columnCount)
     static const int FREE_LAYOUT = 1;
     static const int MINDMAPS_LAYOUT = 2;
 
-    int currentDisposition = (isFreeLayout() ? (isMindMap() ? MINDMAPS_LAYOUT : FREE_LAYOUT) : COLUMNS_LAYOUT);
+    // Once Pages are active, shelf disposition is only retained as
+    // backward-compatibility metadata. Page layout is changed through
+    // setCurrentPageDisposition().
+    if (m_loaded && !m_pages.isEmpty()) {
+        m_columnsCount =
+            disposition == COLUMNS_LAYOUT
+                ? std::max(1, columnCount)
+                : 0;
+
+        m_mindMap =
+            disposition == MINDMAPS_LAYOUT;
+
+        return;
+    }
+
+    int currentDisposition =
+        (m_columnsCount <= 0
+             ? (m_mindMap
+                    ? MINDMAPS_LAYOUT
+                    : FREE_LAYOUT)
+             : COLUMNS_LAYOUT);
 
     if (currentDisposition == COLUMNS_LAYOUT && disposition == COLUMNS_LAYOUT) {
         if (firstNote() && columnCount > m_columnsCount) {
@@ -981,34 +1012,65 @@ void BasketScene::setDisposition(int disposition, int columnCount)
 
 void BasketScene::equalizeColumnSizes()
 {
-    if (!firstNote())
+    Note *column =
+        firstColumnForCurrentPage();
+
+    if (!column)
         return;
 
-    // Necessary to know the available space;
+    QList<Note *> columns;
+
+    for (Note *current = column;
+         current;
+         current = nextColumnInSamePage(current)) {
+        columns.append(current);
+    }
+
+    if (columns.isEmpty())
+        return;
+
     relayoutNotes();
 
-    int availableSpace = m_view->viewport()->width();
-    int columnWidth = (availableSpace - (columnsCount() - 1) * Note::GROUP_WIDTH) / columnsCount();
-    int columnCount = columnsCount();
-    Note *column = firstNote();
-    while (column) {
-        int minGroupWidth = column->minRight() - column->x();
+    int availableSpace =
+        m_view->viewport()->width();
+
+    int remainingColumns =
+        columns.size();
+
+    int columnWidth =
+        (availableSpace
+         - (columns.size() - 1)
+               * Note::GROUP_WIDTH)
+        / std::max(1, remainingColumns);
+
+    for (Note *current : std::as_const(columns)) {
+        const int minGroupWidth =
+            current->minRight()
+            - current->x();
+
         if (minGroupWidth > columnWidth) {
             availableSpace -= minGroupWidth;
-            --columnCount;
+            --remainingColumns;
         }
-        column = column->next();
     }
-    columnWidth = (availableSpace - (columnsCount() - 1) * Note::GROUP_WIDTH) / columnCount;
 
-    column = firstNote();
-    while (column) {
-        int minGroupWidth = column->minRight() - column->x();
-        if (minGroupWidth > columnWidth)
-            column->setGroupWidth(minGroupWidth);
-        else
-            column->setGroupWidth(columnWidth);
-        column = column->next();
+    if (remainingColumns > 0) {
+        columnWidth =
+            (availableSpace
+             - (columns.size() - 1)
+                   * Note::GROUP_WIDTH)
+            / remainingColumns;
+    }
+
+    for (Note *current : std::as_const(columns)) {
+        const int minGroupWidth =
+            current->minRight()
+            - current->x();
+
+        current->setGroupWidth(
+            std::max(
+                minGroupWidth,
+                columnWidth));
     }
 
     relayoutNotes();
@@ -1108,6 +1170,10 @@ void BasketScene::savePages(QXmlStreamWriter &stream)
             QStringLiteral("columnCount"),
             QString::number(
                 std::max(1, page.columnCount)));
+        stream.writeAttribute(
+            QStringLiteral("owned"),
+            XMLWork::trueOrFalse(
+                page.layoutOwned));
         stream.writeEndElement();
 
         stream.writeEndElement();
@@ -1191,6 +1257,12 @@ void BasketScene::loadPages(const QDomElement &pagesElement)
                         QString::number(
                             page.columnCount))
                         .toInt());
+
+            page.layoutOwned =
+                XMLWork::trueOrFalse(
+                    pageDisposition.attribute(
+                        QStringLiteral("owned"),
+                        QStringLiteral("false")));
         }
 
         if (page.id.isEmpty() || seenIds.contains(page.id))
@@ -1217,17 +1289,159 @@ void BasketScene::loadPages(const QDomElement &pagesElement)
         m_currentPageId = m_pages.first().id;
 }
 
-const BasketScene::PageInfo *BasketScene::currentPageInfo() const
+const BasketScene::PageInfo *BasketScene::pageInfoById(
+    const QString &pageId) const
 {
-    if (m_currentPageId.isEmpty())
+    if (pageId.isEmpty())
         return nullptr;
 
     for (const PageInfo &page : m_pages) {
-        if (page.id == m_currentPageId)
+        if (page.id == pageId)
             return &page;
     }
 
     return nullptr;
+}
+
+int BasketScene::columnsCount() const
+{
+    const PageInfo *page =
+        currentPageInfo();
+
+    if (page)
+        return page->freeLayout
+            ? 0
+            : std::max(
+                  1,
+                  page->columnCount);
+
+    return m_columnsCount;
+}
+
+bool BasketScene::isColumnsLayout() const
+{
+    const PageInfo *page =
+        currentPageInfo();
+
+    if (page)
+        return !page->freeLayout;
+
+    return m_columnsCount > 0;
+}
+
+bool BasketScene::isFreeLayout() const
+{
+    return !isColumnsLayout();
+}
+
+bool BasketScene::isMindMap() const
+{
+    if (currentPageInfo())
+        return false;
+
+    return m_columnsCount <= 0
+        && m_mindMap;
+}
+
+bool BasketScene::isFreeLayoutForPage(
+    const QString &pageId) const
+{
+    const PageInfo *page =
+        pageInfoById(pageId);
+
+    if (page)
+        return page->freeLayout;
+
+    return m_columnsCount <= 0;
+}
+
+bool BasketScene::isColumnsLayoutForPage(
+    const QString &pageId) const
+{
+    return !isFreeLayoutForPage(pageId);
+}
+
+Note *BasketScene::firstColumnForCurrentPage() const
+{
+    if (!isColumnsLayout())
+        return nullptr;
+
+    // An owned Page always uses its own columns.
+    for (Note *note = m_firstNote;
+         note;
+         note = note->next()) {
+        if (note->parentNote() == nullptr
+            && note->isGroup()
+            && note->pageId()
+                == m_currentPageId) {
+            return note;
+        }
+    }
+
+    // Unconverted Pages still use the legacy shared columns.
+    if (!currentPageOwnsLayout()) {
+        for (Note *note = m_firstNote;
+             note;
+             note = note->next()) {
+            if (note->parentNote() == nullptr
+                && note->isGroup()
+                && note->pageId().isEmpty()) {
+                return note;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+Note *BasketScene::nextColumnInSamePage(
+    Note *column) const
+{
+    if (!column)
+        return nullptr;
+
+    const QString pageId =
+        column->pageId();
+
+    for (Note *note = column->next();
+         note;
+         note = note->next()) {
+        if (note->parentNote() == nullptr
+            && note->isGroup()
+            && note->pageId() == pageId) {
+            return note;
+        }
+    }
+
+    return nullptr;
+}
+
+Note *BasketScene::previousColumnInSamePage(
+    Note *column) const
+{
+    if (!column)
+        return nullptr;
+
+    const QString pageId =
+        column->pageId();
+
+    for (Note *note = column->prev();
+         note;
+         note = note->prev()) {
+        if (note->parentNote() == nullptr
+            && note->isGroup()
+            && note->pageId() == pageId) {
+            return note;
+        }
+    }
+
+    return nullptr;
+}
+
+const BasketScene::PageInfo *BasketScene::currentPageInfo() const
+{
+    return pageInfoById(
+        m_currentPageId);
 }
 
 QString BasketScene::effectiveBackgroundImageName() const
@@ -1310,6 +1524,41 @@ QColor BasketScene::currentPageTextColorSetting() const
     return effectiveTextColorSetting();
 }
 
+bool BasketScene::currentPageFreeLayoutSetting() const
+{
+    const PageInfo *page =
+        currentPageInfo();
+
+    if (page)
+        return page->freeLayout;
+
+    return m_columnsCount <= 0;
+}
+
+int BasketScene::currentPageColumnCountSetting() const
+{
+    const PageInfo *page =
+        currentPageInfo();
+
+    if (page)
+        return std::max(
+            1,
+            page->columnCount);
+
+    return std::max(
+        1,
+        m_columnsCount);
+}
+
+bool BasketScene::currentPageOwnsLayout() const
+{
+    const PageInfo *page =
+        currentPageInfo();
+
+    return page
+        && page->layoutOwned;
+}
+
 void BasketScene::setCurrentPageAppearance(
     const QString &backgroundImage,
     const QColor &backgroundColor,
@@ -1336,6 +1585,367 @@ void BasketScene::setCurrentPageAppearance(
         save();
         return;
     }
+}
+
+QList<Note *> BasketScene::ownedColumnsForPage(
+    const QString &pageId) const
+{
+    QList<Note *> result;
+
+    for (Note *note = m_firstNote;
+         note;
+         note = note->next()) {
+        if (note->parentNote() == nullptr
+            && note->isGroup()
+            && note->pageId() == pageId) {
+            result.append(note);
+        }
+    }
+
+    return result;
+}
+
+void BasketScene::detachNoteForPageLayout(
+    Note *note)
+{
+    if (!note)
+        return;
+
+    Note *parent =
+        note->parentNote();
+
+    Note *previous =
+        note->prev();
+
+    Note *next =
+        note->next();
+
+    if (previous)
+        previous->setNext(next);
+    else if (parent)
+        parent->setFirstChild(next);
+    else if (m_firstNote == note)
+        m_firstNote = next;
+
+    if (next)
+        next->setPrev(previous);
+
+    note->setPrev(nullptr);
+    note->setNext(nullptr);
+    note->setParentNote(nullptr);
+}
+
+void BasketScene::appendTopLevelForPageLayout(
+    Note *note)
+{
+    if (!note)
+        return;
+
+    note->setParentNote(nullptr);
+    note->setPrev(nullptr);
+    note->setNext(nullptr);
+
+    if (!m_firstNote) {
+        m_firstNote = note;
+        return;
+    }
+
+    Note *last =
+        m_firstNote;
+
+    while (last->next())
+        last = last->next();
+
+    last->setNext(note);
+    note->setPrev(last);
+}
+
+void BasketScene::appendChildForPageLayout(
+    Note *note,
+    Note *parent)
+{
+    if (!note || !parent)
+        return;
+
+    note->setParentNote(parent);
+    note->setPrev(nullptr);
+    note->setNext(nullptr);
+
+    if (!parent->firstChild()) {
+        parent->setFirstChild(note);
+        return;
+    }
+
+    Note *last =
+        parent->firstChild();
+
+    while (last->next())
+        last = last->next();
+
+    last->setNext(note);
+    note->setPrev(last);
+}
+
+void BasketScene::extractPageNodesFromSharedGroup(
+    Note *group,
+    const QString &pageId,
+    QList<Note *> &result)
+{
+    if (!group)
+        return;
+
+    Note *child =
+        group->firstChild();
+
+    while (child) {
+        Note *next =
+            child->next();
+
+        if (child->pageId() == pageId) {
+            detachNoteForPageLayout(child);
+            result.append(child);
+        } else if (child->isGroup()
+                   && child->pageId().isEmpty()) {
+            // A legacy group may contain Mathoms from several Pages.
+            // Extract only the requested Page; never alter another
+            // Mathom's pageId.
+            extractPageNodesFromSharedGroup(
+                child,
+                pageId,
+                result);
+        }
+
+        child = next;
+    }
+}
+
+QList<Note *> BasketScene::takePageNodesFromLegacySharedStructure(
+    const QString &pageId)
+{
+    QList<Note *> result;
+
+    for (Note *note = m_firstNote;
+         note;
+         note = note->next()) {
+        if (note->parentNote() == nullptr
+            && note->isGroup()
+            && note->pageId().isEmpty()) {
+            extractPageNodesFromSharedGroup(
+                note,
+                pageId,
+                result);
+        }
+    }
+
+    return result;
+}
+
+void BasketScene::createOwnedColumnsForPage(
+    const QString &pageId,
+    int columnCount)
+{
+    columnCount =
+        std::max(
+            1,
+            columnCount);
+
+    for (int index = 0;
+         index < columnCount;
+         ++index) {
+        Note *column =
+            new Note(this);
+
+        column->setPageId(pageId);
+
+        appendTopLevelForPageLayout(
+            column);
+    }
+}
+
+void BasketScene::setCurrentPageDisposition(
+    bool freeLayout,
+    int columnCount)
+{
+    if (m_currentPageId.isEmpty())
+        ensureTodayPage();
+
+    PageInfo *page = nullptr;
+
+    for (PageInfo &candidate : m_pages) {
+        if (candidate.id
+            == m_currentPageId) {
+            page = &candidate;
+            break;
+        }
+    }
+
+    if (!page)
+        return;
+
+    columnCount =
+        std::max(
+            1,
+            columnCount);
+
+    const QString pageId =
+        page->id;
+
+    const bool wasFree =
+        page->freeLayout;
+
+    const bool wasOwned =
+        page->layoutOwned;
+
+    QList<Note *> extracted;
+
+    if (!wasOwned) {
+        extracted =
+            takePageNodesFromLegacySharedStructure(
+                pageId);
+    }
+
+    if (freeLayout) {
+        // Only Page-owned columns may be dismantled here.
+        // Normal free-form groups must remain groups.
+        if (!wasFree && wasOwned) {
+            const QList<Note *> columns =
+                ownedColumnsForPage(
+                    pageId);
+
+            for (Note *column : columns) {
+                Note *child =
+                    column->firstChild();
+
+                while (child) {
+                    Note *next =
+                        child->next();
+
+                    detachNoteForPageLayout(
+                        child);
+
+                    extracted.append(child);
+
+                    child = next;
+                }
+
+                detachNoteForPageLayout(
+                    column);
+
+                delete column;
+            }
+        }
+
+        page->freeLayout = true;
+        page->columnCount = columnCount;
+        page->layoutOwned = true;
+
+        for (Note *note : std::as_const(extracted))
+            appendTopLevelForPageLayout(note);
+    } else {
+        QList<Note *> nodes =
+            extracted;
+
+        // A free Page stores its Mathoms directly at top level.
+        // Move only this Page's nodes into its future columns.
+        if (wasFree) {
+            Note *note =
+                m_firstNote;
+
+            while (note) {
+                Note *next =
+                    note->next();
+
+                if (note->parentNote() == nullptr
+                    && note->pageId() == pageId) {
+                    detachNoteForPageLayout(
+                        note);
+
+                    nodes.append(note);
+                }
+
+                note = next;
+            }
+        }
+
+        page->freeLayout = false;
+        page->columnCount = columnCount;
+        page->layoutOwned = true;
+
+        QList<Note *> columns =
+            ownedColumnsForPage(
+                pageId);
+
+        while (columns.size()
+               < columnCount) {
+            Note *column =
+                new Note(this);
+
+            column->setPageId(
+                pageId);
+
+            appendTopLevelForPageLayout(
+                column);
+
+            columns.append(column);
+        }
+
+        while (columns.size()
+               > columnCount) {
+            Note *column =
+                columns.takeLast();
+
+            Note *target =
+                columns.at(
+                    columnCount - 1);
+
+            Note *child =
+                column->firstChild();
+
+            while (child) {
+                Note *next =
+                    child->next();
+
+                detachNoteForPageLayout(
+                    child);
+
+                appendChildForPageLayout(
+                    child,
+                    target);
+
+                child = next;
+            }
+
+            detachNoteForPageLayout(
+                column);
+
+            delete column;
+        }
+
+        if (!columns.isEmpty()) {
+            Note *firstColumn =
+                columns.first();
+
+            for (Note *note : std::as_const(nodes)) {
+                appendChildForPageLayout(
+                    note,
+                    firstColumn);
+            }
+        }
+    }
+
+    unselectAll();
+
+    filterAgain(
+        /*andEnsureVisible=*/false);
+
+    if (freeLayout)
+        relayoutNotes();
+    else
+        equalizeColumnSizes();
+
+    save();
+
+    Q_EMIT pagesChanged();
 }
 
 void BasketScene::assignPageToNoteTree(
@@ -1434,7 +2044,7 @@ bool BasketScene::normalizePageForNoteTree(
     // when Page-owned layouts become active.
     const bool legacySharedColumn =
         note->parentNote() == nullptr
-        && isColumnsLayout()
+        && m_columnsCount > 0
         && note->pageId().isEmpty();
 
     if (legacySharedColumn)
@@ -1593,8 +2203,16 @@ QString BasketScene::createPage()
             std::max(1, columnsCount());
     }
 
+    page.layoutOwned = true;
+
     m_pages.append(page);
     m_currentPageId = page.id;
+
+    if (!page.freeLayout) {
+        createOwnedColumnsForPage(
+            page.id,
+            page.columnCount);
+    }
 
     refreshPageAppearance();
 
@@ -1661,8 +2279,16 @@ QString BasketScene::ensureTodayPage()
             std::max(1, columnsCount());
     }
 
+    page.layoutOwned = true;
+
     m_pages.append(page);
     m_currentPageId = page.id;
+
+    if (!page.freeLayout) {
+        createOwnedColumnsForPage(
+            page.id,
+            page.columnCount);
+    }
 
     refreshPageAppearance();
 
@@ -1875,17 +2501,9 @@ void BasketScene::load()
     m_watcher->startScan();
 
     signalCountsChanged();
-    if (isColumnsLayout()) {
-        // Count the number of columns:
-        int columnsCount = 0;
-        Note *column = firstNote();
-        while (column) {
-            ++columnsCount;
-            column = column->next();
-        }
-        m_columnsCount = columnsCount;
-    }
 
+    // m_columnsCount now remains the legacy shelf fallback.
+    // Page-owned column counts are stored in PageInfo.
     relayoutNotes();
 
     // On application start, the current basket is not focused yet, so the focus rectangle is not shown when calling focusANote():
@@ -2988,14 +3606,16 @@ void BasketScene::insertCreatedNote(Note *note, bool assignPage)
             pos = QPointF(m_focusedNote->x(), m_focusedNote->bottom());
             // Insert at the end of the last column:
         } else if (isColumnsLayout()) {
-            Note *column = /*(Settings::newNotesPlace == 0 ?*/ firstNote() /*: lastNote())*/;
-            /*if (Settings::newNotesPlace == 0 && column->firstChild()) { // On Top, if at least one child in the column
-                clicked = column->firstChild();
-                zone    = Note::TopInsert;
-            } else { // On Bottom*/
-            clicked = column;
-            zone = Note::BottomColumn;
-            /*}*/
+            Note *column =
+                firstColumnForCurrentPage();
+
+            if (column) {
+                clicked = column;
+                zone = Note::BottomColumn;
+            } else {
+                pos = QPointF(0, 0);
+            }
+
             // Insert at free position:
         } else {
             pos = QPointF(0, 0);
@@ -3923,11 +4543,18 @@ Note *BasketScene::noteAt(QPointF pos)
 
     // If the basket is layouted in columns, return one of the columns to be able to add notes in them:
     if (isColumnsLayout()) {
-        Note *column = m_firstNote;
+        Note *column =
+            firstColumnForCurrentPage();
+
         while (column) {
-            if (x >= column->x() && x < column->rightLimit())
+            if (x >= column->x()
+                && x < column->rightLimit()) {
                 return column;
-            column = column->next();
+            }
+
+            column =
+                nextColumnInSamePage(
+                    column);
         }
     }
 
@@ -5500,10 +6127,19 @@ void BasketScene::noteMoveOnTop()
     // Replug the notes:
     Note *fakeNote = NoteFactory::createNoteColor(Qt::red, this);
     if (isColumnsLayout()) {
-        if (firstNote()->firstChild())
-            insertNote(fakeNote, firstNote()->firstChild(), Note::TopInsert);
-        else
-            insertNote(fakeNote, firstNote(), Note::BottomColumn);
+        Note *column =
+            firstColumnForCurrentPage();
+
+        if (column && column->firstChild())
+            insertNote(
+                fakeNote,
+                column->firstChild(),
+                Note::TopInsert);
+        else if (column)
+            insertNote(
+                fakeNote,
+                column,
+                Note::BottomColumn);
     } else {
         // TODO: Also allow to move notes on top of a group!!!!!!!
         insertNote(fakeNote, nullptr, Note::BottomInsert);
@@ -5527,9 +6163,16 @@ void BasketScene::noteMoveOnBottom()
     unplugSelection(selection);
     // Replug the notes:
     Note *fakeNote = NoteFactory::createNoteColor(Qt::red, this);
-    if (isColumnsLayout())
-        insertNote(fakeNote, firstNote(), Note::BottomColumn);
-    else {
+    if (isColumnsLayout()) {
+        Note *column =
+            firstColumnForCurrentPage();
+
+        if (column)
+            insertNote(
+                fakeNote,
+                column,
+                Note::BottomColumn);
+    } else {
         // TODO: Also allow to move notes on top of a group!!!!!!!
         insertNote(fakeNote, nullptr, Note::BottomInsert);
     }

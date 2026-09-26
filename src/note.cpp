@@ -210,8 +210,16 @@ QString Note::toText(const QString &cuttedFullPath)
 bool Note::computeMatching(const FilterData &data)
 {
     // A structural group/column can now belong to one Page.
-    // An empty pageId deliberately means "legacy/shared container".
     if (!content()) {
+        if (basket()
+            && basket()->currentPageOwnsLayout()
+            && parentNote() == nullptr
+            && m_pageId.isEmpty()) {
+            // This is an old shared root structure. A Page that already
+            // owns its layout must no longer display it.
+            return false;
+        }
+
         if (basket()
             && !basket()->currentPageId().isEmpty()
             && !m_pageId.isEmpty()
@@ -657,18 +665,30 @@ qreal Note::yExpander()
 
 bool Note::isFree() const
 {
-    return parentNote() == nullptr && basket() && basket()->isFreeLayout();
+    return parentNote() == nullptr
+        && basket()
+        && basket()->isFreeLayoutForPage(
+            m_pageId);
 }
 
 bool Note::isColumn() const
 {
-    return parentNote() == nullptr && basket() && basket()->isColumnsLayout();
+    return isGroup()
+        && parentNote() == nullptr
+        && basket()
+        && basket()->isColumnsLayoutForPage(
+            m_pageId);
 }
 
 bool Note::hasResizer() const
 {
-    // "isFree" || "isColumn but not the last"
-    return parentNote() == nullptr && ((basket() && basket()->isFreeLayout()) || d->next != nullptr);
+    if (isFree())
+        return true;
+
+    return isColumn()
+        && basket()
+        && basket()->nextColumnInSamePage(
+            const_cast<Note *>(this));
 }
 
 qreal Note::resizerHeight() const
@@ -1195,8 +1215,18 @@ void Note::relayoutAt(qreal ax, qreal ay, bool animate)
         ay = targetY();
         // If it's a column, it always have the same "fixed" position (no animation):
     } else if (isColumn()) {
-        ax = (prev() ? prev()->rightLimit() + RESIZER_WIDTH : 0);
+        Note *previousColumn =
+            basket()->previousColumnInSamePage(
+                this);
+
+        ax =
+            previousColumn
+                ? previousColumn->rightLimit()
+                      + RESIZER_WIDTH
+                : 0;
+
         ay = 0;
+
         setX(ax, animate);
         setY(ay, animate);
         // But relayout others vertically if they are inside such primary groups or if it is a "normal" basket:
@@ -1307,22 +1337,42 @@ qreal Note::groupWidth() const
 
 qreal Note::rightLimit() const
 {
-    if (isColumn() && d->next == nullptr) // The last column
-        return std::max((x() + minWidth()), (qreal)basket()->graphicsView()->viewport()->width());
-    else if (parentNote())
+    if (isColumn()
+        && basket()
+        && !basket()->nextColumnInSamePage(
+            const_cast<Note *>(this))) {
+        return std::max(
+            x() + minWidth(),
+            (qreal)basket()
+                ->graphicsView()
+                ->viewport()
+                ->width());
+    }
+
+    if (parentNote())
         return parentNote()->rightLimit();
-    else
-        return x() + m_groupWidth;
+
+    return x() + m_groupWidth;
 }
 
 qreal Note::finalRightLimit() const
 {
-    if (isColumn() && d->next == nullptr) // The last column
-        return std::max(x() + minWidth(), (qreal)basket()->graphicsView()->viewport()->width());
-    else if (parentNote())
+    if (isColumn()
+        && basket()
+        && !basket()->nextColumnInSamePage(
+            const_cast<Note *>(this))) {
+        return std::max(
+            x() + minWidth(),
+            (qreal)basket()
+                ->graphicsView()
+                ->viewport()
+                ->width());
+    }
+
+    if (parentNote())
         return parentNote()->finalRightLimit();
-    else
-        return x() + m_groupWidth;
+
+    return x() + m_groupWidth;
 }
 
 void Note::drawExpander(QPainter *painter, qreal x, qreal y, const QColor &background, bool expand, BasketScene *basket)

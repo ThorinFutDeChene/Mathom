@@ -161,7 +161,7 @@ public Q_SLOTS:
     void screenshotGrabbed(const QPixmap &pixmap);
     /** BasketScene */
     void askNewBasket();
-    void askNewBasket(BasketScene *parent, BasketScene *pickProperties);
+    void askNewBasket(BasketScene *parent);
     void askNewSubBasket();
     void askNewSiblingBasket();
     void aboutToHideNewBasketPopup();

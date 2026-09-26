@@ -73,6 +73,7 @@
 #include "noteedit.h" // To launch InlineEditors::initToolBars()
 #include "notefactory.h"
 #include "passworddialog.h"
+#include "pagesidebar.h"
 #include "regiongrabber.h"
 #include "settings.h"
 #include "softwareimporters.h"
@@ -222,6 +223,7 @@ void BNPView::onFirstShow()
     setSizes(splitterSizes);
 
     updateTreeToggleButton();
+    updatePagesToggleButton();
 }
 
 void BNPView::setupGlobalShortcuts()
@@ -339,10 +341,57 @@ void BNPView::initialize()
     contentLayout->setSpacing(0);
 
     m_navigationBar = new MathomNavigationBar(m_contentPane);
-    m_stack = new QStackedWidget(m_contentPane);
+
+    m_pagesSplitter = new QSplitter(Qt::Horizontal, m_contentPane);
+    m_stack = new QStackedWidget(m_pagesSplitter);
+    m_pageSidebar = new PageSidebar(m_pagesSplitter);
+
+    m_pagesSplitter->setOpaqueResize(true);
+    m_pagesSplitter->setChildrenCollapsible(false);
+    m_pagesSplitter->setCollapsible(0, false);
+    m_pagesSplitter->setCollapsible(1, true);
+    m_pagesSplitter->setStretchFactor(0, 1);
+    m_pagesSplitter->setStretchFactor(1, 0);
+    m_pagesSplitter->setHandleWidth(18);
+    m_pagesSplitter->setSizes({800, m_pagesLastWidth});
+
+    QSplitterHandle *pagesHandle = m_pagesSplitter->handle(1);
+
+    if (pagesHandle) {
+        auto *pagesHandleLayout = new QVBoxLayout(pagesHandle);
+        pagesHandleLayout->setContentsMargins(0, 0, 0, 0);
+        pagesHandleLayout->setSpacing(0);
+        pagesHandleLayout->addStretch();
+
+        m_pagesToggleButton = new QToolButton(pagesHandle);
+        m_pagesToggleButton->setAutoRaise(true);
+        m_pagesToggleButton->setFixedSize(16, 42);
+        m_pagesToggleButton->setFocusPolicy(Qt::NoFocus);
+
+        pagesHandleLayout->addWidget(
+            m_pagesToggleButton,
+            0,
+            Qt::AlignCenter);
+
+        pagesHandleLayout->addStretch();
+
+        connect(
+            m_pagesToggleButton,
+            &QToolButton::clicked,
+            this,
+            &BNPView::togglePagesVisibility);
+
+        connect(
+            m_pagesSplitter,
+            &QSplitter::splitterMoved,
+            this,
+            [this](int, int) {
+                updatePagesToggleButton();
+            });
+    }
 
     contentLayout->addWidget(m_navigationBar);
-    contentLayout->addWidget(m_stack, 1);
+    contentLayout->addWidget(m_pagesSplitter, 1);
 
     setOpaqueResize(true);
 
@@ -1451,6 +1500,8 @@ void BNPView::setCurrentBasket(BasketScene *basket)
             basket->aboutToBeActivated();
             basket->relayoutNotes();
             basket->openBasket();
+            if (m_pageSidebar)
+                m_pageSidebar->setBasket(basket);
             countsChanged(basket);
             updateStatusBarHint();
         }
@@ -1474,6 +1525,8 @@ void BNPView::setCurrentBasket(BasketScene *basket)
         m_tree->setCurrentItem(item);
         item->ensureVisible();
         m_stack->setCurrentWidget(basket->decoration());
+        if (m_pageSidebar)
+            m_pageSidebar->setBasket(basket);
         // If the window has changed size, only the current basket receive the event,
         // the others will receive only one just before they are shown.
         // But this triggers unwanted animations, so we eliminate it:
@@ -1646,6 +1699,63 @@ void BNPView::updateTreeToggleButton()
     }
 
     m_treeToggleButton->setArrowType(arrow);
+}
+
+void BNPView::togglePagesVisibility()
+{
+    if (!m_pagesSplitter || !m_pageSidebar)
+        return;
+
+    DiagnosticManager::instance().logEvent(QStringLiteral("PAGES_PANEL_TOGGLE_BEGIN"));
+
+    QList<int> currentSizes = m_pagesSplitter->sizes();
+
+    if (currentSizes.size() < 2)
+        return;
+
+    const int pageWidth = currentSizes.value(1);
+    int totalWidth = currentSizes.value(0) + currentSizes.value(1);
+
+    if (pageWidth > 0) {
+        m_pagesLastWidth = pageWidth;
+        m_pageSidebar->setMinimumWidth(0);
+        m_pageSidebar->setMaximumWidth(0);
+        currentSizes[0] = qMax(1, totalWidth);
+        currentSizes[1] = 0;
+    } else {
+        m_pageSidebar->setMinimumWidth(170);
+        m_pageSidebar->setMaximumWidth(360);
+
+        int restoredWidth = m_pagesLastWidth > 0 ? m_pagesLastWidth : 220;
+        restoredWidth = qBound(170, restoredWidth, qMax(170, totalWidth - 100));
+
+        currentSizes[1] = restoredWidth;
+        currentSizes[0] = qMax(1, totalWidth - restoredWidth);
+    }
+
+    m_pagesSplitter->setSizes(currentSizes);
+    updatePagesToggleButton();
+
+    DiagnosticManager::instance().logEvent(
+        QStringLiteral("PAGES_PANEL_TOGGLE_OK"),
+        {{QStringLiteral("pages_hidden"), currentSizes.value(1) == 0}});
+}
+
+void BNPView::updatePagesToggleButton()
+{
+    if (!m_pagesToggleButton || !m_pagesSplitter || !m_pageSidebar)
+        return;
+
+    const QList<int> currentSizes = m_pagesSplitter->sizes();
+    const bool visible = currentSizes.size() >= 2 && currentSizes.value(1) > 0;
+
+    if (visible) {
+        m_pagesToggleButton->setArrowType(Qt::RightArrow);
+        m_pagesToggleButton->setToolTip(i18n("Hide pages"));
+    } else {
+        m_pagesToggleButton->setArrowType(Qt::LeftArrow);
+        m_pagesToggleButton->setToolTip(i18n("Show pages"));
+    }
 }
 
 void BNPView::setTreePlacement(bool onLeft)

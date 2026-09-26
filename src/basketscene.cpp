@@ -552,6 +552,9 @@ void BasketScene::loadNotes(const QDomElement &notes, Note *parent)
                 note->setAddedDate(QDateTime::fromString(e.attribute(QStringLiteral("added")), Qt::ISODate));
             if (e.hasAttribute(QStringLiteral("lastModification")))
                 note->setLastModificationDate(QDateTime::fromString(e.attribute(QStringLiteral("lastModification")), Qt::ISODate));
+
+            note->setPageId(
+                e.attribute(QStringLiteral("page")).trimmed());
         }
         // If we successfully loaded a note:
         if (note) {
@@ -606,6 +609,10 @@ void BasketScene::saveNotes(QXmlStreamWriter &stream, Note *parent)
             // Save Dates:
             stream.writeAttribute("added", note->addedDate().toString(Qt::ISODate));
             stream.writeAttribute("lastModification", note->lastModificationDate().toString(Qt::ISODate));
+
+            if (!note->pageId().isEmpty())
+                stream.writeAttribute("page", note->pageId());
+
             // Save Content:
             stream.writeAttribute("type", note->content()->lowerTypeName());
             note->content()->saveToNode(stream);
@@ -1056,6 +1063,115 @@ void BasketScene::loadPages(const QDomElement &pagesElement)
         m_currentPageId = m_pages.first().id;
 }
 
+void BasketScene::assignPageToNoteTree(
+    Note *note,
+    const QString &pageId)
+{
+    if (!note)
+        return;
+
+    if (note->content()) {
+        note->setPageId(pageId);
+        return;
+    }
+
+    for (Note *child = note->firstChild();
+         child;
+         child = child->next()) {
+        assignPageToNoteTree(child, pageId);
+    }
+}
+
+bool BasketScene::normalizePageForNoteTree(
+    Note *note,
+    const QSet<QString> &validPageIds,
+    const QString &fallbackPageId)
+{
+    if (!note)
+        return false;
+
+    bool changed = false;
+
+    if (note->content()) {
+        if (note->pageId().isEmpty()
+            || !validPageIds.contains(note->pageId())) {
+            note->setPageId(fallbackPageId);
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    for (Note *child = note->firstChild();
+         child;
+         child = child->next()) {
+        changed =
+            normalizePageForNoteTree(
+                child,
+                validPageIds,
+                fallbackPageId)
+            || changed;
+    }
+
+    return changed;
+}
+
+bool BasketScene::migratePageAssignments()
+{
+    // Empty shelves do not need a Page until their first real Mathom.
+    if (m_count <= 0)
+        return false;
+
+    bool changed = false;
+
+    // Pre-Pages Mathom/BasKet data has no page metadata at all.
+    // Preserve every existing Mathom by putting it on one migration Page.
+    if (m_pages.isEmpty()) {
+        PageInfo page;
+        page.id =
+            QUuid::createUuid().toString(
+                QUuid::WithoutBraces);
+        page.title = i18n("Page");
+        page.dayKey.clear();
+
+        m_pages.append(page);
+        m_currentPageId = page.id;
+        changed = true;
+    }
+
+    if (m_currentPageId.isEmpty()
+        && !m_pages.isEmpty()) {
+        m_currentPageId = m_pages.first().id;
+        changed = true;
+    }
+
+    QSet<QString> validPageIds;
+
+    for (const PageInfo &page : std::as_const(m_pages))
+        validPageIds.insert(page.id);
+
+    const QString fallbackPageId =
+        m_currentPageId.isEmpty()
+            ? m_pages.first().id
+            : m_currentPageId;
+
+    // Development builds of Pages already stored Page metadata but did
+    // not yet store a Page id in each Mathom. Attach such Mathoms to the
+    // currently selected Page instead of hiding or losing them.
+    for (Note *note = firstNote();
+         note;
+         note = note->next()) {
+        changed =
+            normalizePageForNoteTree(
+                note,
+                validPageIds,
+                fallbackPageId)
+            || changed;
+    }
+
+    return changed;
+}
+
 QString BasketScene::ensureTodayPage()
 {
     const QDate today = QDate::currentDate();
@@ -1076,6 +1192,9 @@ QString BasketScene::ensureTodayPage()
     m_pages.append(page);
     m_currentPageId = page.id;
 
+    if (m_loaded)
+        filterAgain(/*andEnsureVisible=*/false);
+
     Q_EMIT pagesChanged();
     Q_EMIT currentPageChanged(m_currentPageId);
 
@@ -1088,13 +1207,29 @@ void BasketScene::setCurrentPageId(const QString &pageId)
     if (pageId == m_currentPageId)
         return;
 
+    bool exists = false;
+
     for (const PageInfo &page : std::as_const(m_pages)) {
         if (page.id == pageId) {
-            m_currentPageId = pageId;
-            Q_EMIT currentPageChanged(m_currentPageId);
-            return;
+            exists = true;
+            break;
         }
     }
+
+    if (!exists)
+        return;
+
+    if (isDuringEdit())
+        closeEditor();
+
+    m_currentPageId = pageId;
+
+    if (m_loaded) {
+        filterAgain(/*andEnsureVisible=*/false);
+        save();
+    }
+
+    Q_EMIT currentPageChanged(m_currentPageId);
 }
 
 void BasketScene::renamePage(const QString &pageId, const QString &title)
@@ -1246,6 +1381,10 @@ void BasketScene::load()
     // Load notes
     m_finishLoadOnFirstShow = (Global::bnpView->currentBasket() != this);
     loadNotes(notes, nullptr);
+
+    const bool pageMigrationNeeded =
+        migratePageAssignments();
+
     if (m_shouldConvertPlainTextNotes)
         convertTexts();
 
@@ -1275,6 +1414,18 @@ void BasketScene::load()
     focusANote();
 
     m_loaded = true;
+
+    // Apply Page visibility after all Mathoms and their Page ids exist.
+    filterAgain(/*andEnsureVisible=*/false);
+
+    if (pageMigrationNeeded)
+        save();
+
+    Q_EMIT pagesChanged();
+
+    if (!m_currentPageId.isEmpty())
+        Q_EMIT currentPageChanged(m_currentPageId);
+
     enableActions();
 }
 
@@ -2089,7 +2240,24 @@ void BasketScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 
     if (note) {
         Note::Zone zone = (clicked ? clicked->zoneAt(pos - QPointF(clicked->x(), clicked->y()), /*toAdd=*/true) : Note::None);
-        bool animateNewPosition = NoteFactory::movingNotesInTheSameBasket(event->mimeData(), this, event->dropAction());
+        const bool movingWithinSameShelf =
+            NoteFactory::movingNotesInTheSameBasket(
+                event->mimeData(),
+                this,
+                event->dropAction());
+
+        bool animateNewPosition = movingWithinSameShelf;
+
+        if (!movingWithinSameShelf) {
+            const QString pageId = ensureTodayPage();
+
+            for (Note *current = note;
+                 current;
+                 current = current->next()) {
+                assignPageToNoteTree(current, pageId);
+            }
+        }
+
         if (animateNewPosition) {
             FOR_EACH_NOTE(n)
             {
@@ -2187,7 +2355,9 @@ void BasketScene::insertEmptyNote(int type)
     if (isDuringEdit())
         closeEditor();
     Note *note = NoteFactory::createEmptyNote((NoteType::Id)type, this);
-    insertCreatedNote(note /*, / *edit=* /true*/);
+    insertCreatedNote(
+        note,
+        /*assignPage=*/false);
     DiagnosticManager::instance().logEvent(
         QStringLiteral("NEW_MATHOM_OK"),
         {{QStringLiteral("folder"), folderName()},
@@ -2262,8 +2432,20 @@ void BasketScene::pasteNote(QClipboard::Mode mode)
     }
 }
 
-void BasketScene::insertCreatedNote(Note *note)
+void BasketScene::insertCreatedNote(Note *note, bool assignPage)
 {
+    if (assignPage && note) {
+        const QString pageId = ensureTodayPage();
+
+        // Do this before insertNote(): after insertion, the last new Mathom
+        // can become linked to pre-existing Mathoms in the shelf.
+        for (Note *current = note;
+             current;
+             current = current->next()) {
+            assignPageToNoteTree(current, pageId);
+        }
+    }
+
     // Get the insertion data if the user clicked inside the basket:
     Note *clicked = m_clickedToInsert;
     int zone = m_zoneToInsert;
@@ -4039,6 +4221,16 @@ bool BasketScene::closeEditor(bool deleteEmptyNote /* =true*/)
     m_editorHeight = -1;
     m_inactivityAutoSaveTimer.stop();
 
+    // An empty editor must not create an empty Page.
+    // The Page is created only once the new Mathom contains real content.
+    if (!isEmpty
+        && note
+        && note->pageId().isEmpty()) {
+        const QString pageId = ensureTodayPage();
+        assignPageToNoteTree(note, pageId);
+        save();
+    }
+
     // Delete the note if it is now empty:
     if (isEmpty && deleteEmptyNote) {
         focusANonSelectedNoteAboveOrThenBelow();
@@ -4252,6 +4444,14 @@ void BasketScene::noteEdit(Note *note, bool justAdded, const QPointF &clickedPoi
             if (m_focusedNote == editor->note())
                 m_focusedNote = nullptr;
             delete editor->note();
+            save();
+        } else if (justAdded
+                   && editor->note()
+                   && editor->note()->pageId().isEmpty()) {
+            const QString pageId = ensureTodayPage();
+            assignPageToNoteTree(
+                editor->note(),
+                pageId);
             save();
         }
         editor->deleteLater();

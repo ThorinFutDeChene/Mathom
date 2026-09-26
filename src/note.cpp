@@ -217,6 +217,14 @@ bool Note::computeMatching(const FilterData &data)
     if (basket()->editedNote() == this)
         return true;
 
+    // Pages are independent from the text/tag filter.
+    // When a page is selected, only Mathoms belonging to it are visible.
+    if (basket()
+        && !basket()->currentPageId().isEmpty()
+        && m_pageId != basket()->currentPageId()) {
+        return false;
+    }
+
     bool matching;
     // First match tags (they are fast to compute):
     switch (data.tagFilterType) {

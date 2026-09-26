@@ -11,6 +11,7 @@
 #include <QGraphicsItemGroup>
 #include <QList>
 #include <QSet>
+#include <QString>
 
 #include "basket_export.h"
 #include "tag.h"
@@ -171,6 +172,7 @@ private:
     NoteContent *m_content;
     QDateTime m_addedDate;
     QDateTime m_lastModificationDate;
+    QString m_pageId;
 
 public:
     inline BasketScene *basket() const
@@ -200,6 +202,17 @@ public:
     {
         return m_lastModificationDate;
     }
+
+    const QString &pageId() const
+    {
+        return m_pageId;
+    }
+
+    void setPageId(const QString &pageId)
+    {
+        m_pageId = pageId;
+    }
+
     QString addedStringDate();
     QString lastModificationStringDate();
     QString toText(const QString &cuttedFullPath);

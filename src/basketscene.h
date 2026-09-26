@@ -163,7 +163,7 @@ public:
     void ungroupNote(Note *group); /// << Unplug @p group but put child notes at its place.
     /// And this one do almost all the above methods depending on the context:
     void insertNote(Note *note, Note *clicked, int zone, const QPointF &pos = QPointF(), bool animate = false);
-    void insertCreatedNote(Note *note);
+    void insertCreatedNote(Note *note, bool assignPage = true);
     /// And working with selections:
     void unplugSelection(NoteSelection *selection);
     void insertSelection(NoteSelection *selection, Note *after);
@@ -243,6 +243,13 @@ private:
     QString m_currentPageId;
     void loadPages(const QDomElement &pages);
     void savePages(QXmlStreamWriter &stream);
+
+    void assignPageToNoteTree(Note *note, const QString &pageId);
+    bool normalizePageForNoteTree(
+        Note *note,
+        const QSet<QString> &validPageIds,
+        const QString &fallbackPageId);
+    bool migratePageAssignments();
 
     /// LOAD AND SAVE:
 private:

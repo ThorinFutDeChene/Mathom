@@ -9,14 +9,20 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 PACKAGING="$ROOT/packaging"
 APPDIR="$PACKAGING/Mathom.AppDir"
 DEBROOT="$PACKAGING/mathom-debroot"
-OUTPUT="$PACKAGING/mathom_${VERSION}-${REVISION}_${ARCH}.deb"
+if [ -n "$REVISION" ]; then
+    PACKAGE_VERSION="${VERSION}-${REVISION}"
+else
+    PACKAGE_VERSION="${VERSION}"
+fi
+
+OUTPUT="$PACKAGING/mathom_${PACKAGE_VERSION}_${ARCH}.deb"
 MANIFEST="$ROOT/.flatpak-manifest.json"
 
 LINUXDEPLOY="$PACKAGING/tools/linuxdeploy-x86_64.AppImage"
 
 cd "$ROOT"
 
-echo "=== Mathom ${VERSION}-${REVISION} : construction ==="
+echo "=== Mathom ${PACKAGE_VERSION} : construction ==="
 
 if [ ! -x "$LINUXDEPLOY" ]; then
     echo "Erreur : linuxdeploy absent ou non exécutable :"
@@ -223,7 +229,7 @@ done
 
 cat > "$DEBROOT/DEBIAN/control" <<CONTROL
 Package: mathom
-Version: ${VERSION}-${REVISION}
+Version: ${PACKAGE_VERSION}
 Section: office
 Priority: optional
 Architecture: ${ARCH}
@@ -285,7 +291,7 @@ echo
 echo "=== 7/7 Contrôles ==="
 
 test "$(dpkg-deb -f "$OUTPUT" Package)" = "mathom"
-test "$(dpkg-deb -f "$OUTPUT" Version)" = "${VERSION}-${REVISION}"
+test "$(dpkg-deb -f "$OUTPUT" Version)" = "${PACKAGE_VERSION}"
 test "$(dpkg-deb -f "$OUTPUT" Architecture)" = "$ARCH"
 
 CONTENTS_LIST="$PACKAGING/mathom-deb-contents.txt"

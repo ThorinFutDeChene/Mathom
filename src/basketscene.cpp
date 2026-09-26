@@ -31,6 +31,7 @@
 #include <QGraphicsSceneHelpEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QGridLayout>
+#include <QHash>
 #include <QInputDialog>
 #include <QKeyEvent>
 #include <QLabel>
@@ -76,6 +77,7 @@
 
 #include <algorithm>
 #include <cstdlib> // rand() function
+#include <utility>
 
 #include "animation.h"
 #include "backgroundmanager.h"

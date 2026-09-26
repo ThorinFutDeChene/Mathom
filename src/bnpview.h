@@ -34,6 +34,7 @@ class KXMLGUIClient;
 class ColorPicker;
 class RegionGrabber;
 class MathomNavigationBar;
+class PageSidebar;
 
 class BasketScene;
 class DecoratedBasket;
@@ -278,6 +279,10 @@ private:
     void toggleTreeVisibility();
     void updateTreeToggleButton();
 
+    // Pages sidebar:
+    void togglePagesVisibility();
+    void updatePagesToggleButton();
+
     DecoratedBasket *currentDecoratedBasket();
 
 public:
@@ -348,7 +353,11 @@ private:
 
     QWidget *m_contentPane = nullptr;
     MathomNavigationBar *m_navigationBar = nullptr;
+    QSplitter *m_pagesSplitter = nullptr;
     QStackedWidget *m_stack;
+    PageSidebar *m_pageSidebar = nullptr;
+    QToolButton *m_pagesToggleButton = nullptr;
+    int m_pagesLastWidth = 220;
     bool m_loading;
     bool m_newBasketPopup;
     bool m_firstShow;

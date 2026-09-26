@@ -4997,3 +4997,39 @@ msgstr "السماح بإصدارات تطوير Mathom"
 
 msgid "Development versions are intended for testing and may contain bugs."
 msgstr "إصدارات التطوير مخصصة للاختبار وقد تحتوي على أخطاء."
+
+
+# Mathom pages
+msgid "Page"
+msgstr "صفحة"
+
+msgid "Pages"
+msgstr "الصفحات"
+
+msgid "New Page"
+msgstr "صفحة جديدة"
+
+msgid "Sort"
+msgstr "فرز"
+
+msgid "Manual order"
+msgstr "ترتيب يدوي"
+
+msgid "Date - oldest first"
+msgstr "التاريخ - الأقدم أولاً"
+
+msgid "Date - newest first"
+msgstr "التاريخ - الأحدث أولاً"
+
+msgid "Name - A to Z"
+msgstr "الاسم - من أ إلى ي"
+
+msgid "Name - Z to A"
+msgstr "الاسم - من ي إلى أ"
+
+msgid "Hide pages"
+msgstr "إخفاء الصفحات"
+
+msgid "Show pages"
+msgstr "إظهار الصفحات"
+

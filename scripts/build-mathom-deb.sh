@@ -1,19 +1,29 @@
 #!/bin/sh
 set -eu
 
-VERSION="${MATHOM_VERSION:-0.1.12-1}"
-REVISION="${MATHOM_DEB_REVISION-}"
 ARCH="amd64"
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+APP_VERSION="${MATHOM_VERSION:-$(tr -d '[:space:]' < "$ROOT/VERSION")}"
+
+if printf '%s\n' "$APP_VERSION" | grep -Eq '^[0-9]+(\.[0-9]+)*-dev[0-9]+$'; then
+    BASE_VERSION="${APP_VERSION%%-dev*}"
+    DEV_NUMBER="${APP_VERSION##*-dev}"
+    DEFAULT_REVISION="0dev${DEV_NUMBER}"
+elif printf '%s\n' "$APP_VERSION" | grep -Eq '^[0-9]+(\.[0-9]+)*$'; then
+    BASE_VERSION="$APP_VERSION"
+    DEFAULT_REVISION="1"
+else
+    echo "Erreur : version Mathom invalide : $APP_VERSION"
+    exit 1
+fi
+
+REVISION="${MATHOM_DEB_REVISION:-$DEFAULT_REVISION}"
+PACKAGE_VERSION="${BASE_VERSION}-${REVISION}"
+
 PACKAGING="$ROOT/packaging"
 APPDIR="$PACKAGING/Mathom.AppDir"
 DEBROOT="$PACKAGING/mathom-debroot"
-if [ -n "$REVISION" ]; then
-    PACKAGE_VERSION="${VERSION}-${REVISION}"
-else
-    PACKAGE_VERSION="${VERSION}"
-fi
 
 OUTPUT="$PACKAGING/mathom_${PACKAGE_VERSION}_${ARCH}.deb"
 MANIFEST="$ROOT/.flatpak-manifest.json"

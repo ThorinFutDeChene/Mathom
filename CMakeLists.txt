@@ -7,6 +7,15 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Basket VERSION 2.50.90)
 
+# Version publique de Mathom.
+# La version historique Basket ci-dessus est conservée pour la compatibilité ABI.
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" MATHOM_VERSION)
+string(STRIP "${MATHOM_VERSION}" MATHOM_VERSION)
+
+if(NOT MATHOM_VERSION MATCHES "^[0-9]+(\\.[0-9]+)*(-dev[0-9]+)?$")
+    message(FATAL_ERROR "Invalid Mathom version: ${MATHOM_VERSION}")
+endif()
+
 set(QT_MIN_VERSION "6.5.0")
 set(KF_MIN_VERSION "6.9.0")
 

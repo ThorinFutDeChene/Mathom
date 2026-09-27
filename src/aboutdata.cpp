@@ -22,7 +22,7 @@ AboutData::AboutData()
                  QString(),
                  QString())
 {
-    setHomepage(QStringLiteral("https://github.com/ThorinFutDeChene/Mathom"));
+    setHomepage(QStringLiteral("https://github.com/ThorinFutDeChene/Mathom-Notes"));
     setBugAddress(QByteArray());
     setOrganizationDomain(QByteArrayLiteral("thorinux.fr"));
     setDesktopFileName(QStringLiteral("fr.thorinux.mathom"));

@@ -34,12 +34,12 @@ namespace
 const QString stableUpdateApiUrl =
     QStringLiteral(
         "https://api.github.com/repos/"
-        "ThorinFutDeChene/Mathom/releases/latest");
+        "ThorinFutDeChene/Mathom-Notes/releases/latest");
 
 const QString allUpdatesApiUrl =
     QStringLiteral(
         "https://api.github.com/repos/"
-        "ThorinFutDeChene/Mathom/releases?per_page=20");
+        "ThorinFutDeChene/Mathom-Notes/releases?per_page=20");
 }
 
 UpdateChecker::UpdateChecker(QWidget *parent)

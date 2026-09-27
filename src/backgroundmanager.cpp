@@ -279,6 +279,11 @@ QPixmap *BackgroundManager::preview(const QString &image)
     if (!QFileInfo::exists(previewPath)) {
         previewPath = QStandardPaths::locate(
             QStandardPaths::GenericDataLocation,
+            QStringLiteral("mathom/backgrounds/previews/") + entry->name);
+    }
+    if (!QFileInfo::exists(previewPath)) {
+        previewPath = QStandardPaths::locate(
+            QStandardPaths::GenericDataLocation,
             QStringLiteral("basket/backgrounds/previews/") + entry->name);
     }
     auto *previewPixmap = new QPixmap(previewPath);
@@ -359,6 +364,11 @@ QString BackgroundManager::previewPathForImageName(const QString &image)
         return {};
     } else {
         QString previewPath = Global::backgroundsFolder() + QStringLiteral("previews/") + entry->name;
+    if (!QFileInfo::exists(previewPath)) {
+        previewPath = QStandardPaths::locate(
+            QStandardPaths::GenericDataLocation,
+            QStringLiteral("mathom/backgrounds/previews/") + entry->name);
+    }
     if (!QFileInfo::exists(previewPath)) {
         previewPath = QStandardPaths::locate(
             QStandardPaths::GenericDataLocation,

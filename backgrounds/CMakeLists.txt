@@ -13,5 +13,5 @@ install(FILES
     strings.png
     todo.png
     working.png
-    DESTINATION ${KDE_INSTALL_DATADIR}/basket/backgrounds
+    DESTINATION ${KDE_INSTALL_DATADIR}/mathom/backgrounds
 )

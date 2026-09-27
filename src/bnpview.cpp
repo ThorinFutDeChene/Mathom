@@ -197,12 +197,22 @@ void BNPView::lateInit()
 
 void BNPView::addWelcomeBaskets()
 {
-    // First locate the English version:
-    QString path = QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("basket/welcome/Welcome.baskets"));
-    // Then try to locate the localized version:
+    // Mathom-owned welcome data has priority.
+    QString path = QStandardPaths::locate(
+        QStandardPaths::GenericDataLocation,
+        QStringLiteral("mathom/welcome/Welcome.baskets"));
+
+    // Compatibility with older Mathom/BasKet installations.
+    if (path.isEmpty()) {
+        path = QStandardPaths::locate(
+            QStandardPaths::GenericDataLocation,
+            QStringLiteral("basket/welcome/Welcome.baskets"));
+    }
+
+    // Then try to locate the localized version.
     path = KLocalizedString::localizedFilePath(path);
 
-    // Extract:
+    // Extract.
     Archive::open(path);
 }
 

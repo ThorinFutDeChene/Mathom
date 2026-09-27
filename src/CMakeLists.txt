@@ -144,27 +144,27 @@ install(TARGETS mathom DESTINATION ${KDE_INSTALL_BINDIR})
 
 add_library(basket_config_general MODULE kcm_basket/basket_config_general.cpp)
 target_link_libraries(basket_config_general LibBasket)
-install(TARGETS basket_config_general DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/basket/)
+install(TARGETS basket_config_general DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/mathom/)
 
 add_library(basket_config_baskets MODULE kcm_basket/basket_config_baskets.cpp)
 target_link_libraries(basket_config_baskets LibBasket)
-install(TARGETS basket_config_baskets DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/basket/)
+install(TARGETS basket_config_baskets DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/mathom/)
 
 add_library(basket_config_new_notes MODULE kcm_basket/basket_config_new_notes.cpp)
 target_link_libraries(basket_config_new_notes LibBasket)
-install(TARGETS basket_config_new_notes DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/basket/)
+install(TARGETS basket_config_new_notes DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/mathom/)
 
 add_library(basket_config_notes_appearance MODULE kcm_basket/basket_config_notes_appearance.cpp)
 target_link_libraries(basket_config_notes_appearance LibBasket)
-install(TARGETS basket_config_notes_appearance DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/basket/)
+install(TARGETS basket_config_notes_appearance DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/mathom/)
 
 add_library(basket_config_apps MODULE kcm_basket/basket_config_apps.cpp)
 target_link_libraries(basket_config_apps LibBasket)
-install(TARGETS basket_config_apps DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/basket/)
+install(TARGETS basket_config_apps DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/mathom/)
 
 add_library(basket_config_version_sync MODULE kcm_basket/basket_config_version_sync.cpp)
 target_link_libraries(basket_config_version_sync LibBasket)
-install(TARGETS basket_config_version_sync DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/basket/)
+install(TARGETS basket_config_version_sync DESTINATION ${KDE_INSTALL_PLUGINDIR}/pim/kcms/mathom/)
 
 
 install(FILES fr.thorinux.mathom.desktop DESTINATION ${KDE_INSTALL_APPDIR})

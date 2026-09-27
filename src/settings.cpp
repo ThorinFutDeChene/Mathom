@@ -374,7 +374,7 @@ void Settings::setAutoBullet(bool yes)
 SettingsDialog::SettingsDialog(QWidget *parent)
     : KCMultiDialog(parent)
 {
-    const QList<KPluginMetaData> availablePlugins = KPluginMetaData::findPlugins(QStringLiteral("pim/kcms/basket"));
+    const QList<KPluginMetaData> availablePlugins = KPluginMetaData::findPlugins(QStringLiteral("pim/kcms/mathom"));
     qCInfo(BASKET_LOG) << "SettingsDialog" << availablePlugins.size();
     for (const KPluginMetaData &metaData : availablePlugins) {
         qCInfo(BASKET_LOG) << "SettingsDialog" << metaData.pluginId() << metaData.fileName() << metaData.name();

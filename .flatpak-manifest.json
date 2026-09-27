@@ -35,7 +35,8 @@
          "name": "mathom",
          "buildsystem": "cmake-ninja",
          "config-opts": [
-            "-DBUILD_TESTING=OFF"
+            "-DBUILD_TESTING=OFF",
+            "-DBUILD_DEVTOOLS=OFF"
          ],
          "sources": [
             {

@@ -32,11 +32,11 @@ AboutData::AboutData()
     // default KAboutData author text also prevents KDE's default bug-report
     // address from being presented as a Mathom contact point.
     setCustomAuthorText(
-        i18n("For questions or help with Mathom: contact@thorinux.fr"),
-        i18n("For questions or help with Mathom: <a href=\"mailto:contact@thorinux.fr\">contact@thorinux.fr</a>"));
+        i18n("For questions or help with Mathom Notes: contact@thorinux.fr"),
+        i18n("For questions or help with Mathom Notes: <a href=\"mailto:contact@thorinux.fr\">contact@thorinux.fr</a>"));
 
     addAuthor(QStringLiteral("Thorinux Systems"),
-              i18n("Mathom maintainer and user support"),
+              i18n("Mathom Notes maintainer and user support"),
               QStringLiteral("contact@thorinux.fr"));
 
     // Keep the BasKet lineage visible for attribution, but do not present
@@ -66,5 +66,5 @@ QString AboutData::componentName()
 
 QString AboutData::displayName()
 {
-    return QStringLiteral("Mathom");
+    return QStringLiteral("Mathom Notes");
 }

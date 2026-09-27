@@ -5,8 +5,8 @@ Priority: optional
 Architecture: @ARCH@
 Maintainer: Thorinux Systems
 Depends: libc6, apport, systemd, xdg-utils
-Description: Mathom - notes and information organizer
- Mathom is an application for recording ideas as mathoms and
+Description: Mathom Notes - notes and information organizer
+ Mathom Notes is an application for recording ideas as mathoms and
  organizing them into Mathom-Houses and shelves.
  .
  Mathom is developed by Thorinux Systems and is based on

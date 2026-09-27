@@ -8,7 +8,7 @@ Categories=Qt;KDE;Office;
 
 X-DBUS-StartupType=Unique
 
-Name=Mathom
+Name=Mathom Notes
 GenericName=Notes and knowledge organizer
 GenericName[ar]=منظم الملاحظات والمهام
 GenericName[ca]=Organitzador de notes i tasques pendents

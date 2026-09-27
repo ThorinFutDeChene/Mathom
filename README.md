@@ -1,6 +1,6 @@
-# Mathom
+# Mathom Notes
 
-Mathom est un gestionnaire de notes et de connaissances développé par **Thorinux Systems** à partir de **BasKet Note Pads**.
+Mathom Notes est un gestionnaire de notes et de connaissances développé par **Thorinux Systems** à partir de **BasKet Note Pads**.
 
 L'application organise les informations selon trois niveaux :
 

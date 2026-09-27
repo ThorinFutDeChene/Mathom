@@ -7,7 +7,7 @@
   <developer id="fr.thorinux">
     <name translate="no">Thorinux Systems</name>
   </developer>
-  <name>Mathom</name>
+  <name>Mathom Notes</name>
   <summary>Notes and knowledge organizer</summary>
   <summary xml:lang="ar">منظم الملاحظات والمهام</summary>
   <summary xml:lang="ca">Organitzador de notes i tasques pendents</summary>
@@ -44,7 +44,7 @@
   <summary xml:lang="zh-CN">记事贴和待办事项组织工具</summary>
   <summary xml:lang="zh-TW">筆記與待辦事項管理工具</summary>
   <description>
-    <p>Mathom lets you organize information in Mathom-Houses, shelves and mathoms, with drag and drop.</p>
+    <p>Mathom Notes lets you organize information in Mathom-Houses, shelves and mathoms, with drag and drop.</p>
     <p xml:lang="ar">يوفر هذا التطبيق عددًا غير محدود من السلال، ويمكنك سحبها وإفلاتها.</p>
     <p xml:lang="ca">Aquesta aplicació proporciona tantes cistelles com desitgeu, i les podeu arrossegar i deixar anar.</p>
     <p xml:lang="ca-valencia">Esta aplicació proporciona tantes cistelles com voleu, i les podeu arrossegar i deixar anar.</p>
@@ -56,7 +56,7 @@
     <p xml:lang="et">See rakendus pakub nii palju korve, kui vähegi vaja, ning siin saab ka lohistada.</p>
     <p xml:lang="eu">Aplikazio honek nahi adina saski hornitzen ditu, eta arrastatu eta jaregin daiteke.</p>
     <p xml:lang="fi">Sovellus tarjoaa niin monta koria kuin haluat, ja se tukee vetämistä ja pudottamista.</p>
-    <p xml:lang="fr">Mathom organise vos informations en Mathom-Houses, étagères et mathoms, avec prise en charge du glisser-déposer.</p>
+    <p xml:lang="fr">Mathom Notes organise vos informations en Mathom-Houses, étagères et mathoms, avec prise en charge du glisser-déposer.</p>
     <p xml:lang="gl">Esta aplicación fornece todos os cestos que queira, e permite arrastrar e soltar.</p>
     <p xml:lang="he">היישום הזה מספק כמה סלים שנחוץ לך, אפשר גם לגרור.</p>
     <p xml:lang="ia">Iste application provide omne le panieros que on vole, e tu pote traher e deponer. </p>

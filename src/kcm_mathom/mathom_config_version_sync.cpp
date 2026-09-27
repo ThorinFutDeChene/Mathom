@@ -3,9 +3,9 @@
    SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 */
 
-#include "settings.h"
+#include "settings_versionsync.h"
 #include <KPluginFactory>
 
-K_PLUGIN_CLASS_WITH_JSON(ApplicationsPage, "basket_config_apps.json")
+K_PLUGIN_CLASS_WITH_JSON(VersionSyncPage, "mathom_config_version_sync.json")
 
-#include "basket_config_apps.moc"
+#include "mathom_config_version_sync.moc"

@@ -6,6 +6,6 @@
 #include "settings.h"
 #include <KPluginFactory>
 
-K_PLUGIN_CLASS_WITH_JSON(GeneralPage, "basket_config_general.json")
+K_PLUGIN_CLASS_WITH_JSON(GeneralPage, "mathom_config_general.json")
 
-#include "basket_config_general.moc"
+#include "mathom_config_general.moc"

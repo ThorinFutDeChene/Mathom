@@ -60,7 +60,7 @@
         ]
     },
     "X-KDE-CfgDlgHierarchy": "Basket",
-    "X-KDE-FactoryName": "basket_config_new_notes",
+    "X-KDE-FactoryName": "mathom_config_new_notes",
     "X-KDE-HasReadOnlyMode": "false",
     "X-KDE-ModuleType": "Library",
     "X-KDE-ParentApp": "basket",

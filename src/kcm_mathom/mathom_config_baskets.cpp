@@ -6,6 +6,6 @@
 #include "settings.h"
 #include <KPluginFactory>
 
-K_PLUGIN_CLASS_WITH_JSON(NewNotesPage, "basket_config_new_notes.json")
+K_PLUGIN_CLASS_WITH_JSON(BasketsPage, "mathom_config_baskets.json")
 
-#include "basket_config_new_notes.moc"
+#include "mathom_config_baskets.moc"

@@ -6,6 +6,6 @@
 #include "settings.h"
 #include <KPluginFactory>
 
-K_PLUGIN_CLASS_WITH_JSON(NotesAppearancePage, "basket_config_notes_appearance.json")
+K_PLUGIN_CLASS_WITH_JSON(NotesAppearancePage, "mathom_config_notes_appearance.json")
 
-#include "basket_config_notes_appearance.moc"
+#include "mathom_config_notes_appearance.moc"

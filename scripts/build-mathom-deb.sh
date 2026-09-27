@@ -175,43 +175,8 @@ mkdir -p \
 
 cp -a "$APPDIR" "$DEBROOT/opt/mathom"
 
-cat > "$DEBROOT/usr/bin/mathom" <<'WRAPPER'
-#!/bin/sh
-
-APPDIR="/opt/mathom"
-
-if [ -z "${XDG_MENU_PREFIX:-}" ]; then
-    if [ -f /etc/xdg/menus/mate-applications.menu ]; then
-        export XDG_MENU_PREFIX="mate-"
-    elif [ -f /etc/xdg/menus/gnome-applications.menu ]; then
-        export XDG_MENU_PREFIX="gnome-"
-    elif [ -f /etc/xdg/menus/plasma-applications.menu ]; then
-        export XDG_MENU_PREFIX="plasma-"
-    elif [ -f /etc/xdg/menus/kf5-applications.menu ]; then
-        export XDG_MENU_PREFIX="kf5-"
-    fi
-fi
-
-export XDG_DATA_DIRS="$APPDIR/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
-export PATH="$APPDIR/usr/bin:$PATH"
-
-# The self-contained KF6 runtime must search its own translations as well as
-# the host locale tree. This keeps the installed .deb identical to the lab
-# build for KStandardAction/KXmlGui strings.
-export XLOCALEDIR="$APPDIR/usr/share/locale"
-
-if [ -x "$APPDIR/usr/bin/kbuildsycoca6" ]; then
-    env \
-        LD_LIBRARY_PATH="$APPDIR/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
-        XDG_DATA_DIRS="$XDG_DATA_DIRS" \
-        XDG_MENU_PREFIX="${XDG_MENU_PREFIX:-}" \
-        "$APPDIR/usr/bin/kbuildsycoca6" >/dev/null 2>&1 || true
-fi
-
-exec "$APPDIR/AppRun" "$@"
-WRAPPER
-
-chmod 755 "$DEBROOT/usr/bin/mathom"
+install -Dm755 "$ROOT/packaging/debian/mathom-wrapper" \
+    "$DEBROOT/usr/bin/mathom"
 
 cp "$APPDIR/usr/share/applications/fr.thorinux.mathom.desktop" \
     "$DEBROOT/usr/share/applications/"
@@ -237,56 +202,17 @@ while IFS= read -r icon; do
     cp "$icon" "$destination/"
 done
 
-cat > "$DEBROOT/DEBIAN/control" <<CONTROL
-Package: mathom
-Version: ${PACKAGE_VERSION}
-Section: office
-Priority: optional
-Architecture: ${ARCH}
-Maintainer: Thorinux Systems
-Depends: libc6, apport, systemd, xdg-utils
-Description: Mathom - notes and information organizer
- Mathom is an application for recording ideas as mathoms and
- organizing them into Mathom-Houses and shelves.
- .
- Mathom is developed by Thorinux Systems and is based on
- BasKet Note Pads.
-CONTROL
+sed \
+    -e "s|@PACKAGE_VERSION@|${PACKAGE_VERSION}|g" \
+    -e "s|@ARCH@|${ARCH}|g" \
+    "$ROOT/packaging/debian/control.in" \
+    > "$DEBROOT/DEBIAN/control"
 
-cat > "$DEBROOT/DEBIAN/postinst" <<'POSTINST'
-#!/bin/sh
-set -e
+install -Dm755 "$ROOT/packaging/debian/postinst" \
+    "$DEBROOT/DEBIAN/postinst"
 
-# MATE/GNOME can keep the old launcher icon in cache after an upgrade.
-# Refresh the caches when the tools are available, without making them
-# mandatory dependencies of Mathom.
-if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-    gtk-update-icon-cache -f -q /usr/share/icons/hicolor || true
-fi
-
-if command -v update-desktop-database >/dev/null 2>&1; then
-    update-desktop-database -q /usr/share/applications || true
-fi
-
-exit 0
-POSTINST
-
-cat > "$DEBROOT/DEBIAN/postrm" <<'POSTRM'
-#!/bin/sh
-set -e
-
-if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-    gtk-update-icon-cache -f -q /usr/share/icons/hicolor || true
-fi
-
-if command -v update-desktop-database >/dev/null 2>&1; then
-    update-desktop-database -q /usr/share/applications || true
-fi
-
-exit 0
-POSTRM
-
-chmod 755 "$DEBROOT/DEBIAN/postinst" "$DEBROOT/DEBIAN/postrm"
+install -Dm755 "$ROOT/packaging/debian/postrm" \
+    "$DEBROOT/DEBIAN/postrm"
 
 echo
 echo "=== 6/7 Construction du paquet ==="

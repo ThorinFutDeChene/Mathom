@@ -36,6 +36,7 @@ public Q_SLOTS:
     void configureToolbars() override;
     void configureNotifications();
     void showSettingsDialog();
+    void showCustomAccessibilityDialog();
     void showUpdateSettingsDialog();
     void showAboutThorinuxDialog();
     void minimizeRestore();

@@ -12,6 +12,7 @@
 #include <QCheckBox>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QGroupBox>
 // #include <QDesktopWidget>
 #include <QLabel>
 #include <QMoveEvent>
@@ -176,10 +177,14 @@ void MainWindow::setupActions()
         i18n("TDAH"),
         QStringLiteral("adhd"));
 
-    addAccessibilityProfileAction(
-        QStringLiteral("profile_custom"),
-        i18n("Personnalisé..."),
-        QStringLiteral("custom"));
+    QAction *customProfileAction =
+        actionCollection()->addAction(
+            QStringLiteral("profile_custom"),
+            this,
+            &MainWindow::showCustomAccessibilityDialog);
+
+    customProfileAction->setText(
+        i18n("Personnalisé..."));
 
     QAction *diagnosticsAction =
         actionCollection()->addAction(QStringLiteral("help_open_diagnostics"), this, []() {
@@ -259,6 +264,553 @@ void MainWindow::showSettingsDialog()
 
     m_settings->show();
 }
+
+void MainWindow::showCustomAccessibilityDialog()
+{
+    QDialog dialog(this);
+
+    dialog.setWindowTitle(
+        i18n("Profil personnalisé"));
+
+    auto *layout =
+        new QVBoxLayout(&dialog);
+
+    auto *description =
+        new QLabel(
+            i18n(
+                "Sélectionnez les aides à appliquer. "
+                "Les modules peuvent être combinés librement."),
+            &dialog);
+
+    description->setWordWrap(true);
+    layout->addWidget(description);
+
+
+    auto config =
+        KSharedConfig::openConfig();
+
+    KConfigGroup custom(
+        config,
+        QStringLiteral(
+            "Accessibility Custom Modules"));
+
+
+    /*
+     * ============================================================
+     * TYPOGRAPHIE
+     * ============================================================
+     */
+
+    auto *typographyGroup =
+        new QGroupBox(
+            i18n("Typographie"),
+            &dialog);
+
+    auto *typographyLayout =
+        new QVBoxLayout(typographyGroup);
+
+
+    auto *adaptedFont =
+        new QCheckBox(
+            i18n("Police adaptée"),
+            typographyGroup);
+
+    adaptedFont->setChecked(
+        custom.readEntry(
+            QStringLiteral("adaptedFont"),
+            false));
+
+    typographyLayout->addWidget(
+        adaptedFont);
+
+
+    auto *largerText =
+        new QCheckBox(
+            i18n("Texte agrandi"),
+            typographyGroup);
+
+    largerText->setChecked(
+        custom.readEntry(
+            QStringLiteral("largerText"),
+            false));
+
+    typographyLayout->addWidget(
+        largerText);
+
+
+    auto *letterSpacing =
+        new QCheckBox(
+            i18n("Espacement des lettres"),
+            typographyGroup);
+
+    letterSpacing->setChecked(
+        custom.readEntry(
+            QStringLiteral("letterSpacing"),
+            false));
+
+    typographyLayout->addWidget(
+        letterSpacing);
+
+
+    auto *wordSpacing =
+        new QCheckBox(
+            i18n("Espacement des mots"),
+            typographyGroup);
+
+    wordSpacing->setChecked(
+        custom.readEntry(
+            QStringLiteral("wordSpacing"),
+            false));
+
+    typographyLayout->addWidget(
+        wordSpacing);
+
+
+    auto *lineSpacing =
+        new QCheckBox(
+            i18n("Interligne augmenté"),
+            typographyGroup);
+
+    lineSpacing->setChecked(
+        custom.readEntry(
+            QStringLiteral("lineSpacing"),
+            false));
+
+    typographyLayout->addWidget(
+        lineSpacing);
+
+
+    /*
+     * MODULE PREVU - ESPACEMENT DES PARAGRAPHES
+     *
+     * A decommenter lorsque le module sera operationnel.
+     */
+
+    // auto *paragraphSpacing =
+    //     new QCheckBox(
+    //         i18n("Espacement des paragraphes"),
+    //         typographyGroup);
+    //
+    // paragraphSpacing->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("paragraphSpacing"),
+    //         false));
+    //
+    // typographyLayout->addWidget(
+    //     paragraphSpacing);
+
+
+    layout->addWidget(
+        typographyGroup);
+
+
+    /*
+     * ============================================================
+     * AIDES A LA LECTURE
+     * ============================================================
+     *
+     * Interface deja preparee.
+     * Les lignes seront decommmentees module par module.
+     */
+
+    // auto *readingGroup =
+    //     new QGroupBox(
+    //         i18n("Aides à la lecture"),
+    //         &dialog);
+    //
+    // auto *readingLayout =
+    //     new QVBoxLayout(readingGroup);
+
+
+    /*
+     * LireCouleur : coloration syllabique
+     */
+
+    // auto *syllableColoring =
+    //     new QCheckBox(
+    //         i18n("Coloration des syllabes"),
+    //         readingGroup);
+    //
+    // syllableColoring->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("syllableColoring"),
+    //         false));
+    //
+    // readingLayout->addWidget(
+    //     syllableColoring);
+
+
+    /*
+     * LireCouleur : coloration des phonemes
+     */
+
+    // auto *phonemeColoring =
+    //     new QCheckBox(
+    //         i18n("Coloration des phonèmes"),
+    //         readingGroup);
+    //
+    // phonemeColoring->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("phonemeColoring"),
+    //         false));
+    //
+    // readingLayout->addWidget(
+    //     phonemeColoring);
+
+
+    /*
+     * Mise en evidence des graphemes
+     */
+
+    // auto *graphemeHighlight =
+    //     new QCheckBox(
+    //         i18n("Mise en évidence des graphèmes"),
+    //         readingGroup);
+    //
+    // graphemeHighlight->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("graphemeHighlight"),
+    //         false));
+    //
+    // readingLayout->addWidget(
+    //     graphemeHighlight);
+
+
+    /*
+     * Confusions visuelles b/d, p/q, etc.
+     */
+
+    // auto *confusableLetters =
+    //     new QCheckBox(
+    //         i18n("Aide aux lettres confondables"),
+    //         readingGroup);
+    //
+    // confusableLetters->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("confusableLetters"),
+    //         false));
+    //
+    // readingLayout->addWidget(
+    //     confusableLetters);
+
+
+    /*
+     * Alternance visuelle des lignes
+     */
+
+    // auto *alternatingLines =
+    //     new QCheckBox(
+    //         i18n("Alternance visuelle des lignes"),
+    //         readingGroup);
+    //
+    // alternatingLines->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("alternatingLines"),
+    //         false));
+    //
+    // readingLayout->addWidget(
+    //     alternatingLines);
+
+
+    /*
+     * Guide de lecture
+     */
+
+    // auto *readingGuide =
+    //     new QCheckBox(
+    //         i18n("Guide de lecture"),
+    //         readingGroup);
+    //
+    // readingGuide->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("readingGuide"),
+    //         false));
+    //
+    // readingLayout->addWidget(
+    //     readingGuide);
+
+
+    /*
+     * Ligne active
+     */
+
+    // auto *activeLineHighlight =
+    //     new QCheckBox(
+    //         i18n("Mettre en évidence la ligne active"),
+    //         readingGroup);
+    //
+    // activeLineHighlight->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("activeLineHighlight"),
+    //         false));
+    //
+    // readingLayout->addWidget(
+    //     activeLineHighlight);
+
+
+    /*
+     * Attenuation du reste du texte
+     */
+
+    // auto *dimOtherLines =
+    //     new QCheckBox(
+    //         i18n("Atténuer les autres lignes"),
+    //         readingGroup);
+    //
+    // dimOtherLines->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("dimOtherLines"),
+    //         false));
+    //
+    // readingLayout->addWidget(
+    //     dimOtherLines);
+
+
+    // layout->addWidget(
+    //     readingGroup);
+
+
+    /*
+     * ============================================================
+     * LECTURE VOCALE
+     * ============================================================
+     */
+
+    // auto *speechGroup =
+    //     new QGroupBox(
+    //         i18n("Lecture vocale"),
+    //         &dialog);
+    //
+    // auto *speechLayout =
+    //     new QVBoxLayout(speechGroup);
+
+
+    // auto *textToSpeech =
+    //     new QCheckBox(
+    //         i18n("Activer la lecture vocale"),
+    //         speechGroup);
+    //
+    // textToSpeech->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("textToSpeech"),
+    //         false));
+    //
+    // speechLayout->addWidget(
+    //     textToSpeech);
+
+
+    // auto *speechTracking =
+    //     new QCheckBox(
+    //         i18n("Suivre visuellement le texte lu"),
+    //         speechGroup);
+    //
+    // speechTracking->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("speechTracking"),
+    //         false));
+    //
+    // speechLayout->addWidget(
+    //     speechTracking);
+
+
+    // layout->addWidget(
+    //     speechGroup);
+
+
+    /*
+     * ============================================================
+     * CONCENTRATION / ERGONOMIE
+     * ============================================================
+     */
+
+    // auto *focusGroup =
+    //     new QGroupBox(
+    //         i18n("Concentration et ergonomie"),
+    //         &dialog);
+    //
+    // auto *focusLayout =
+    //     new QVBoxLayout(focusGroup);
+
+
+    // auto *reducedDistractions =
+    //     new QCheckBox(
+    //         i18n("Réduire les distractions"),
+    //         focusGroup);
+    //
+    // reducedDistractions->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("reducedDistractions"),
+    //         false));
+    //
+    // focusLayout->addWidget(
+    //     reducedDistractions);
+
+
+    // auto *largerControls =
+    //     new QCheckBox(
+    //         i18n("Agrandir les contrôles"),
+    //         focusGroup);
+    //
+    // largerControls->setChecked(
+    //     custom.readEntry(
+    //         QStringLiteral("largerControls"),
+    //         false));
+    //
+    // focusLayout->addWidget(
+    //     largerControls);
+
+
+    // layout->addWidget(
+    //     focusGroup);
+
+
+    /*
+     * ============================================================
+     * BOUTONS
+     * ============================================================
+     */
+
+    auto *buttons =
+        new QDialogButtonBox(
+            QDialogButtonBox::Ok
+            | QDialogButtonBox::Cancel,
+            &dialog);
+
+    layout->addWidget(buttons);
+
+    connect(
+        buttons,
+        &QDialogButtonBox::accepted,
+        &dialog,
+        &QDialog::accept);
+
+    connect(
+        buttons,
+        &QDialogButtonBox::rejected,
+        &dialog,
+        &QDialog::reject);
+
+
+    if (dialog.exec()
+        != QDialog::Accepted) {
+
+        return;
+    }
+
+
+    /*
+     * ============================================================
+     * ENREGISTREMENT DES MODULES ACTIFS
+     * ============================================================
+     */
+
+    custom.writeEntry(
+        QStringLiteral("adaptedFont"),
+        adaptedFont->isChecked());
+
+    custom.writeEntry(
+        QStringLiteral("largerText"),
+        largerText->isChecked());
+
+    custom.writeEntry(
+        QStringLiteral("letterSpacing"),
+        letterSpacing->isChecked());
+
+    custom.writeEntry(
+        QStringLiteral("wordSpacing"),
+        wordSpacing->isChecked());
+
+    custom.writeEntry(
+        QStringLiteral("lineSpacing"),
+        lineSpacing->isChecked());
+
+
+    /*
+     * FUTURS MODULES
+     *
+     * Les cles correspondent deja exactement a celles du moteur
+     * AccessibilitySettings.
+     */
+
+    // custom.writeEntry(
+    //     QStringLiteral("paragraphSpacing"),
+    //     paragraphSpacing->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("syllableColoring"),
+    //     syllableColoring->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("phonemeColoring"),
+    //     phonemeColoring->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("graphemeHighlight"),
+    //     graphemeHighlight->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("confusableLetters"),
+    //     confusableLetters->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("alternatingLines"),
+    //     alternatingLines->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("readingGuide"),
+    //     readingGuide->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("activeLineHighlight"),
+    //     activeLineHighlight->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("dimOtherLines"),
+    //     dimOtherLines->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("textToSpeech"),
+    //     textToSpeech->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("speechTracking"),
+    //     speechTracking->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("reducedDistractions"),
+    //     reducedDistractions->isChecked());
+
+    // custom.writeEntry(
+    //     QStringLiteral("largerControls"),
+    //     largerControls->isChecked());
+
+
+    /*
+     * Personnalise est considere actif des qu'au moins
+     * un module actuellement disponible est selectionne.
+     */
+
+    const bool customEnabled =
+        adaptedFont->isChecked()
+        || largerText->isChecked()
+        || letterSpacing->isChecked()
+        || wordSpacing->isChecked()
+        || lineSpacing->isChecked();
+
+    KConfigGroup profiles(
+        config,
+        QStringLiteral(
+            "Accessibility Profiles"));
+
+    profiles.writeEntry(
+        QStringLiteral("custom"),
+        customEnabled);
+
+    config->sync();
+
+    AccessibilitySettings::refreshAllDisplays();
+}
+
 
 void MainWindow::showUpdateSettingsDialog()
 {

@@ -27,19 +27,184 @@
 #include <KConfigGroup>
 #include <KSharedConfig>
 
+
 namespace
 {
 
-QFont dyslexiaFont(const QFont &base)
+void enable(
+    AccessibilityConfiguration &config,
+    AccessibilityModule module)
+{
+    config.modules |= module;
+}
+
+
+void applyDyslexiaPreset(
+    AccessibilityConfiguration &config)
+{
+    /*
+     * Modules deja operationnels dans le profil Dyslexie.
+     *
+     * Les futurs modules LireCouleur seront ajoutes ici
+     * progressivement lorsqu'ils seront implementes.
+     */
+    enable(config, AccessibilityModule::AdaptedFont);
+    enable(config, AccessibilityModule::LargerText);
+    enable(config, AccessibilityModule::LetterSpacing);
+    enable(config, AccessibilityModule::WordSpacing);
+    enable(config, AccessibilityModule::LineSpacing);
+}
+
+
+void applyCustomModules(
+    AccessibilityConfiguration &config)
+{
+    auto sharedConfig =
+        KSharedConfig::openConfig();
+
+    KConfigGroup custom(
+        sharedConfig,
+        QStringLiteral("Accessibility Custom Modules"));
+
+    auto readModule =
+        [&custom, &config](
+            const QString &key,
+            AccessibilityModule module)
+    {
+        if (custom.readEntry(key, false))
+            enable(config, module);
+    };
+
+    readModule(
+        QStringLiteral("adaptedFont"),
+        AccessibilityModule::AdaptedFont);
+
+    readModule(
+        QStringLiteral("largerText"),
+        AccessibilityModule::LargerText);
+
+    readModule(
+        QStringLiteral("letterSpacing"),
+        AccessibilityModule::LetterSpacing);
+
+    readModule(
+        QStringLiteral("wordSpacing"),
+        AccessibilityModule::WordSpacing);
+
+    readModule(
+        QStringLiteral("lineSpacing"),
+        AccessibilityModule::LineSpacing);
+
+    readModule(
+        QStringLiteral("paragraphSpacing"),
+        AccessibilityModule::ParagraphSpacing);
+
+    readModule(
+        QStringLiteral("syllableColoring"),
+        AccessibilityModule::SyllableColoring);
+
+    readModule(
+        QStringLiteral("phonemeColoring"),
+        AccessibilityModule::PhonemeColoring);
+
+    readModule(
+        QStringLiteral("graphemeHighlight"),
+        AccessibilityModule::GraphemeHighlight);
+
+    readModule(
+        QStringLiteral("confusableLetters"),
+        AccessibilityModule::ConfusableLetters);
+
+    readModule(
+        QStringLiteral("alternatingLines"),
+        AccessibilityModule::AlternatingLines);
+
+    readModule(
+        QStringLiteral("readingGuide"),
+        AccessibilityModule::ReadingGuide);
+
+    readModule(
+        QStringLiteral("activeLineHighlight"),
+        AccessibilityModule::ActiveLineHighlight);
+
+    readModule(
+        QStringLiteral("dimOtherLines"),
+        AccessibilityModule::DimOtherLines);
+
+    readModule(
+        QStringLiteral("textToSpeech"),
+        AccessibilityModule::TextToSpeech);
+
+    readModule(
+        QStringLiteral("speechTracking"),
+        AccessibilityModule::SpeechTracking);
+
+    readModule(
+        QStringLiteral("reducedDistractions"),
+        AccessibilityModule::ReducedDistractions);
+
+    readModule(
+        QStringLiteral("largerControls"),
+        AccessibilityModule::LargerControls);
+
+
+    /*
+     * Valeurs personnalisables.
+     *
+     * L'interface Personnalise les exposera ensuite.
+     */
+    config.fontFamily =
+        custom.readEntry(
+            QStringLiteral("fontFamily"),
+            config.fontFamily);
+
+    config.fontPointSize =
+        custom.readEntry(
+            QStringLiteral("fontPointSize"),
+            config.fontPointSize);
+
+    config.letterSpacingPercent =
+        custom.readEntry(
+            QStringLiteral("letterSpacingPercent"),
+            config.letterSpacingPercent);
+
+    config.wordSpacing =
+        custom.readEntry(
+            QStringLiteral("wordSpacing"),
+            config.wordSpacing);
+
+    config.lineSpacingPercent =
+        custom.readEntry(
+            QStringLiteral("lineSpacingPercent"),
+            config.lineSpacingPercent);
+
+    config.paragraphSpacing =
+        custom.readEntry(
+            QStringLiteral("paragraphSpacingValue"),
+            config.paragraphSpacing);
+}
+
+
+QFont accessibleFont(
+    const QFont &base,
+    const AccessibilityConfiguration &config)
 {
     QFont font(base);
 
-    font.setFamily(QStringLiteral("Noto Sans"));
-    font.setPointSizeF(14.0);
-    font.setLetterSpacing(
-        QFont::PercentageSpacing,
-        110.0);
-    font.setWordSpacing(3.0);
+    if (config.has(AccessibilityModule::AdaptedFont))
+        font.setFamily(config.fontFamily);
+
+    if (config.has(AccessibilityModule::LargerText))
+        font.setPointSizeF(config.fontPointSize);
+
+    if (config.has(AccessibilityModule::LetterSpacing)) {
+        font.setLetterSpacing(
+            QFont::PercentageSpacing,
+            config.letterSpacingPercent);
+    }
+
+    if (config.has(AccessibilityModule::WordSpacing))
+        font.setWordSpacing(config.wordSpacing);
 
     return font;
 }
@@ -48,39 +213,76 @@ QFont dyslexiaFont(const QFont &base)
 class AccessibilityHighlighter : public QSyntaxHighlighter
 {
 public:
-    explicit AccessibilityHighlighter(QTextDocument *document)
+    explicit AccessibilityHighlighter(
+        QTextDocument *document)
         : QSyntaxHighlighter(document)
     {
         setObjectName(
-            QStringLiteral("mathomAccessibilityHighlighter"));
+            QStringLiteral(
+                "mathomAccessibilityHighlighter"));
     }
 
-    void setDyslexiaEnabled(bool enabled)
+    void setConfiguration(
+        const AccessibilityConfiguration &configuration)
     {
-        m_dyslexiaEnabled = enabled;
+        m_configuration = configuration;
         rehighlight();
     }
 
 protected:
-    void highlightBlock(const QString &text) override
+    void highlightBlock(
+        const QString &text) override
     {
-        if (!m_dyslexiaEnabled || text.isEmpty())
+        if (text.isEmpty())
             return;
 
         QTextCharFormat format;
+        bool hasFormatting = false;
 
-        format.setFontFamilies(
-            QStringList{QStringLiteral("Noto Sans")});
+        if (m_configuration.has(
+                AccessibilityModule::AdaptedFont)) {
 
-        format.setFontPointSize(14.0);
-        format.setFontLetterSpacing(110.0);
-        format.setFontWordSpacing(3.0);
+            format.setFontFamilies(
+                QStringList{
+                    m_configuration.fontFamily});
 
-        setFormat(0, text.length(), format);
+            hasFormatting = true;
+        }
+
+        if (m_configuration.has(
+                AccessibilityModule::LargerText)) {
+
+            format.setFontPointSize(
+                m_configuration.fontPointSize);
+
+            hasFormatting = true;
+        }
+
+        if (m_configuration.has(
+                AccessibilityModule::LetterSpacing)) {
+
+            format.setFontLetterSpacing(
+                m_configuration
+                    .letterSpacingPercent);
+
+            hasFormatting = true;
+        }
+
+        if (m_configuration.has(
+                AccessibilityModule::WordSpacing)) {
+
+            format.setFontWordSpacing(
+                m_configuration.wordSpacing);
+
+            hasFormatting = true;
+        }
+
+        if (hasFormatting)
+            setFormat(0, text.length(), format);
     }
 
 private:
-    bool m_dyslexiaEnabled = false;
+    AccessibilityConfiguration m_configuration;
 };
 
 
@@ -92,15 +294,19 @@ AccessibilityHighlighter *accessibilityHighlighter(
 
     QObject *object =
         document->findChild<QObject *>(
-            QStringLiteral("mathomAccessibilityHighlighter"),
+            QStringLiteral(
+                "mathomAccessibilityHighlighter"),
             Qt::FindDirectChildrenOnly);
 
     auto *highlighter =
-        dynamic_cast<AccessibilityHighlighter *>(object);
+        dynamic_cast<AccessibilityHighlighter *>(
+            object);
 
-    if (!highlighter)
+    if (!highlighter) {
         highlighter =
-            new AccessibilityHighlighter(document);
+            new AccessibilityHighlighter(
+                document);
+    }
 
     return highlighter;
 }
@@ -108,15 +314,45 @@ AccessibilityHighlighter *accessibilityHighlighter(
 } // namespace
 
 
-bool AccessibilitySettings::dyslexiaEnabled()
+AccessibilityConfiguration
+AccessibilitySettings::effectiveConfiguration()
 {
-    KConfigGroup group(
-        KSharedConfig::openConfig(),
+    AccessibilityConfiguration configuration;
+
+    auto config =
+        KSharedConfig::openConfig();
+
+    KConfigGroup profiles(
+        config,
         QStringLiteral("Accessibility Profiles"));
 
-    return group.readEntry(
-        QStringLiteral("dyslexia"),
-        false);
+    /*
+     * Les profils sont des PRESETS.
+     *
+     * Ils ne modifient jamais directement l'affichage.
+     */
+    if (profiles.readEntry(
+            QStringLiteral("dyslexia"),
+            false)) {
+
+        applyDyslexiaPreset(configuration);
+    }
+
+    /*
+     * Les autres profils seront raccordes a leurs presets
+     * au fur et a mesure de leur implementation.
+     *
+     * Les cases peuvent deja coexister sans conflit.
+     */
+
+    if (profiles.readEntry(
+            QStringLiteral("custom"),
+            false)) {
+
+        applyCustomModules(configuration);
+    }
+
+    return configuration;
 }
 
 
@@ -130,11 +366,12 @@ void AccessibilitySettings::applyToTextEditor(
             "mathomAccessibilityEditor").toBool())
         return;
 
-    const bool dyslexia = dyslexiaEnabled();
+    const AccessibilityConfiguration configuration =
+        effectiveConfiguration();
 
     /*
      * Editeur HTML :
-     * couche visuelle temporaire uniquement.
+     * couche de presentation uniquement.
      */
     if (editor->property(
             "mathomAccessibilityRichText").toBool()) {
@@ -143,8 +380,10 @@ void AccessibilitySettings::applyToTextEditor(
             accessibilityHighlighter(
                 editor->document());
 
-        if (highlighter)
-            highlighter->setDyslexiaEnabled(dyslexia);
+        if (highlighter) {
+            highlighter->setConfiguration(
+                configuration);
+        }
 
         editor->viewport()->update();
         return;
@@ -153,10 +392,13 @@ void AccessibilitySettings::applyToTextEditor(
     /*
      * Editeur texte brut.
      */
-    if (!editor->property("mathomOriginalFont").isValid()) {
+    if (!editor->property(
+            "mathomOriginalFont").isValid()) {
+
         editor->setProperty(
             "mathomOriginalFont",
-            QVariant::fromValue(editor->font()));
+            QVariant::fromValue(
+                editor->font()));
     }
 
     const QFont originalFont =
@@ -167,13 +409,15 @@ void AccessibilitySettings::applyToTextEditor(
     const QSignalBlocker documentBlocker(
         editor->document());
 
-    QFont font = originalFont;
+    editor->setFont(
+        accessibleFont(
+            originalFont,
+            configuration));
 
-    if (dyslexia)
-        font = dyslexiaFont(originalFont);
-
-    editor->setFont(font);
-    editor->document()->setDefaultFont(font);
+    editor->document()->setDefaultFont(
+        accessibleFont(
+            originalFont,
+            configuration));
 
     for (QTextBlock block =
              editor->document()->begin();
@@ -181,17 +425,29 @@ void AccessibilitySettings::applyToTextEditor(
          block = block.next()) {
 
         QTextCursor cursor(block);
+
         QTextBlockFormat format =
             cursor.blockFormat();
 
-        if (dyslexia) {
+        if (configuration.has(
+                AccessibilityModule::LineSpacing)) {
+
             format.setLineHeight(
-                150.0,
+                configuration.lineSpacingPercent,
                 QTextBlockFormat::ProportionalHeight);
+
         } else {
+
             format.setLineHeight(
                 100.0,
                 QTextBlockFormat::SingleHeight);
+        }
+
+        if (configuration.has(
+                AccessibilityModule::ParagraphSpacing)) {
+
+            format.setBottomMargin(
+                configuration.paragraphSpacing);
         }
 
         cursor.setBlockFormat(format);
@@ -208,41 +464,34 @@ void AccessibilitySettings::applyToGraphicsItem(
     if (!item)
         return;
 
-    /*
-     * Les contenus texte Mathom sont des enfants directs
-     * de l'objet Note.
-     */
     auto *note =
-        dynamic_cast<Note *>(item->parentItem());
+        dynamic_cast<Note *>(
+            item->parentItem());
 
     if (!note || !note->content())
         return;
 
-    /*
-     * Evite de modifier d'autres objets graphiques appartenant
-     * eventuellement a la Note.
-     */
     if (note->content()->graphicsItem() != item)
         return;
 
-    const bool dyslexia = dyslexiaEnabled();
+    const AccessibilityConfiguration configuration =
+        effectiveConfiguration();
 
     /*
-     * Mathom HTML affiche hors edition :
-     * QGraphicsTextItem + QTextDocument.
-     *
-     * QSyntaxHighlighter agit uniquement sur le rendu :
-     * le HTML enregistre reste intact.
+     * Mathom HTML hors edition.
      */
     if (auto *rich =
-            dynamic_cast<QGraphicsTextItem *>(item)) {
+            dynamic_cast<QGraphicsTextItem *>(
+                item)) {
 
         AccessibilityHighlighter *highlighter =
             accessibilityHighlighter(
                 rich->document());
 
-        if (highlighter)
-            highlighter->setDyslexiaEnabled(dyslexia);
+        if (highlighter) {
+            highlighter->setConfiguration(
+                configuration);
+        }
 
         rich->update();
 
@@ -253,18 +502,17 @@ void AccessibilitySettings::applyToGraphicsItem(
     }
 
     /*
-     * Anciennes notes texte brut :
-     * QGraphicsSimpleTextItem.
+     * Ancien Mathom texte brut.
      */
     if (auto *plain =
-            dynamic_cast<QGraphicsSimpleTextItem *>(item)) {
+            dynamic_cast<QGraphicsSimpleTextItem *>(
+                item)) {
 
-        QFont font = note->font();
+        plain->setFont(
+            accessibleFont(
+                note->font(),
+                configuration));
 
-        if (dyslexia)
-            font = dyslexiaFont(font);
-
-        plain->setFont(font);
         plain->update();
 
         if (requestRelayout)
@@ -279,12 +527,13 @@ void AccessibilitySettings::refreshAllDisplays()
         QApplication::allWidgets();
 
     /*
-     * 1. Editeurs actuellement ouverts.
+     * Editeurs actifs.
      */
     for (QWidget *widget : widgets) {
 
         auto *editor =
-            qobject_cast<QTextEdit *>(widget);
+            qobject_cast<QTextEdit *>(
+                widget);
 
         if (!editor)
             continue;
@@ -297,29 +546,29 @@ void AccessibilitySettings::refreshAllDisplays()
     }
 
     /*
-     * 2. Tous les Mathoms affiches dans les scenes.
-     *
-     * C'est cette partie qui rend le profil permanent
-     * quand aucune ligne n'est en edition.
+     * Mathoms affiches dans toutes les scenes ouvertes.
      */
     QSet<QGraphicsScene *> processedScenes;
 
     for (QWidget *widget : widgets) {
 
         auto *view =
-            qobject_cast<QGraphicsView *>(widget);
+            qobject_cast<QGraphicsView *>(
+                widget);
 
         if (!view || !view->scene())
             continue;
 
-        QGraphicsScene *scene = view->scene();
+        QGraphicsScene *scene =
+            view->scene();
 
         if (processedScenes.contains(scene))
             continue;
 
         processedScenes.insert(scene);
 
-        const auto items = scene->items();
+        const auto items =
+            scene->items();
 
         for (QGraphicsItem *item : items)
             applyToGraphicsItem(item);

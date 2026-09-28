@@ -108,9 +108,9 @@ void MainWindow::setupActions()
     /*
      * Accessibility profiles
      *
-     * Profiles can be combined. For now this layer only stores
-     * the selected profiles. The effective accessibility settings
-     * will be calculated by the accessibility engine later.
+     * Profiles can be combined. Each profile is a preset that
+     * activates accessibility modules. The rendering layer only
+     * receives the resulting effective configuration.
      */
     auto addAccessibilityProfileAction =
         [this](const QString &actionName,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
-<gui name="basket" version="4">
+<gui name="basket" version="5">
  <MenuBar noMerge="1" >
   <Menu name="basket" >
    <text>&amp;Mathom-House</text>
@@ -105,6 +105,18 @@
    <Action name="options_configure_notifications" />
    <Action name="options_update_settings" />
    <Action name="options_configure" />
+  </Menu>
+  <Menu name="profile">
+    <text>&amp;Profil</text>
+    <Action name="profile_dyslexia" />
+    <Action name="profile_dysorthography" />
+    <Action name="profile_dysgraphia" />
+    <Action name="profile_dyspraxia" />
+    <Action name="profile_dysphasia" />
+    <Action name="profile_dyscalculia" />
+    <Action name="profile_adhd" />
+    <Separator/>
+    <Action name="profile_custom" />
   </Menu>
   <Menu name="help" >
    <text>&amp;Help</text>

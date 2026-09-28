@@ -5,6 +5,7 @@
  */
 
 #include "mainwindow.h"
+#include "accessibilitysettings.h"
 
 #include <QAction>
 #include <QApplication>
@@ -103,6 +104,82 @@ void MainWindow::setupActions()
         actionCollection()->addAction(QStringLiteral("options_update_settings"), this, &MainWindow::showUpdateSettingsDialog);
     updateSettingsAction->setText(i18n("Update Settings..."));
     updateSettingsAction->setIcon(QIcon::fromTheme(QStringLiteral("system-software-update")));
+
+    /*
+     * Accessibility profiles
+     *
+     * Profiles can be combined. For now this layer only stores
+     * the selected profiles. The effective accessibility settings
+     * will be calculated by the accessibility engine later.
+     */
+    auto addAccessibilityProfileAction =
+        [this](const QString &actionName,
+               const QString &label,
+               const QString &configKey) -> QAction *
+    {
+        auto config = KSharedConfig::openConfig();
+        KConfigGroup group(config, QStringLiteral("Accessibility Profiles"));
+
+        auto *action = new QAction(this);
+        action->setText(label);
+        action->setCheckable(true);
+        action->setChecked(group.readEntry(configKey, false));
+
+        actionCollection()->addAction(actionName, action);
+
+        connect(action, &QAction::toggled, this, [configKey](bool enabled) {
+            auto config = KSharedConfig::openConfig();
+            KConfigGroup group(config, QStringLiteral("Accessibility Profiles"));
+
+            group.writeEntry(configKey, enabled);
+            config->sync();
+
+            // Apply profile changes immediately to open Mathom editors.
+            AccessibilitySettings::refreshOpenEditors();
+        });
+
+        return action;
+    };
+
+    addAccessibilityProfileAction(
+        QStringLiteral("profile_dyslexia"),
+        i18n("Dyslexie"),
+        QStringLiteral("dyslexia"));
+
+    addAccessibilityProfileAction(
+        QStringLiteral("profile_dysorthography"),
+        i18n("Dysorthographie"),
+        QStringLiteral("dysorthography"));
+
+    addAccessibilityProfileAction(
+        QStringLiteral("profile_dysgraphia"),
+        i18n("Dysgraphie"),
+        QStringLiteral("dysgraphia"));
+
+    addAccessibilityProfileAction(
+        QStringLiteral("profile_dyspraxia"),
+        i18n("Dyspraxie / TDC"),
+        QStringLiteral("dyspraxia"));
+
+    addAccessibilityProfileAction(
+        QStringLiteral("profile_dysphasia"),
+        i18n("Dysphasie / TDL"),
+        QStringLiteral("dysphasia"));
+
+    addAccessibilityProfileAction(
+        QStringLiteral("profile_dyscalculia"),
+        i18n("Dyscalculie"),
+        QStringLiteral("dyscalculia"));
+
+    addAccessibilityProfileAction(
+        QStringLiteral("profile_adhd"),
+        i18n("TDAH"),
+        QStringLiteral("adhd"));
+
+    addAccessibilityProfileAction(
+        QStringLiteral("profile_custom"),
+        i18n("Personnalisé..."),
+        QStringLiteral("custom"));
 
     QAction *diagnosticsAction =
         actionCollection()->addAction(QStringLiteral("help_open_diagnostics"), this, []() {

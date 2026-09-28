@@ -5,6 +5,7 @@
  */
 
 #include "noteedit.h"
+#include "accessibilitysettings.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -27,6 +28,7 @@
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <QWidgetAction>
+#include <QVariant>
 
 #include <KActionCollection>
 #include <KColorCombo>
@@ -263,6 +265,31 @@ TextEditor::TextEditor(TextContent *textContent, QWidget * /*parent*/)
         textEdit->setCheckSpellingEnabled(true);
     textEdit->setPlainText(m_textContent->text());
 
+    // Mathom accessibility layer: visual adaptation only.
+    textEdit->setProperty(
+        "mathomAccessibilityEditor",
+        true);
+
+    textEdit->setProperty(
+        "mathomOriginalFont",
+        QVariant::fromValue(textEdit->font()));
+
+    AccessibilitySettings::applyToTextEditor(textEdit);
+
+    /*
+     * Mark this editor as a plain-text Mathom editor.
+     * Accessibility settings affect presentation only.
+     */
+    textEdit->setProperty(
+        "mathomAccessibilityPlainText",
+        true);
+
+    textEdit->setProperty(
+        "mathomAccessibilityOriginalFont",
+        QVariant::fromValue(note()->font()));
+
+    AccessibilitySettings::applyToTextEditor(textEdit);
+
     // Not sure if the following comment is still true
     // FIXME: Sometimes, the cursor flicker at ends before being positioned where clicked (because qApp->processEvents() I think)
     textEdit->moveCursor(QTextCursor::End);
@@ -336,6 +363,20 @@ HtmlEditor::HtmlEditor(HtmlContent *htmlContent, QWidget * /*parent*/)
 
     textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     textEdit->setHtml(Tools::detectCrossReferences(m_htmlContent->html(), /*userLink=*/true));
+
+    /*
+     * Accessibility layer for standard rich-text Mathoms.
+     * This changes presentation only, never the stored HTML.
+     */
+    textEdit->setProperty(
+        "mathomAccessibilityEditor",
+        true);
+
+    textEdit->setProperty(
+        "mathomAccessibilityRichText",
+        true);
+
+    AccessibilitySettings::applyToTextEditor(textEdit);
     textEdit->moveCursor(QTextCursor::End);
     textEdit->verticalScrollBar()->setCursor(Qt::ArrowCursor);
     setInlineEditor(textEdit);

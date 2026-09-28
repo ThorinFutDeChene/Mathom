@@ -66,6 +66,7 @@ ecm_qt_declare_logging_category(libbasket_SRCS
 )
 
 add_library(LibBasket SHARED ${libbasket_SRCS} ${basket_FORM_HDRS} ${basket_RESOURCES})
+target_sources(LibBasket PRIVATE accessibilitysettings.cpp)
 
 target_compile_definitions(LibBasket PRIVATE
     MATHOM_VERSION_STRING="${MATHOM_VERSION}"

@@ -1,10 +1,19 @@
 #include "accessibilitysettings.h"
 
+#include "note.h"
+#include "notecontent.h"
+
 #include <QApplication>
 #include <QFont>
+#include <QGraphicsItem>
+#include <QGraphicsScene>
+#include <QGraphicsSimpleTextItem>
+#include <QGraphicsTextItem>
+#include <QGraphicsView>
 #include <QObject>
-#include <QStringList>
+#include <QSet>
 #include <QSignalBlocker>
+#include <QStringList>
 #include <QSyntaxHighlighter>
 #include <QTextBlock>
 #include <QTextBlockFormat>
@@ -21,13 +30,29 @@
 namespace
 {
 
+QFont dyslexiaFont(const QFont &base)
+{
+    QFont font(base);
+
+    font.setFamily(QStringLiteral("Noto Sans"));
+    font.setPointSizeF(14.0);
+    font.setLetterSpacing(
+        QFont::PercentageSpacing,
+        110.0);
+    font.setWordSpacing(3.0);
+
+    return font;
+}
+
+
 class AccessibilityHighlighter : public QSyntaxHighlighter
 {
 public:
     explicit AccessibilityHighlighter(QTextDocument *document)
         : QSyntaxHighlighter(document)
     {
-        setObjectName(QStringLiteral("mathomAccessibilityHighlighter"));
+        setObjectName(
+            QStringLiteral("mathomAccessibilityHighlighter"));
     }
 
     void setDyslexiaEnabled(bool enabled)
@@ -42,12 +67,6 @@ protected:
         if (!m_dyslexiaEnabled || text.isEmpty())
             return;
 
-        /*
-         * Visual overlay only.
-         *
-         * QSyntaxHighlighter formats are not written into the Mathom HTML.
-         * Existing bold/italic/colour information therefore remains intact.
-         */
         QTextCharFormat format;
 
         format.setFontFamilies(
@@ -64,9 +83,12 @@ private:
     bool m_dyslexiaEnabled = false;
 };
 
-AccessibilityHighlighter *accessibilityHighlighter(QTextEdit *editor)
+
+AccessibilityHighlighter *accessibilityHighlighter(
+    QTextDocument *document)
 {
-    QTextDocument *document = editor->document();
+    if (!document)
+        return nullptr;
 
     QObject *object =
         document->findChild<QObject *>(
@@ -77,7 +99,8 @@ AccessibilityHighlighter *accessibilityHighlighter(QTextEdit *editor)
         dynamic_cast<AccessibilityHighlighter *>(object);
 
     if (!highlighter)
-        highlighter = new AccessibilityHighlighter(document);
+        highlighter =
+            new AccessibilityHighlighter(document);
 
     return highlighter;
 }
@@ -97,38 +120,39 @@ bool AccessibilitySettings::dyslexiaEnabled()
 }
 
 
-void AccessibilitySettings::applyToTextEditor(QTextEdit *editor)
+void AccessibilitySettings::applyToTextEditor(
+    QTextEdit *editor)
 {
     if (!editor)
         return;
 
-    if (!editor->property("mathomAccessibilityEditor").toBool())
+    if (!editor->property(
+            "mathomAccessibilityEditor").toBool())
         return;
 
     const bool dyslexia = dyslexiaEnabled();
 
     /*
-     * Rich-text Mathoms:
-     *
-     * Never alter the real QTextDocument formatting.
-     * A QSyntaxHighlighter supplies a display-only accessibility layer.
+     * Editeur HTML :
+     * couche visuelle temporaire uniquement.
      */
-    if (editor->property("mathomAccessibilityRichText").toBool()) {
+    if (editor->property(
+            "mathomAccessibilityRichText").toBool()) {
 
-        accessibilityHighlighter(editor)
-            ->setDyslexiaEnabled(dyslexia);
+        AccessibilityHighlighter *highlighter =
+            accessibilityHighlighter(
+                editor->document());
+
+        if (highlighter)
+            highlighter->setDyslexiaEnabled(dyslexia);
 
         editor->viewport()->update();
         return;
     }
 
     /*
-     * Plain-text Mathoms:
-     *
-     * Their saved content contains no rich formatting, so their display
-     * font and block spacing can safely be adapted directly.
+     * Editeur texte brut.
      */
-
     if (!editor->property("mathomOriginalFont").isValid()) {
         editor->setProperty(
             "mathomOriginalFont",
@@ -136,31 +160,29 @@ void AccessibilitySettings::applyToTextEditor(QTextEdit *editor)
     }
 
     const QFont originalFont =
-        editor->property("mathomOriginalFont").value<QFont>();
+        editor->property(
+            "mathomOriginalFont").value<QFont>();
 
     const QSignalBlocker editorBlocker(editor);
-    const QSignalBlocker documentBlocker(editor->document());
+    const QSignalBlocker documentBlocker(
+        editor->document());
 
     QFont font = originalFont;
 
-    if (dyslexia) {
-        font.setFamily(QStringLiteral("Noto Sans"));
-        font.setPointSizeF(14.0);
-        font.setLetterSpacing(
-            QFont::PercentageSpacing,
-            110.0);
-        font.setWordSpacing(3.0);
-    }
+    if (dyslexia)
+        font = dyslexiaFont(originalFont);
 
     editor->setFont(font);
     editor->document()->setDefaultFont(font);
 
-    for (QTextBlock block = editor->document()->begin();
+    for (QTextBlock block =
+             editor->document()->begin();
          block.isValid();
          block = block.next()) {
 
         QTextCursor cursor(block);
-        QTextBlockFormat format = cursor.blockFormat();
+        QTextBlockFormat format =
+            cursor.blockFormat();
 
         if (dyslexia) {
             format.setLineHeight(
@@ -179,10 +201,86 @@ void AccessibilitySettings::applyToTextEditor(QTextEdit *editor)
 }
 
 
-void AccessibilitySettings::refreshOpenEditors()
+void AccessibilitySettings::applyToGraphicsItem(
+    QGraphicsItem *item,
+    bool requestRelayout)
 {
-    const auto widgets = QApplication::allWidgets();
+    if (!item)
+        return;
 
+    /*
+     * Les contenus texte Mathom sont des enfants directs
+     * de l'objet Note.
+     */
+    auto *note =
+        dynamic_cast<Note *>(item->parentItem());
+
+    if (!note || !note->content())
+        return;
+
+    /*
+     * Evite de modifier d'autres objets graphiques appartenant
+     * eventuellement a la Note.
+     */
+    if (note->content()->graphicsItem() != item)
+        return;
+
+    const bool dyslexia = dyslexiaEnabled();
+
+    /*
+     * Mathom HTML affiche hors edition :
+     * QGraphicsTextItem + QTextDocument.
+     *
+     * QSyntaxHighlighter agit uniquement sur le rendu :
+     * le HTML enregistre reste intact.
+     */
+    if (auto *rich =
+            dynamic_cast<QGraphicsTextItem *>(item)) {
+
+        AccessibilityHighlighter *highlighter =
+            accessibilityHighlighter(
+                rich->document());
+
+        if (highlighter)
+            highlighter->setDyslexiaEnabled(dyslexia);
+
+        rich->update();
+
+        if (requestRelayout)
+            note->requestRelayout();
+
+        return;
+    }
+
+    /*
+     * Anciennes notes texte brut :
+     * QGraphicsSimpleTextItem.
+     */
+    if (auto *plain =
+            dynamic_cast<QGraphicsSimpleTextItem *>(item)) {
+
+        QFont font = note->font();
+
+        if (dyslexia)
+            font = dyslexiaFont(font);
+
+        plain->setFont(font);
+        plain->update();
+
+        if (requestRelayout)
+            note->requestRelayout();
+    }
+}
+
+
+void AccessibilitySettings::refreshAllDisplays()
+{
+    const auto widgets =
+        QApplication::allWidgets();
+
+    /*
+     * 1. Editeurs actuellement ouverts.
+     */
     for (QWidget *widget : widgets) {
 
         auto *editor =
@@ -196,5 +294,34 @@ void AccessibilitySettings::refreshOpenEditors()
             continue;
 
         applyToTextEditor(editor);
+    }
+
+    /*
+     * 2. Tous les Mathoms affiches dans les scenes.
+     *
+     * C'est cette partie qui rend le profil permanent
+     * quand aucune ligne n'est en edition.
+     */
+    QSet<QGraphicsScene *> processedScenes;
+
+    for (QWidget *widget : widgets) {
+
+        auto *view =
+            qobject_cast<QGraphicsView *>(widget);
+
+        if (!view || !view->scene())
+            continue;
+
+        QGraphicsScene *scene = view->scene();
+
+        if (processedScenes.contains(scene))
+            continue;
+
+        processedScenes.insert(scene);
+
+        const auto items = scene->items();
+
+        for (QGraphicsItem *item : items)
+            applyToGraphicsItem(item);
     }
 }

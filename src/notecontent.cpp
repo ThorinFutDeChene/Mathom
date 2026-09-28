@@ -43,6 +43,7 @@
 
 #include <algorithm>
 
+#include "accessibilitysettings.h"
 #include "basketscene.h"
 #include "bnpview.h"
 #include "common.h"
@@ -986,7 +987,14 @@ bool TextContent::loadFromFile(bool lazyLoad)
 bool TextContent::finishLazyLoad()
 {
     m_graphicsTextItem.setFont(note()->font());
-    contentChanged(m_graphicsTextItem.boundingRect().width() + 1);
+
+    AccessibilitySettings::applyToGraphicsItem(
+        &m_graphicsTextItem,
+        false);
+
+    contentChanged(
+        m_graphicsTextItem.boundingRect().width() + 1);
+
     return true;
 }
 
@@ -1103,6 +1111,11 @@ bool HtmlContent::finishLazyLoad()
     m_graphicsTextItem.setHtml(convert);
     m_graphicsTextItem.setDefaultTextColor(note()->textColor());
     m_graphicsTextItem.setFont(note()->font());
+
+    AccessibilitySettings::applyToGraphicsItem(
+        &m_graphicsTextItem,
+        false);
+
     m_graphicsTextItem.setTextWidth(1); // We put a width of 1 pixel, so usedWidth() is equal to the minimum width
     int minWidth = m_graphicsTextItem.document()->idealWidth();
     m_graphicsTextItem.setTextWidth(width);

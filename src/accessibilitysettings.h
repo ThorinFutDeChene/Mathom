@@ -3,14 +3,24 @@
 
 #include "basket_export.h"
 
+class QGraphicsItem;
 class QTextEdit;
 
 class BASKET_EXPORT AccessibilitySettings
 {
 public:
     static bool dyslexiaEnabled();
+
+    // Editeur actif
     static void applyToTextEditor(QTextEdit *editor);
-    static void refreshOpenEditors();
+
+    // Affichage permanent des Mathoms dans la scene
+    static void applyToGraphicsItem(
+        QGraphicsItem *item,
+        bool requestRelayout = true);
+
+    // Actualise editeurs + Mathoms affiches
+    static void refreshAllDisplays();
 };
 
 #endif

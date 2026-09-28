@@ -135,7 +135,7 @@ void MainWindow::setupActions()
             config->sync();
 
             // Apply profile changes immediately to open Mathom editors.
-            AccessibilitySettings::refreshOpenEditors();
+            AccessibilitySettings::refreshAllDisplays();
         });
 
         return action;

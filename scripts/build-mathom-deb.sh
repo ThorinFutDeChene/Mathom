@@ -232,7 +232,7 @@ test "$(dpkg-deb -f "$OUTPUT" Architecture)" = "$ARCH"
 
 DEPENDS="$(dpkg-deb -f "$OUTPUT" Depends)"
 
-for dependency in apport systemd xdg-utils; do
+for dependency in apport systemd xdg-utils fonts-opendyslexic; do
     if ! printf '%s\n' "$DEPENDS" | grep -Eq "(^|, )${dependency}(,|$)"; then
         echo "Erreur : dependance diagnostic absente : $dependency"
         exit 1

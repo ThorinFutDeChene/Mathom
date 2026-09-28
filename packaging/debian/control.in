@@ -4,7 +4,7 @@ Section: office
 Priority: optional
 Architecture: @ARCH@
 Maintainer: Thorinux Systems
-Depends: libc6, apport, systemd, xdg-utils
+Depends: libc6, apport, systemd, xdg-utils, fonts-opendyslexic
 Description: Mathom Notes - notes and information organizer
  Mathom Notes is an application for recording ideas as mathoms and
  organizing them into Mathom-Houses and shelves.

@@ -58,7 +58,7 @@ struct BASKET_EXPORT AccessibilityConfiguration
 {
     AccessibilityModules modules;
 
-    QString fontFamily = QStringLiteral("Noto Sans");
+    QString fontFamily = QStringLiteral("OpenDyslexic");
 
     qreal fontPointSize = 14.0;
     qreal letterSpacingPercent = 110.0;

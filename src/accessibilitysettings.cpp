@@ -49,7 +49,11 @@ struct SyllableRange
 };
 
 
-bool isFrenchVowel(QChar character)
+/*
+ * Voyelles graphiques utilisees pour reperer les noyaux
+ * des syllabes ecrites.
+ */
+bool isFrenchVowelLetter(QChar character)
 {
     static const QString vowels =
         QStringLiteral(
@@ -64,6 +68,258 @@ bool isFrenchVowel(QChar character)
 
     return vowels.contains(
         character.toLower());
+}
+
+
+bool hasDiaeresis(QChar character)
+{
+    static const QString diaeresis =
+        QStringLiteral("ëïüÿ");
+
+    return diaeresis.contains(
+        character.toLower());
+}
+
+
+/*
+ * En francais, y peut jouer le role d'une consonne
+ * entre deux voyelles :
+ *
+ * voyage -> vo-ya-ge
+ * royaume -> ro-yau-me
+ */
+bool isConsonantalY(
+    const QString &word,
+    int position)
+{
+    if (position < 0
+        || position >= word.length()) {
+
+        return false;
+    }
+
+    if (word.at(position).toLower()
+        != QLatin1Char('y')) {
+
+        return false;
+    }
+
+    if (position == 0
+        || position + 1 >= word.length()) {
+
+        return false;
+    }
+
+    return isFrenchVowelLetter(
+               word.at(position - 1))
+        && isFrenchVowelLetter(
+               word.at(position + 1));
+}
+
+
+/*
+ * Le u de qu et de certains gu ne constitue pas
+ * un noyau vocalique.
+ *
+ * qui     -> qui
+ * liquide -> li-qui-de
+ * guerre  -> guer-re
+ * guide   -> gui-de
+ */
+bool isSilentGraphicU(
+    const QString &word,
+    int position)
+{
+    if (position <= 0
+        || position + 1 >= word.length()) {
+
+        return false;
+    }
+
+    if (word.at(position).toLower()
+        != QLatin1Char('u')) {
+
+        return false;
+    }
+
+    const QChar previous =
+        word.at(position - 1).toLower();
+
+    const QChar next =
+        word.at(position + 1).toLower();
+
+
+    /*
+     * qu + voyelle
+     */
+    if (previous == QLatin1Char('q')
+        && isFrenchVowelLetter(next)) {
+
+        return true;
+    }
+
+
+    /*
+     * gu devant e/i/y.
+     *
+     * Le trema est volontairement exclu :
+     * il signale justement une prononciation particuliere.
+     */
+    if (previous == QLatin1Char('g')) {
+
+        static const QString following =
+            QStringLiteral(
+                "eéèê"
+                "iî"
+                "y");
+
+        if (following.contains(next))
+            return true;
+    }
+
+    return false;
+}
+
+
+bool isEffectiveVowel(
+    const QString &word,
+    int position)
+{
+    if (position < 0
+        || position >= word.length()) {
+
+        return false;
+    }
+
+    if (!isFrenchVowelLetter(
+            word.at(position))) {
+
+        return false;
+    }
+
+    if (isConsonantalY(
+            word,
+            position)) {
+
+        return false;
+    }
+
+    if (isSilentGraphicU(
+            word,
+            position)) {
+
+        return false;
+    }
+
+    return true;
+}
+
+
+/*
+ * Retourne la longueur d'un grapheme vocalique courant.
+ *
+ * Il ne s'agit PAS encore du moteur phonemique :
+ * celui-ci constituera un autre module Mathom.
+ */
+int vowelGraphemeLength(
+    const QString &word,
+    int position)
+{
+    if (!isEffectiveVowel(
+            word,
+            position)) {
+
+        return 0;
+    }
+
+
+    /*
+     * Un trema interdit de fusionner cette voyelle
+     * avec la precedente.
+     *
+     * mais -> "mais"
+     * maïs -> "ma-ïs"
+     */
+    if (hasDiaeresis(
+            word.at(position))) {
+
+        return 1;
+    }
+
+
+    static const QStringList graphemes = {
+        QStringLiteral("eau"),
+        QStringLiteral("oeu"),
+        QStringLiteral("œu"),
+
+        QStringLiteral("ai"),
+        QStringLiteral("ei"),
+        QStringLiteral("au"),
+        QStringLiteral("eu"),
+        QStringLiteral("ou"),
+        QStringLiteral("oi"),
+
+        QStringLiteral("ay"),
+        QStringLiteral("ey")
+    };
+
+
+    const QString lower =
+        word.toLower();
+
+    for (const QString &grapheme : graphemes) {
+
+        if (position + grapheme.length()
+            > word.length()) {
+
+            continue;
+        }
+
+        if (lower.mid(
+                position,
+                grapheme.length())
+            != grapheme) {
+
+            continue;
+        }
+
+
+        bool valid = true;
+
+        for (int offset = 0;
+             offset < grapheme.length();
+             ++offset) {
+
+            const int current =
+                position + offset;
+
+            /*
+             * Un trema au milieu d'un groupe impose
+             * une nouvelle unite.
+             */
+            if (offset > 0
+                && hasDiaeresis(
+                    word.at(current))) {
+
+                valid = false;
+                break;
+            }
+
+            if (!isEffectiveVowel(
+                    word,
+                    current)) {
+
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid)
+            return grapheme.length();
+    }
+
+
+    return 1;
 }
 
 
@@ -84,10 +340,14 @@ bool isCommonFrenchOnset(
         QStringLiteral("pr"),
         QStringLiteral("tr"),
         QStringLiteral("vr"),
+
         QStringLiteral("ch"),
         QStringLiteral("ph"),
         QStringLiteral("th"),
-        QStringLiteral("gn")
+        QStringLiteral("gn"),
+
+        QStringLiteral("qu"),
+        QStringLiteral("gu")
     };
 
     return onsets.contains(
@@ -96,28 +356,33 @@ bool isCommonFrenchOnset(
 
 
 /*
- * Segmentation orthographique francaise volontairement prudente.
+ * Segmentation en syllabes ecrites.
  *
- * Ce moteur constitue une implementation Mathom independante.
- * Il ne reprend pas le code de LireCouleur.
+ * Cette implementation est propre a Mathom.
+ * Elle ne reprend pas le moteur de LireCouleur.
  *
- * Regles principales :
- * - les voyelles consecutives forment un noyau ;
+ * Principes :
+ *
+ * - reconnaissance de plusieurs graphemes vocaliques courants ;
+ * - distinction des hiatus ;
+ * - gestion contextuelle du y ;
+ * - gestion du u graphique de qu/gu ;
  * - une consonne entre deux noyaux rejoint la syllabe suivante ;
- * - les groupes courants bl/br/cl/cr/... restent ensemble ;
- * - les consonnes doubles sont separees.
+ * - les groupes consonantiques courants restent ensemble ;
+ * - une consonne double est partagee entre les syllabes.
  *
- * Le moteur sera enrichi progressivement pour traiter les cas
- * particuliers du francais, les lettres muettes et les phonemes.
+ * Le futur module "Coloration des phonemes" utilisera un moteur
+ * distinct et pourra traiter la prononciation proprement dite.
  */
 QVector<SyllableRange> syllableRanges(
     const QString &word)
 {
     struct Nucleus
     {
-        int start;
-        int end;
+        int start = 0;
+        int end = 0;
     };
+
 
     QVector<Nucleus> nuclei;
 
@@ -125,27 +390,29 @@ QVector<SyllableRange> syllableRanges(
 
     while (position < word.length()) {
 
-        if (!isFrenchVowel(word.at(position))) {
+        const int graphemeLength =
+            vowelGraphemeLength(
+                word,
+                position);
+
+        if (graphemeLength <= 0) {
             ++position;
             continue;
         }
 
-        const int start = position;
-
-        while (position < word.length()
-               && isFrenchVowel(word.at(position))) {
-
-            ++position;
-        }
-
         nuclei.append(
-            {start, position});
+            {
+                position,
+                position + graphemeLength
+            });
+
+        position += graphemeLength;
     }
 
 
     /*
-     * Aucun ou un seul noyau vocalique :
-     * le mot entier est considere comme une syllabe.
+     * Aucun ou un seul noyau :
+     * aucune coupure necessaire.
      */
     if (nuclei.size() <= 1) {
         return {
@@ -155,6 +422,7 @@ QVector<SyllableRange> syllableRanges(
 
 
     QVector<int> boundaries;
+
 
     for (int index = 0;
          index < nuclei.size() - 1;
@@ -167,17 +435,27 @@ QVector<SyllableRange> syllableRanges(
             nuclei.at(index + 1).start;
 
         const int consonantCount =
-            consonantEnd - consonantStart;
+            consonantEnd
+            - consonantStart;
 
+
+        /*
+         * Deux noyaux immediatement consecutifs :
+         * hiatus.
+         *
+         * Exemple :
+         * maïs -> ma-ïs
+         */
         int boundary =
             consonantStart;
 
 
         /*
-         * Une seule consonne :
+         * Une consonne entre deux noyaux :
          *
          * ma-man
          * li-re
+         * vo-ya-ge
          */
         if (consonantCount == 1) {
             boundary =
@@ -186,14 +464,20 @@ QVector<SyllableRange> syllableRanges(
 
 
         /*
-         * Plusieurs consonnes :
-         * on conserve comme attaque de la syllabe suivante
-         * les groupes consonantiques francais les plus usuels.
+         * Plusieurs consonnes.
+         *
+         * On conserve une attaque consonantique valide
+         * avec la syllabe suivante.
          *
          * ta-ble
          * a-près
          * ar-bre
-         * a-chat
+         * li-qui-de
+         *
+         * Une consonne double est naturellement separee :
+         *
+         * pom-me
+         * bel-le
          */
         else if (consonantCount >= 2) {
 
@@ -204,22 +488,30 @@ QVector<SyllableRange> syllableRanges(
                     consonantEnd - 2,
                     2);
 
-            if (isCommonFrenchOnset(lastTwo))
+            if (isCommonFrenchOnset(
+                    lastTwo)) {
+
                 onsetLength = 2;
+            }
 
             boundary =
-                consonantEnd - onsetLength;
+                consonantEnd
+                - onsetLength;
         }
 
 
-        if (boundary > 0
-            && boundary < word.length()) {
+        if (boundary <= 0
+            || boundary >= word.length()) {
 
-            if (boundaries.isEmpty()
-                || boundaries.last() != boundary) {
+            continue;
+        }
 
-                boundaries.append(boundary);
-            }
+        if (boundaries.isEmpty()
+            || boundaries.last()
+                != boundary) {
+
+            boundaries.append(
+                boundary);
         }
     }
 
@@ -234,15 +526,24 @@ QVector<SyllableRange> syllableRanges(
             continue;
 
         result.append(
-            {start, boundary - start});
+            {
+                start,
+                boundary - start
+            });
 
         start = boundary;
     }
 
+
     if (start < word.length()) {
+
         result.append(
-            {start, word.length() - start});
+            {
+                start,
+                word.length() - start
+            });
     }
+
 
     return result;
 }

@@ -467,18 +467,23 @@ void MainWindow::showCustomAccessibilityDialog()
      * Mise en evidence des graphemes
      */
 
-    // auto *graphemeHighlight =
-    //     new QCheckBox(
-    //         i18n("Mise en évidence des graphèmes"),
-    //         readingGroup);
-    //
-    // graphemeHighlight->setChecked(
-    //     custom.readEntry(
-    //         QStringLiteral("graphemeHighlight"),
-    //         false));
-    //
-    // readingLayout->addWidget(
-    //     graphemeHighlight);
+    auto *graphemeHighlight =
+        new QCheckBox(
+            i18n("Mise en évidence des graphèmes"),
+            readingGroup);
+
+    graphemeHighlight->setChecked(
+        custom.readEntry(
+            QStringLiteral("graphemeHighlight"),
+            false));
+
+    graphemeHighlight->setToolTip(
+        i18n(
+            "Souligne les groupes de lettres formant "
+            "des unités de lecture courantes."));
+
+    readingLayout->addWidget(
+        graphemeHighlight);
 
 
     /*
@@ -749,9 +754,9 @@ void MainWindow::showCustomAccessibilityDialog()
         QStringLiteral("phonemeColoring"),
         phonemeColoring->isChecked());
 
-    // custom.writeEntry(
-    //     QStringLiteral("graphemeHighlight"),
-    //     graphemeHighlight->isChecked());
+    custom.writeEntry(
+        QStringLiteral("graphemeHighlight"),
+        graphemeHighlight->isChecked());
 
     // custom.writeEntry(
     //     QStringLiteral("confusableLetters"),
@@ -802,7 +807,8 @@ void MainWindow::showCustomAccessibilityDialog()
         || wordSpacing->isChecked()
         || lineSpacing->isChecked()
         || syllableColoring->isChecked()
-        || phonemeColoring->isChecked();
+        || phonemeColoring->isChecked()
+        || graphemeHighlight->isChecked();
 
     KConfigGroup profiles(
         config,

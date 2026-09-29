@@ -738,6 +738,49 @@ QVector<SyllableRange> phonemeRanges(
 }
 
 
+
+/*
+ * Retourne les graphemes complexes reconnus par
+ * le moteur phonemique.
+ *
+ * Les lettres simples ne sont pas mises en evidence :
+ * l'objectif est de faire ressortir les groupes
+ * graphiques representant une unite de lecture.
+ */
+QVector<SyllableRange> graphemeRanges(
+    const QString &word)
+{
+    QVector<SyllableRange> result;
+
+    int position = 0;
+
+    while (position < word.length()) {
+
+        const int length =
+            phonemeGraphemeLength(
+                word,
+                position);
+
+        if (length <= 0) {
+            ++position;
+            continue;
+        }
+
+        if (length > 1) {
+            result.append(
+                {
+                    position,
+                    length
+                });
+        }
+
+        position += length;
+    }
+
+    return result;
+}
+
+
 void applyDyslexiaPreset(
     AccessibilityConfiguration &config)
 {
@@ -1099,6 +1142,57 @@ protected:
                             + range.start,
                         range.length,
                         format);
+                }
+            }
+        }
+
+
+        /*
+         * Mise en evidence des graphemes.
+         *
+         * Le soulignement est ajoute au format deja calcule
+         * afin de conserver une eventuelle coloration
+         * syllabique ou phonemique.
+         */
+        if (m_configuration.has(
+                AccessibilityModule::GraphemeHighlight)) {
+
+            static const QRegularExpression wordExpression(
+                QStringLiteral("\\p{L}+"),
+                QRegularExpression::
+                    UseUnicodePropertiesOption);
+
+            auto matches =
+                wordExpression.globalMatch(text);
+
+            while (matches.hasNext()) {
+
+                const QRegularExpressionMatch match =
+                    matches.next();
+
+                const QString word =
+                    match.captured();
+
+                const QVector<SyllableRange> ranges =
+                    graphemeRanges(word);
+
+                for (const SyllableRange &range : ranges) {
+
+                    const int start =
+                        match.capturedStart()
+                        + range.start;
+
+                    QTextCharFormat graphemeFormat =
+                        format(start);
+
+                    graphemeFormat.setFontUnderline(true);
+                    graphemeFormat.setFontWeight(
+                        QFont::DemiBold);
+
+                    setFormat(
+                        start,
+                        range.length,
+                        graphemeFormat);
                 }
             }
         }

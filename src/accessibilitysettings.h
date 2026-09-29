@@ -3,6 +3,7 @@
 
 #include "basket_export.h"
 
+#include <QColor>
 #include <QFlags>
 #include <QString>
 #include <QtGlobal>
@@ -65,6 +66,14 @@ struct BASKET_EXPORT AccessibilityConfiguration
     qreal wordSpacing = 3.0;
     qreal lineSpacingPercent = 150.0;
     qreal paragraphSpacing = 0.0;
+
+    /*
+     * Coloration syllabique.
+     * Bleu / rouge par defaut, modifiable plus tard
+     * depuis le profil personnalise.
+     */
+    QColor syllableColor1 = QColor(QStringLiteral("#005BBB"));
+    QColor syllableColor2 = QColor(QStringLiteral("#C00040"));
 
     bool has(AccessibilityModule module) const
     {

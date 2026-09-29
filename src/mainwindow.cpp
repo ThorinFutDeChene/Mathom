@@ -413,31 +413,31 @@ void MainWindow::showCustomAccessibilityDialog()
      * Les lignes seront decommmentees module par module.
      */
 
-    // auto *readingGroup =
-    //     new QGroupBox(
-    //         i18n("Aides à la lecture"),
-    //         &dialog);
-    //
-    // auto *readingLayout =
-    //     new QVBoxLayout(readingGroup);
+    auto *readingGroup =
+        new QGroupBox(
+            i18n("Aides à la lecture"),
+            &dialog);
+
+    auto *readingLayout =
+        new QVBoxLayout(readingGroup);
 
 
     /*
      * LireCouleur : coloration syllabique
      */
 
-    // auto *syllableColoring =
-    //     new QCheckBox(
-    //         i18n("Coloration des syllabes"),
-    //         readingGroup);
-    //
-    // syllableColoring->setChecked(
-    //     custom.readEntry(
-    //         QStringLiteral("syllableColoring"),
-    //         false));
-    //
-    // readingLayout->addWidget(
-    //     syllableColoring);
+    auto *syllableColoring =
+        new QCheckBox(
+            i18n("Coloration des syllabes"),
+            readingGroup);
+
+    syllableColoring->setChecked(
+        custom.readEntry(
+            QStringLiteral("syllableColoring"),
+            false));
+
+    readingLayout->addWidget(
+        syllableColoring);
 
 
     /*
@@ -566,8 +566,8 @@ void MainWindow::showCustomAccessibilityDialog()
     //     dimOtherLines);
 
 
-    // layout->addWidget(
-    //     readingGroup);
+    layout->addWidget(
+        readingGroup);
 
 
     /*
@@ -736,9 +736,9 @@ void MainWindow::showCustomAccessibilityDialog()
     //     QStringLiteral("paragraphSpacing"),
     //     paragraphSpacing->isChecked());
 
-    // custom.writeEntry(
-    //     QStringLiteral("syllableColoring"),
-    //     syllableColoring->isChecked());
+    custom.writeEntry(
+        QStringLiteral("syllableColoring"),
+        syllableColoring->isChecked());
 
     // custom.writeEntry(
     //     QStringLiteral("phonemeColoring"),
@@ -795,7 +795,8 @@ void MainWindow::showCustomAccessibilityDialog()
         || largerText->isChecked()
         || letterSpacing->isChecked()
         || wordSpacing->isChecked()
-        || lineSpacing->isChecked();
+        || lineSpacing->isChecked()
+        || syllableColoring->isChecked();
 
     KConfigGroup profiles(
         config,

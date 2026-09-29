@@ -4,6 +4,7 @@
 #include "notecontent.h"
 
 #include <QApplication>
+#include <QBrush>
 #include <QFont>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
@@ -11,6 +12,7 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsView>
 #include <QObject>
+#include <QRegularExpression>
 #include <QSet>
 #include <QSignalBlocker>
 #include <QStringList>
@@ -22,6 +24,7 @@
 #include <QTextDocument>
 #include <QTextEdit>
 #include <QVariant>
+#include <QVector>
 #include <QWidget>
 
 #include <KConfigGroup>
@@ -36,6 +39,212 @@ void enable(
     AccessibilityModule module)
 {
     config.modules |= module;
+}
+
+
+struct SyllableRange
+{
+    int start = 0;
+    int length = 0;
+};
+
+
+bool isFrenchVowel(QChar character)
+{
+    static const QString vowels =
+        QStringLiteral(
+            "aeiouy"
+            "àâä"
+            "éèêë"
+            "îï"
+            "ôö"
+            "ùûü"
+            "ÿ"
+            "æœ");
+
+    return vowels.contains(
+        character.toLower());
+}
+
+
+bool isCommonFrenchOnset(
+    const QString &cluster)
+{
+    static const QStringList onsets = {
+        QStringLiteral("bl"),
+        QStringLiteral("br"),
+        QStringLiteral("cl"),
+        QStringLiteral("cr"),
+        QStringLiteral("dr"),
+        QStringLiteral("fl"),
+        QStringLiteral("fr"),
+        QStringLiteral("gl"),
+        QStringLiteral("gr"),
+        QStringLiteral("pl"),
+        QStringLiteral("pr"),
+        QStringLiteral("tr"),
+        QStringLiteral("vr"),
+        QStringLiteral("ch"),
+        QStringLiteral("ph"),
+        QStringLiteral("th"),
+        QStringLiteral("gn")
+    };
+
+    return onsets.contains(
+        cluster.toLower());
+}
+
+
+/*
+ * Segmentation orthographique francaise volontairement prudente.
+ *
+ * Ce moteur constitue une implementation Mathom independante.
+ * Il ne reprend pas le code de LireCouleur.
+ *
+ * Regles principales :
+ * - les voyelles consecutives forment un noyau ;
+ * - une consonne entre deux noyaux rejoint la syllabe suivante ;
+ * - les groupes courants bl/br/cl/cr/... restent ensemble ;
+ * - les consonnes doubles sont separees.
+ *
+ * Le moteur sera enrichi progressivement pour traiter les cas
+ * particuliers du francais, les lettres muettes et les phonemes.
+ */
+QVector<SyllableRange> syllableRanges(
+    const QString &word)
+{
+    struct Nucleus
+    {
+        int start;
+        int end;
+    };
+
+    QVector<Nucleus> nuclei;
+
+    int position = 0;
+
+    while (position < word.length()) {
+
+        if (!isFrenchVowel(word.at(position))) {
+            ++position;
+            continue;
+        }
+
+        const int start = position;
+
+        while (position < word.length()
+               && isFrenchVowel(word.at(position))) {
+
+            ++position;
+        }
+
+        nuclei.append(
+            {start, position});
+    }
+
+
+    /*
+     * Aucun ou un seul noyau vocalique :
+     * le mot entier est considere comme une syllabe.
+     */
+    if (nuclei.size() <= 1) {
+        return {
+            {0, word.length()}
+        };
+    }
+
+
+    QVector<int> boundaries;
+
+    for (int index = 0;
+         index < nuclei.size() - 1;
+         ++index) {
+
+        const int consonantStart =
+            nuclei.at(index).end;
+
+        const int consonantEnd =
+            nuclei.at(index + 1).start;
+
+        const int consonantCount =
+            consonantEnd - consonantStart;
+
+        int boundary =
+            consonantStart;
+
+
+        /*
+         * Une seule consonne :
+         *
+         * ma-man
+         * li-re
+         */
+        if (consonantCount == 1) {
+            boundary =
+                consonantStart;
+        }
+
+
+        /*
+         * Plusieurs consonnes :
+         * on conserve comme attaque de la syllabe suivante
+         * les groupes consonantiques francais les plus usuels.
+         *
+         * ta-ble
+         * a-près
+         * ar-bre
+         * a-chat
+         */
+        else if (consonantCount >= 2) {
+
+            int onsetLength = 1;
+
+            const QString lastTwo =
+                word.mid(
+                    consonantEnd - 2,
+                    2);
+
+            if (isCommonFrenchOnset(lastTwo))
+                onsetLength = 2;
+
+            boundary =
+                consonantEnd - onsetLength;
+        }
+
+
+        if (boundary > 0
+            && boundary < word.length()) {
+
+            if (boundaries.isEmpty()
+                || boundaries.last() != boundary) {
+
+                boundaries.append(boundary);
+            }
+        }
+    }
+
+
+    QVector<SyllableRange> result;
+
+    int start = 0;
+
+    for (int boundary : boundaries) {
+
+        if (boundary <= start)
+            continue;
+
+        result.append(
+            {start, boundary - start});
+
+        start = boundary;
+    }
+
+    if (start < word.length()) {
+        result.append(
+            {start, word.length() - start});
+    }
+
+    return result;
 }
 
 
@@ -236,49 +445,114 @@ protected:
         if (text.isEmpty())
             return;
 
-        QTextCharFormat format;
-        bool hasFormatting = false;
+        QTextCharFormat baseFormat;
+        bool hasBaseFormatting = false;
 
+
+        /*
+         * Modules typographiques.
+         */
         if (m_configuration.has(
                 AccessibilityModule::AdaptedFont)) {
 
-            format.setFontFamilies(
+            baseFormat.setFontFamilies(
                 QStringList{
                     m_configuration.fontFamily});
 
-            hasFormatting = true;
+            hasBaseFormatting = true;
         }
 
         if (m_configuration.has(
                 AccessibilityModule::LargerText)) {
 
-            format.setFontPointSize(
+            baseFormat.setFontPointSize(
                 m_configuration.fontPointSize);
 
-            hasFormatting = true;
+            hasBaseFormatting = true;
         }
 
         if (m_configuration.has(
                 AccessibilityModule::LetterSpacing)) {
 
-            format.setFontLetterSpacing(
+            baseFormat.setFontLetterSpacing(
                 m_configuration
                     .letterSpacingPercent);
 
-            hasFormatting = true;
+            hasBaseFormatting = true;
         }
 
         if (m_configuration.has(
                 AccessibilityModule::WordSpacing)) {
 
-            format.setFontWordSpacing(
+            baseFormat.setFontWordSpacing(
                 m_configuration.wordSpacing);
 
-            hasFormatting = true;
+            hasBaseFormatting = true;
         }
 
-        if (hasFormatting)
-            setFormat(0, text.length(), format);
+
+        if (hasBaseFormatting) {
+            setFormat(
+                0,
+                text.length(),
+                baseFormat);
+        }
+
+
+        /*
+         * Coloration syllabique.
+         *
+         * Couche purement visuelle :
+         * aucune couleur n'est enregistree dans le HTML du Mathom.
+         */
+        if (m_configuration.has(
+                AccessibilityModule::SyllableColoring)) {
+
+            static const QRegularExpression wordExpression(
+                QStringLiteral("\\p{L}+"),
+                QRegularExpression::
+                    UseUnicodePropertiesOption);
+
+            auto matches =
+                wordExpression.globalMatch(text);
+
+            while (matches.hasNext()) {
+
+                const QRegularExpressionMatch match =
+                    matches.next();
+
+                const QString word =
+                    match.captured();
+
+                const QVector<SyllableRange> ranges =
+                    syllableRanges(word);
+
+                for (int index = 0;
+                     index < ranges.size();
+                     ++index) {
+
+                    const SyllableRange &range =
+                        ranges.at(index);
+
+                    QTextCharFormat format =
+                        baseFormat;
+
+                    const QColor color =
+                        (index % 2 == 0)
+                        ? m_configuration.syllableColor1
+                        : m_configuration.syllableColor2;
+
+                    format.setForeground(
+                        QBrush(color));
+
+                    setFormat(
+                        match.capturedStart()
+                            + range.start,
+                        range.length,
+                        format);
+                }
+            }
+        }
     }
 
 private:
@@ -451,6 +725,19 @@ void AccessibilitySettings::applyToTextEditor(
         }
 
         cursor.setBlockFormat(format);
+    }
+
+    /*
+     * Les modules visuels tels que la coloration syllabique
+     * utilisent egalement le highlighter dans l'editeur texte brut.
+     */
+    AccessibilityHighlighter *highlighter =
+        accessibilityHighlighter(
+            editor->document());
+
+    if (highlighter) {
+        highlighter->setConfiguration(
+            configuration);
     }
 
     editor->viewport()->update();

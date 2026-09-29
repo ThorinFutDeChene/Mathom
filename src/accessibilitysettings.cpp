@@ -549,6 +549,195 @@ QVector<SyllableRange> syllableRanges(
 }
 
 
+
+/*
+ * Premiere segmentation phonemique de Mathom.
+ *
+ * Cette couche reconnait volontairement les correspondances
+ * graphemes-sons francaises les plus fiables.
+ *
+ * Elle reste independante du moteur syllabique.
+ */
+int phonemeGraphemeLength(
+    const QString &word,
+    int position)
+{
+    if (position < 0
+        || position >= word.length()) {
+
+        return 0;
+    }
+
+    const QString lower =
+        word.toLower();
+
+    auto matches =
+        [&lower, position](
+            const QString &sequence)
+    {
+        return position + sequence.length()
+                <= lower.length()
+            && lower.mid(
+                   position,
+                   sequence.length())
+                == sequence;
+    };
+
+
+    /*
+     * Voyelles nasales.
+     *
+     * On ne fusionne pas n/m lorsque la consonne
+     * est suivie d'une voyelle ou lorsqu'elle est double.
+     */
+    static const QStringList nasalGroups = {
+        QStringLiteral("ain"),
+        QStringLiteral("ein"),
+        QStringLiteral("aim"),
+        QStringLiteral("eim"),
+        QStringLiteral("oin"),
+
+        QStringLiteral("an"),
+        QStringLiteral("am"),
+        QStringLiteral("en"),
+        QStringLiteral("em"),
+        QStringLiteral("on"),
+        QStringLiteral("om"),
+        QStringLiteral("in"),
+        QStringLiteral("im"),
+        QStringLiteral("un"),
+        QStringLiteral("um"),
+        QStringLiteral("yn"),
+        QStringLiteral("ym")
+    };
+
+    for (const QString &group : nasalGroups) {
+
+        if (!matches(group))
+            continue;
+
+        const int nextPosition =
+            position + group.length();
+
+        if (nextPosition < lower.length()) {
+
+            const QChar next =
+                lower.at(nextPosition);
+
+            const QChar final =
+                group.at(group.length() - 1);
+
+            if (isFrenchVowelLetter(next)
+                || next == final) {
+
+                continue;
+            }
+        }
+
+        return group.length();
+    }
+
+
+    /*
+     * Graphemes vocaliques courants.
+     */
+    static const QStringList vowelGroups = {
+        QStringLiteral("eau"),
+        QStringLiteral("oeu"),
+        QStringLiteral("œu"),
+        QStringLiteral("ou"),
+        QStringLiteral("oi"),
+        QStringLiteral("au"),
+        QStringLiteral("ai"),
+        QStringLiteral("ei"),
+        QStringLiteral("eu")
+    };
+
+    for (const QString &group : vowelGroups) {
+        if (matches(group))
+            return group.length();
+    }
+
+
+    /*
+     * Graphemes consonantiques courants.
+     */
+    static const QStringList consonantGroups = {
+        QStringLiteral("ch"),
+        QStringLiteral("ph"),
+        QStringLiteral("gn"),
+        QStringLiteral("qu"),
+        QStringLiteral("th"),
+        QStringLiteral("sh"),
+        QStringLiteral("ck")
+    };
+
+    for (const QString &group : consonantGroups) {
+        if (matches(group))
+            return group.length();
+    }
+
+
+    /*
+     * gu devant e/i/y.
+     */
+    if (matches(QStringLiteral("gu"))
+        && position + 2 < lower.length()) {
+
+        static const QString following =
+            QStringLiteral(
+                "eéèêë"
+                "iîï"
+                "yÿ");
+
+        if (following.contains(
+                lower.at(position + 2))) {
+
+            return 2;
+        }
+    }
+
+
+    /*
+     * Cas simple :
+     * une lettre constitue une unite visuelle.
+     */
+    return 1;
+}
+
+
+QVector<SyllableRange> phonemeRanges(
+    const QString &word)
+{
+    QVector<SyllableRange> result;
+
+    int position = 0;
+
+    while (position < word.length()) {
+
+        const int length =
+            phonemeGraphemeLength(
+                word,
+                position);
+
+        if (length <= 0) {
+            ++position;
+            continue;
+        }
+
+        result.append(
+            {
+                position,
+                length
+            });
+
+        position += length;
+    }
+
+    return result;
+}
+
+
 void applyDyslexiaPreset(
     AccessibilityConfiguration &config)
 {
@@ -807,7 +996,9 @@ protected:
          * aucune couleur n'est enregistree dans le HTML du Mathom.
          */
         if (m_configuration.has(
-                AccessibilityModule::SyllableColoring)) {
+                AccessibilityModule::SyllableColoring)
+            && !m_configuration.has(
+                AccessibilityModule::PhonemeColoring)) {
 
             static const QRegularExpression wordExpression(
                 QStringLiteral("\\p{L}+"),
@@ -827,6 +1018,63 @@ protected:
 
                 const QVector<SyllableRange> ranges =
                     syllableRanges(word);
+
+                for (int index = 0;
+                     index < ranges.size();
+                     ++index) {
+
+                    const SyllableRange &range =
+                        ranges.at(index);
+
+                    QTextCharFormat format =
+                        baseFormat;
+
+                    const QColor color =
+                        (index % 2 == 0)
+                        ? m_configuration.syllableColor1
+                        : m_configuration.syllableColor2;
+
+                    format.setForeground(
+                        QBrush(color));
+
+                    setFormat(
+                        match.capturedStart()
+                            + range.start,
+                        range.length,
+                        format);
+                }
+            }
+        }
+
+
+        /*
+         * Coloration phonemique.
+         *
+         * Si coloration syllabique et phonemique sont
+         * actives simultanement, la couche phonemique
+         * prend la priorite.
+         */
+        if (m_configuration.has(
+                AccessibilityModule::PhonemeColoring)) {
+
+            static const QRegularExpression wordExpression(
+                QStringLiteral("\\p{L}+"),
+                QRegularExpression::
+                    UseUnicodePropertiesOption);
+
+            auto matches =
+                wordExpression.globalMatch(text);
+
+            while (matches.hasNext()) {
+
+                const QRegularExpressionMatch match =
+                    matches.next();
+
+                const QString word =
+                    match.captured();
+
+                const QVector<SyllableRange> ranges =
+                    phonemeRanges(word);
 
                 for (int index = 0;
                      index < ranges.size();

@@ -444,18 +444,23 @@ void MainWindow::showCustomAccessibilityDialog()
      * LireCouleur : coloration des phonemes
      */
 
-    // auto *phonemeColoring =
-    //     new QCheckBox(
-    //         i18n("Coloration des phonèmes"),
-    //         readingGroup);
-    //
-    // phonemeColoring->setChecked(
-    //     custom.readEntry(
-    //         QStringLiteral("phonemeColoring"),
-    //         false));
-    //
-    // readingLayout->addWidget(
-    //     phonemeColoring);
+    auto *phonemeColoring =
+        new QCheckBox(
+            i18n("Coloration des phonèmes"),
+            readingGroup);
+
+    phonemeColoring->setChecked(
+        custom.readEntry(
+            QStringLiteral("phonemeColoring"),
+            false));
+
+    phonemeColoring->setToolTip(
+        i18n(
+            "Repérage visuel des correspondances "
+            "graphèmes-sons courantes du français."));
+
+    readingLayout->addWidget(
+        phonemeColoring);
 
 
     /*
@@ -740,9 +745,9 @@ void MainWindow::showCustomAccessibilityDialog()
         QStringLiteral("syllableColoring"),
         syllableColoring->isChecked());
 
-    // custom.writeEntry(
-    //     QStringLiteral("phonemeColoring"),
-    //     phonemeColoring->isChecked());
+    custom.writeEntry(
+        QStringLiteral("phonemeColoring"),
+        phonemeColoring->isChecked());
 
     // custom.writeEntry(
     //     QStringLiteral("graphemeHighlight"),
@@ -796,7 +801,8 @@ void MainWindow::showCustomAccessibilityDialog()
         || letterSpacing->isChecked()
         || wordSpacing->isChecked()
         || lineSpacing->isChecked()
-        || syllableColoring->isChecked();
+        || syllableColoring->isChecked()
+        || phonemeColoring->isChecked();
 
     KConfigGroup profiles(
         config,

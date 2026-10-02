@@ -102,6 +102,9 @@ BASKET_EXPORT QString fileNameForNewFile(const QString &wantedName, const QStrin
 //! @returns Total size in bytes of all files and subdirectories
 BASKET_EXPORT qint64 computeSizeRecursively(const QString &path);
 
+BASKET_EXPORT QString launcherCommandWithoutFieldCodes(
+    const QString &command);
+
 // Other:
 // void iconForURL(const QUrl &url);
 

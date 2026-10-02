@@ -38,6 +38,63 @@
 
 #include <basket_debug.h>
 
+
+QString Tools::launcherCommandWithoutFieldCodes(
+    const QString &command)
+{
+    /*
+     * Les fichiers .desktop utilisent des field codes tels que
+     * %u, %U, %f ou %F.
+     *
+     * Ils ont un sens lorsqu'un environnement de bureau lance
+     * l'application avec un fichier ou une URL.
+     *
+     * Un Mathom de type Lanceur ne fournit aucun fichier/URL :
+     * ces codes ne doivent donc pas etre transmis litteralement
+     * au programme.
+     *
+     * %% represente en revanche un vrai caractere %.
+     */
+    static const QString fieldCodes =
+        QStringLiteral("fFuUdDnNickvm");
+
+    QString result;
+    result.reserve(command.length());
+
+    for (int index = 0;
+         index < command.length();
+         ++index) {
+
+        const QChar current =
+            command.at(index);
+
+        if (current != QLatin1Char('%')
+            || index + 1 >= command.length()) {
+
+            result.append(current);
+            continue;
+        }
+
+        const QChar code =
+            command.at(index + 1);
+
+        if (code == QLatin1Char('%')) {
+            result.append(QLatin1Char('%'));
+            ++index;
+            continue;
+        }
+
+        if (fieldCodes.contains(code)) {
+            ++index;
+            continue;
+        }
+
+        result.append(current);
+    }
+
+    return result.trimmed();
+}
+
 QString Tools::textToHTML(const QString &text)
 {
     if (text.isEmpty())

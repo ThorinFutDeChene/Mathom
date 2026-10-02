@@ -1329,15 +1329,22 @@ void LauncherEditDialog::slotOk()
     // TODO: Remember if a string has been modified AND IS DIFFERENT FROM THE
     // ORIGINAL!
 
+    const QString command =
+        Tools::launcherCommandWithoutFieldCodes(
+            m_command->runCommand());
+
     KDesktopFile dtFile(m_noteContent->fullPath());
     KConfigGroup grp = dtFile.desktopGroup();
-    grp.writeEntry("Exec", m_command->runCommand());
+    grp.writeEntry("Exec", command);
     grp.writeEntry("Name", m_name->text());
     grp.writeEntry("Icon", m_icon->icon());
 
     // Just for faster feedback: conf object will save to disk (and then
     // m_note->loadContent() called)
-    m_noteContent->setLauncher(m_name->text(), m_icon->icon(), m_command->runCommand());
+    m_noteContent->setLauncher(
+        m_name->text(),
+        m_icon->icon(),
+        command);
     m_noteContent->setEdited();
 }
 

@@ -7,6 +7,7 @@
 #include "variouswidgets.h"
 #include "debugwindow.h"
 #include "mathomicons.h"
+#include "tools.h"
 
 #include <QDialogButtonBox>
 #include <QDrag>
@@ -72,10 +73,15 @@ void RunCommandRequester::slotSelCommand()
 
     KService::Ptr selectedService = dlg->service();
 
-    if (selectedService)
-        m_runCommand->setText(selectedService->exec());
-    else if (!dlg->text().isEmpty())
-        m_runCommand->setText(dlg->text());
+    if (selectedService) {
+        m_runCommand->setText(
+            Tools::launcherCommandWithoutFieldCodes(
+                selectedService->exec()));
+    } else if (!dlg->text().isEmpty()) {
+        m_runCommand->setText(
+            Tools::launcherCommandWithoutFieldCodes(
+                dlg->text()));
+    }
 }
 
 /** class ServiceLaunchRequester: */

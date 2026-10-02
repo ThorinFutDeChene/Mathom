@@ -6014,7 +6014,13 @@ void BasketScene::noteOpen(Note *note)
 
         if (note->content()->type() == NoteType::Launcher) {
             auto *launcherContent = static_cast<LauncherContent *>(note->content());
-            auto *job = new KIO::CommandLauncherJob(launcherContent->exec());
+
+            const QString command =
+                Tools::launcherCommandWithoutFieldCodes(
+                    launcherContent->exec());
+
+            auto *job =
+                new KIO::CommandLauncherJob(command);
             job->setUiDelegate(new KDialogJobUiDelegate(
                 KJobUiDelegate::AutoHandlingEnabled,
                 m_view->window()));

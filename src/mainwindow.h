@@ -38,6 +38,7 @@ public Q_SLOTS:
     void showSettingsDialog();
     void showCustomAccessibilityDialog();
     void showUpdateSettingsDialog();
+    void showAboutMathomDialog();
     void showAboutThorinuxDialog();
     void minimizeRestore();
     void quit();

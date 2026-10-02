@@ -39,24 +39,6 @@ AboutData::AboutData()
               i18n("Mathom Notes maintainer and user support"),
               QStringLiteral("contact@thorinux.fr"));
 
-    // Keep the BasKet lineage visible for attribution, but do not present
-    // historical BasKet contributors as current Mathom contacts.
-    addCredit(QStringLiteral("Carl Schwan"),
-              i18n("BasKet historical co-maintainer"));
-    addCredit(QStringLiteral("Niccolò Venerandi"),
-              i18n("BasKet historical co-maintainer"));
-    addCredit(QStringLiteral("OmegaPhil"),
-              i18n("BasKet historical contributor — paste as plain text option"));
-    addCredit(QStringLiteral("Kelvie Wong"),
-              i18n("BasKet former maintainer"));
-    addCredit(QStringLiteral("Sébastien Laoût"),
-              i18n("BasKet original author"));
-    addCredit(QStringLiteral("Petri Damstén"),
-              i18n("BasKet historical contributor — encryption, Kontact integration, KnowIt importer"));
-    addCredit(QStringLiteral("Alex Gontmakher"),
-              i18n("BasKet historical contributor — auto lock, save-status icon, HTML copy/paste, basket name tooltip, drop to basket name"));
-    addCredit(QStringLiteral("Marco Martin"),
-              i18n("BasKet historical contributor — original icon"));
 }
 
 QString AboutData::componentName()

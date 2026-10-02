@@ -36,6 +36,7 @@
 #include "bnpview.h"
 #include "diagnosticmanager.h"
 #include "global.h"
+#include "mathomicons.h"
 #include "settings.h"
 
 #include <basket_debug.h>
@@ -185,6 +186,19 @@ void MainWindow::setupActions()
 
     customProfileAction->setText(
         i18n("Personnalisé..."));
+
+    QAction *aboutMathomAction =
+        actionCollection()->addAction(
+            QStringLiteral("help_about_app"),
+            this,
+            &MainWindow::showAboutMathomDialog);
+
+    aboutMathomAction->setText(
+        i18n("À propos de Mathom Notes"));
+
+    aboutMathomAction->setIcon(
+        MathomIcons::application());
+
 
     QAction *diagnosticsAction =
         actionCollection()->addAction(QStringLiteral("help_open_diagnostics"), this, []() {
@@ -864,6 +878,168 @@ void MainWindow::showUpdateSettingsDialog()
     Settings::setAllowDevelopmentUpdates(allowDevelopment->isChecked());
     Settings::saveConfig();
 }
+
+void MainWindow::showAboutMathomDialog()
+{
+    QDialog dialog(this);
+
+    dialog.setWindowTitle(
+        i18n("À propos de Mathom Notes"));
+
+    dialog.setWindowIcon(
+        MathomIcons::application());
+
+    dialog.resize(760, 520);
+
+    auto *layout =
+        new QVBoxLayout(&dialog);
+
+    auto *tabs =
+        new QTabWidget(&dialog);
+
+    layout->addWidget(tabs);
+
+
+    auto makePage =
+        [&tabs](const QString &html)
+    {
+        auto *browser =
+            new QTextBrowser(tabs);
+
+        browser->setOpenExternalLinks(true);
+        browser->setHtml(html);
+
+        return browser;
+    };
+
+
+    const QString version =
+        KAboutData::applicationData().version();
+
+
+    /*
+     * A PROPOS
+     */
+    const QString aboutHtml =
+        i18n(
+            "<h2>Mathom Notes %1</h2>"
+            "<p>Mathom Notes est un logiciel libre de prise de notes "
+            "et d'organisation des connaissances.</p>"
+            "<p>Le projet est développé et maintenu par "
+            "<b>Thorinux Systems</b>.</p>"
+            "<p>Mathom Notes est basé sur le projet libre "
+            "<b>BasKet Note Pads</b>.</p>"
+            "<p><b>Site du projet :</b> "
+            "<a href=\"https://github.com/ThorinFutDeChene/Mathom-Notes\">"
+            "GitHub - Mathom Notes</a></p>"
+            "<p><b>Contact :</b> "
+            "<a href=\"mailto:contact@thorinux.fr\">"
+            "contact@thorinux.fr</a></p>",
+            version);
+
+    tabs->addTab(
+        makePage(aboutHtml),
+        i18n("À propos"));
+
+
+    /*
+     * SOUTIENS ULULE
+     */
+    const QString supportersHtml =
+        i18n(
+            "<h2>Soutiens Ulule</h2>"
+            "<p>Cette page remercie les personnes ayant soutenu "
+            "Mathom Notes lors de sa campagne de financement "
+            "participatif sur Ulule.</p>"
+            "<p>Les noms ou pseudonymes des contributeurs ayant "
+            "choisi d'apparaître dans Mathom seront ajoutés ici.</p>"
+            "<p>Merci à toutes celles et ceux qui participent "
+            "au développement et à la pérennité du projet.</p>");
+
+    tabs->addTab(
+        makePage(supportersHtml),
+        i18n("Soutiens Ulule"));
+
+
+    /*
+     * PARTENAIRES ULULE
+     */
+    const QString partnersHtml =
+        i18n(
+            "<h2>Partenaires Ulule</h2>"
+            "<p>Les entreprises, associations et organismes "
+            "partenaires de la campagne Mathom Notes pourront "
+            "être présentés dans cet espace.</p>"
+            "<p>Leur nom, leur logo et, lorsque prévu par la "
+            "contrepartie choisie, un lien vers leur site pourront "
+            "y être affichés.</p>");
+
+    tabs->addTab(
+        makePage(partnersHtml),
+        i18n("Partenaires Ulule"));
+
+
+    /*
+     * COLLECTE ULULE
+     */
+    const QString campaignHtml =
+        i18n(
+            "<h2>Collecte Ulule</h2>"
+            "<p>Mathom Notes est destiné à rester un logiciel "
+            "libre et accessible gratuitement.</p>"
+            "<p>La campagne Ulule permet de financer son "
+            "développement, ses outils d'accessibilité, "
+            "sa documentation et sa diffusion.</p>"
+            "<p>Les informations définitives de la campagne, "
+            "son lien et son bilan seront ajoutés ici.</p>");
+
+    tabs->addTab(
+        makePage(campaignHtml),
+        i18n("Collecte Ulule"));
+
+
+    /*
+     * LICENCE ET ATTRIBUTION
+     */
+    const QString licenseHtml =
+        i18n(
+            "<h2>Licence</h2>"
+            "<p><b>Mathom Notes</b> est distribué sous licence "
+            "<b>GNU GPL version 2 ou ultérieure</b>.</p>"
+            "<p>Copyright © 2026 Thorinux Systems.</p>"
+            "<p>Mathom Notes est un fork de "
+            "<b>BasKet Note Pads</b>.</p>"
+            "<p>Les copyrights, licences et attributions du projet "
+            "d'origine sont conservés dans le code source et les "
+            "fichiers de licence du projet.</p>");
+
+    tabs->addTab(
+        makePage(licenseHtml),
+        i18n("Licence"));
+
+
+    auto *buttons =
+        new QDialogButtonBox(
+            QDialogButtonBox::Close,
+            &dialog);
+
+    connect(
+        buttons,
+        &QDialogButtonBox::rejected,
+        &dialog,
+        &QDialog::reject);
+
+    connect(
+        buttons,
+        &QDialogButtonBox::accepted,
+        &dialog,
+        &QDialog::accept);
+
+    layout->addWidget(buttons);
+
+    dialog.exec();
+}
+
 
 void MainWindow::showAboutThorinuxDialog()
 {

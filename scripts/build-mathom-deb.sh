@@ -192,6 +192,14 @@ install -Dm644 "$ROOT/resources/icons/app/mathom.png" \
 install -Dm644 "$ROOT/resources/icons/app/mathom.png" \
     "$DEBROOT/usr/share/pixmaps/fr.thorinux.mathom.png"
 
+# Les menus GNOME/MATE/Lubuntu ne resolvent pas toujours de facon
+# fiable le nom d'icone du lanceur natif. Le paquet Debian dispose
+# deja d'une icone dediee dans /usr/share/pixmaps : utiliser ici
+# son chemin absolu rend le lanceur independant du theme d'icones.
+sed -i \
+    's|^Icon=.*$|Icon=/usr/share/pixmaps/fr.thorinux.mathom.png|' \
+    "$DEBROOT/usr/share/applications/fr.thorinux.mathom.desktop"
+
 # Installer les icônes Mathom disponibles (PNG et SVG).
 find "$APPDIR/usr/share/icons/hicolor" \
     -type f \( -name 'fr.thorinux.mathom.png' -o -name 'fr.thorinux.mathom.svg' \) |
@@ -253,6 +261,10 @@ grep -q './opt/mathom/usr/lib/plugins/kf6/kio/kio_file.so' "$CONTENTS_LIST"
 grep -q './usr/share/icons/hicolor/scalable/apps/fr.thorinux.mathom.svg' "$CONTENTS_LIST"
 grep -q './usr/share/icons/hicolor/48x48/apps/fr.thorinux.mathom.png' "$CONTENTS_LIST"
 grep -q './usr/share/pixmaps/fr.thorinux.mathom.png' "$CONTENTS_LIST"
+
+grep -qx \
+    'Icon=/usr/share/pixmaps/fr.thorinux.mathom.png' \
+    "$DEBROOT/usr/share/applications/fr.thorinux.mathom.desktop"
 
 if grep -Eq '/opt/basket(/|$)|org\.kde\.basket\.desktop|Mathom \(Nightly\)' "$CONTENTS_LIST"; then
     echo "Erreur : ancienne identité BasKet/Nightly trouvée dans le paquet."

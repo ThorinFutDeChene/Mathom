@@ -929,6 +929,8 @@ void MainWindow::showAboutMathomDialog()
             "<b>Thorinux Systems</b>.</p>"
             "<p>Mathom Notes est basé sur le projet libre "
             "<b>BasKet Note Pads</b>.</p>"
+            "<p>Mathom Notes utilise <b>Qt 6</b> et "
+            "<b>KDE Frameworks 6</b> fournis par le système.</p>"
             "<p><b>Site du projet :</b> "
             "<a href=\"https://github.com/ThorinFutDeChene/Mathom-Notes\">"
             "GitHub - Mathom Notes</a></p>"
@@ -943,40 +945,69 @@ void MainWindow::showAboutMathomDialog()
 
 
     /*
-     * SOUTIENS ULULE
+     * COLLABORATEURS
+     */
+    const QString collaboratorsHtml =
+        i18n(
+            "<h2>Collaborateurs</h2>"
+            "<p>Mathom Notes est développé avec une volonté de "
+            "transparence sur les personnes et les outils ayant "
+            "participé au projet.</p>"
+
+            "<h3>Fabrice PEREYRON</h3>"
+            "<p>Conception du projet, développement, tests, "
+            "maintenance et direction de Mathom Notes.</p>"
+
+            "<h3>ChatGPT (OpenAI)</h3>"
+            "<p>Assistance au développement, analyse de code, "
+            "débogage, documentation, structuration technique "
+            "et aide à la conception.</p>"
+
+            "<p><i>ChatGPT est utilisé comme outil d'assistance. "
+            "La conception, les choix fonctionnels, les validations "
+            "et la maintenance du projet restent sous la responsabilité "
+            "du développeur de Mathom Notes.</i></p>");
+
+    tabs->addTab(
+        makePage(collaboratorsHtml),
+        i18n("Collaborateurs"));
+
+
+    /*
+     * SOUTIENS PARTICULIERS
      */
     const QString supportersHtml =
         i18n(
-            "<h2>Soutiens Ulule</h2>"
-            "<p>Cette page remercie les personnes ayant soutenu "
-            "Mathom Notes lors de sa campagne de financement "
-            "participatif sur Ulule.</p>"
+            "<h2>Soutiens particuliers</h2>"
+            "<p>Cet espace remercie les personnes ayant soutenu "
+            "financièrement Mathom Notes à titre personnel.</p>"
             "<p>Les noms ou pseudonymes des contributeurs ayant "
-            "choisi d'apparaître dans Mathom seront ajoutés ici.</p>"
-            "<p>Merci à toutes celles et ceux qui participent "
+            "choisi d'apparaître dans Mathom Notes seront affichés ici.</p>"
+            "<p>Le montant de leur contribution n'est pas publié.</p>"
+            "<p>Merci à toutes celles et ceux qui contribuent "
             "au développement et à la pérennité du projet.</p>");
 
     tabs->addTab(
         makePage(supportersHtml),
-        i18n("Soutiens Ulule"));
+        i18n("Soutiens particuliers"));
 
 
     /*
-     * PARTENAIRES ULULE
+     * PARTENAIRES FINANCIERS
      */
     const QString partnersHtml =
         i18n(
-            "<h2>Partenaires Ulule</h2>"
-            "<p>Les entreprises, associations et organismes "
-            "partenaires de la campagne Mathom Notes pourront "
-            "être présentés dans cet espace.</p>"
-            "<p>Leur nom, leur logo et, lorsque prévu par la "
-            "contrepartie choisie, un lien vers leur site pourront "
-            "y être affichés.</p>");
+            "<h2>Partenaires financiers</h2>"
+            "<p>Cet espace est réservé aux entreprises, associations "
+            "et organismes apportant un soutien financier au projet "
+            "Mathom Notes.</p>"
+            "<p>Selon les modalités du partenariat, leur nom, "
+            "leur logo et un lien vers leur site pourront être "
+            "présentés ici.</p>");
 
     tabs->addTab(
         makePage(partnersHtml),
-        i18n("Partenaires Ulule"));
+        i18n("Partenaires financiers"));
 
 
     /*

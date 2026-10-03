@@ -129,7 +129,7 @@
    <Action name="help_check_updates" />
    <Action name="help_open_diagnostics" />
    <Separator/>
-   <Action name="help_about_app" />
+   <Action name="help_about_mathom" />
    <Action name="help_about_thorinux" />
   </Menu>
  </MenuBar>

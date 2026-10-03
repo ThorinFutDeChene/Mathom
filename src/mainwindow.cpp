@@ -189,7 +189,7 @@ void MainWindow::setupActions()
 
     QAction *aboutMathomAction =
         actionCollection()->addAction(
-            QStringLiteral("help_about_app"),
+            QStringLiteral("help_about_mathom"),
             this,
             &MainWindow::showAboutMathomDialog);
 
